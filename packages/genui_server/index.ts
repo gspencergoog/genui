@@ -1,0 +1,9 @@
+// Copyright 2025 The Flutter Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import { startFlowsServer } from '@genkit-ai/flow';
+import './src/generate';
+import './src/session';
+
+startFlowsServer();
