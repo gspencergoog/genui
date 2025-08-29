@@ -19,7 +19,7 @@
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest"
   },
   "keywords": [],
-  "author": "gspencer",
+  "author": "Dash team",
   "license": "ISC",
   "description": "Genkit version of GenUI",
   "dependencies": {

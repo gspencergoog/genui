@@ -31,7 +31,10 @@ class FirestoreCacheService implements ICacheService {
   private sessionCollection = this.db.collection("sessions");
 
   constructor() {
-    this.db.settings({ ignoreUndefinedProperties: true });
+    this.db.settings({
+      ignoreUndefinedProperties: true,
+      databaseId: "genui-sdk-sessions",
+    });
   }
 
   async setSessionCache(
