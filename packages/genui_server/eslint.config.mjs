@@ -5,6 +5,9 @@ import tseslint from 'typescript-eslint';
 import globals from 'globals';
 
 export default tseslint.config(
+  {
+    ignores: ["lib/**", "node_modules/**"],
+  },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -21,6 +24,14 @@ export default tseslint.config(
           'varsIgnorePattern': '^_',
         }
       ]
+    }
+  },
+  {
+    files: ['src/test/**'],
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+      }
     }
   }
 );

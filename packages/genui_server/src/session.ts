@@ -15,14 +15,6 @@ export const startSessionFlow = ai.defineFlow(
       `Received startSession request. Body: ${JSON.stringify(request, null, 2)}`
     );
 
-    const validationResult = startSessionRequestSchema.safeParse(request);
-    if (!validationResult.success) {
-      const message = `Manual validation failed for startSession request:
-${JSON.stringify(request, null, 2)}`;
-      logger.error({ error: validationResult.error.format() }, message);
-      throw new Error(message);
-    }
-
     const resolvedCache =
       (flow.context as CacheFlowContext)?.cache || cacheService;
     logger.info("Starting new session...");
@@ -30,7 +22,7 @@ ${JSON.stringify(request, null, 2)}`;
     logger.debug(`Generated session ID: ${sessionId}`);
     await resolvedCache.setSessionCache(
       sessionId,
-      validationResult.data?.catalog
+      request.catalog
     );
     logger.info(`Successfully started session ${sessionId}`);
     return sessionId;

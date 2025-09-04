@@ -20,9 +20,11 @@ class GenUIClient {
 
   @visibleForTesting
   GenUIClient.withClient(
-    http.Client client, {
+    http.Client client,
+    {
     String baseUrl = 'http://localhost:3400',
-  }) : _baseUrl = baseUrl,
+  })
+    : _baseUrl = baseUrl,
        _client = client;
 
   Future<String> startSession(Catalog catalog) async {
@@ -37,8 +39,10 @@ class GenUIClient {
     }
 
     final requestBody = jsonEncode({
-      'protocolVersion': '0.1.0',
-      'catalog': catalogSchema,
+      'data': {
+        'protocolVersion': '0.1.0',
+        'catalog': catalogSchema,
+      },
     }, toEncodable: toEncodable);
     genUiLogger.info('Request body: $requestBody');
     final response = await _client.post(
@@ -76,8 +80,10 @@ class GenUIClient {
     final request = http.Request('POST', Uri.parse('$_baseUrl/generateUi'));
     request.headers['Content-Type'] = 'application/json';
     request.body = jsonEncode({
-      'sessionId': sessionId,
-      'conversation': conversation.map((m) => m.toJson()).toList(),
+      'data': {
+        'sessionId': sessionId,
+        'conversation': conversation.map((m) => m.toJson()).toList(),
+      },
     });
 
     final response = await _client.send(request);
