@@ -15,7 +15,7 @@ graph TD
         B -- "/startSession" --> C["startSessionFlow"]
         B -- "/generateUi" --> D["generateUiFlow (Streaming)"]
 
-        C -- "Caches Catalog" --> E["Session Cache (In-Memory Map)"]
+        C -- "Caches Catalog" --> E["Session Cache (Firestore)"]
         D -- "Retrieves Catalog" --> E
         D -- "Invokes LLM" --> F{"LLM (Gemini)"}
         F -- "Calls Tools" --> G["UI Tools (addOrUpdateSurface, deleteSurface)"]
@@ -25,11 +25,11 @@ graph TD
 
 ### Core Components
 
-1. **Genkit Framework**: The foundation of the server, providing tools for creating AI flows, managing models, and defining tools.
-2. **TypeScript**: The language for implementation, providing type safety.
-3. **pnpm**: For efficient and deterministic package management.
-4. **Zod**: For defining the schemas for API inputs.
-5. **Session Cache**: A simple in-memory `Map` to store widget catalogs associated with session IDs.
+1.  **Genkit Framework**: The foundation of the server, providing tools for creating AI flows, managing models, and defining tools.
+2.  **TypeScript**: The language for implementation, providing type safety.
+3.  **pnpm**: For efficient and deterministic package management.
+4.  **Zod**: For defining the schemas for API inputs.
+5.  **Session Cache**: A Firestore-based cache to store widget catalogs associated with session IDs.
 
 ## API Design
 
@@ -39,66 +39,59 @@ The server exposes two primary HTTP endpoints, each corresponding to a Genkit fl
 
 This endpoint initializes a new session for a client and corresponds to the `startSessionFlow`.
 
-- **Purpose**: To register a client's UI capabilities (its widget catalog) with the server and establish a session.
-- **Request Body Schema** (`startSessionRequestSchema`):
+-   **Purpose**: To register a client's UI capabilities (its widget catalog) with the server and establish a session.
+-   **Request Body Schema** (`startSessionRequestSchema`):
 
-  ```typescript
-  z.object({
-    protocolVersion: z.string(),
-    catalog: z.any(),
-  });
-  ```
+    ```typescript
+    z.object({
+      protocolVersion: z.string(),
+      catalog: jsonSchema, // A recursive Zod schema for JSON schemas
+    });
+    ```
 
-- **Response Body**: A JSON object containing the unique session identifier.
+-   **Response Body**: A JSON object containing the unique session identifier.
 
-  ```json
-  {
-    "result": "unique-session-identifier"
-  }
-  ```
+    ```json
+    {
+      "result": "unique-session-identifier"
+    }
+    ```
 
 ### 2. `POST /generateUi` (Streaming)
 
 This endpoint generates UI updates in real-time for a given conversation and corresponds to the `generateUiFlow`.
 
-- **Purpose**: To take the current conversation state and generate the next UI to be displayed, streaming tool calls as they are produced by the LLM.
-- **Request Body Schema** (`generateUiRequestSchema`):
+-   **Purpose**: To take the current conversation state and generate the next UI to be displayed, streaming tool calls as they are produced by the LLM.
+-   **Request Body Schema** (`generateUiRequestSchema`):
 
-  ```typescript
-  z.object({
-    sessionId: z.string(),
-    conversation: z.array(z.any()),
-  });
-  ```
+    ```typescript
+    z.object({
+      sessionId: z.string(),
+      conversation: z.array(messageSchema), // A schema for the conversation history
+    });
+    ```
 
-- **Response Body**: A stream of JSON objects. The server yields a chunk for each tool call requested by the LLM.
+-   **Response Body**: A stream of JSON objects. The server yields a chunk for each tool call requested by the LLM, and a final message.
 
-  ```json
-  // Example of a streamed chunk
-  {
-    "type": "toolRequest",
-    "toolRequests": [
-      {
-        "name": "addOrUpdateSurface",
-        "input": {
-          "surfaceId": "some-surface",
-          "definition": { ... }
-        }
-      }
-    ]
-  }
-  ```
+    ```json
+    // Example of a streamed chunk
+    data: {"message":{"role":"model","index":0,"content":[{"toolRequest":{...}}]}}
 
-- **Logic**:
-  1. The flow is a **streaming Genkit flow**.
-  2. It retrieves the `catalog` from the in-memory session cache using the `sessionId`.
-  3. It uses statically defined `addOrUpdateSurface` and `deleteSurface` Genkit tools.
-  4. When the LLM calls one of these tools, the flow immediately `yield`s the `toolRequest` object as a chunk in the response stream.
-  5. The client is responsible for interpreting these tool requests and updating its UI accordingly.
+    // Example of a final message
+    data: {"result":{"message":{...}}}
+    ```
+
+-   **Logic**:
+    1.  The flow is a **streaming Genkit flow**.
+    2.  It retrieves the `catalog` from the Firestore session cache using the `sessionId`.
+    3.  It uses statically defined `addOrUpdateSurface` and `deleteSurface` Genkit tools with strict Zod schemas.
+    4.  It transforms incoming `UiEventPart` messages into descriptive text for the LLM.
+    5.  When the LLM calls one of these tools, the flow immediately `yield`s the `toolRequest` object as a chunk in the response stream.
+    6.  The client is responsible for interpreting these tool requests and updating its UI accordingly.
 
 ## Data Flow
 
-The following diagram illustrates the sequence of interactions, including the streaming response.
+The following diagram illustrates the sequence of interactions, including the streaming response and UI events.
 
 ```mermaid
 sequenceDiagram
@@ -107,17 +100,17 @@ sequenceDiagram
     participant LLM
 
     Client->>+Server: POST /startSession (protocolVersion, catalog)
-    Server->>Server: Cache catalog, generate sessionId
+    Server->>Server: Cache catalog in Firestore, generate sessionId
     Server-->>-Client: 200 OK { result: "sessionId" }
 
     loop Conversation
-        Client->>+Server: POST /generateUi (sessionId, conversation)
+        Client->>+Server: POST /generateUi (sessionId, conversation with UiEvent)
         Server->>Server: Retrieve catalog by sessionId
+        Server->>Server: Convert UiEvent to text for LLM
         Server->>LLM: generateStream(conversation, tools)
         LLM-->>Server: toolRequest: addOrUpdateSurface(...)
-        Server-->>Client: streams { type: "toolRequest", ... }
-        LLM-->>Server: toolRequest: deleteSurface(...)
-        Server-->>Client: streams { type: "toolRequest", ... }
-        Server-->>-Client: Stream ends
+        Server-->>Client: streams { "message": { "content": [{ "toolRequest": ... }]}}
+        LLM-->>Server: Final text response
+        Server-->>-Client: streams { "result": { "message": ... }}
     end
 ```
