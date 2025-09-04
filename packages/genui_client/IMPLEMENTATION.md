@@ -29,9 +29,9 @@ graph TD
 
 2.  **`GenUIClient`**: This class handles all network communication with the `genui_server`.
 
-    -   It manages the `sessionId` for the conversation.
-    -   **`startSession(Catalog catalog)`**: Performs the initial handshake.
-    -   **`generateUI(String sessionId, List<ChatMessage> conversation)`**: Returns a `Stream<ChatMessage>` from the server. The client listens to this stream to receive real-time UI updates and final text messages.
+    - It manages the `sessionId` for the conversation.
+    - **`startSession(Catalog catalog)`**: Performs the initial handshake.
+    - **`generateUI(String sessionId, List<ChatMessage> conversation)`**: Returns a `Stream<ChatMessage>` from the server. The client listens to this stream to receive real-time UI updates and final text messages.
 
 3.  **`GenUiManager`**: The client-side state manager for all dynamic UI surfaces. It implements the `SurfaceBuilder` interface and holds the `WidgetValueStore` to maintain the state of individual widgets (e.g., text field input).
 
