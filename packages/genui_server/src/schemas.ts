@@ -97,5 +97,6 @@ export const generateUiRequestSchema = z.object({
 
 type Part = z.infer<typeof partSchema>;
 type Message = z.infer<typeof messageSchema>;
+type GenerateUiRequest = z.infer<typeof generateUiRequestSchema>;
 
-export type { Part, Message };
+export type { Part, Message, GenerateUiRequest };

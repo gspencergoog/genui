@@ -3,9 +3,9 @@
   "packages": [
     {
       "name": "_fe_analyzer_shared",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/_fe_analyzer_shared-85.0.0",
+      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/_fe_analyzer_shared-88.0.0",
       "packageUri": "lib/",
-      "languageVersion": "3.5"
+      "languageVersion": "3.7"
     },
     {
       "name": "_flutterfire_internals",
@@ -15,9 +15,9 @@
     },
     {
       "name": "analyzer",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/analyzer-7.7.1",
+      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/analyzer-8.1.1",
       "packageUri": "lib/",
-      "languageVersion": "3.5"
+      "languageVersion": "3.7"
     },
     {
       "name": "args",
@@ -39,37 +39,7 @@
     },
     {
       "name": "build",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/build-3.1.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.7"
-    },
-    {
-      "name": "build_config",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/build_config-1.2.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.7"
-    },
-    {
-      "name": "build_daemon",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/build_daemon-4.0.4",
-      "packageUri": "lib/",
-      "languageVersion": "3.6"
-    },
-    {
-      "name": "build_resolvers",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/build_resolvers-3.0.3",
-      "packageUri": "lib/",
-      "languageVersion": "3.7"
-    },
-    {
-      "name": "build_runner",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/build_runner-2.7.1",
-      "packageUri": "lib/",
-      "languageVersion": "3.7"
-    },
-    {
-      "name": "build_runner_core",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/build_runner_core-9.3.1",
+      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/build-4.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -81,7 +51,7 @@
     },
     {
       "name": "built_value",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/built_value-8.11.1",
+      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/built_value-8.11.2",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -90,12 +60,6 @@
       "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/characters-1.4.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
-    },
-    {
-      "name": "checked_yaml",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/checked_yaml-2.0.4",
-      "packageUri": "lib/",
-      "languageVersion": "3.8"
     },
     {
       "name": "clock",
@@ -135,7 +99,7 @@
     },
     {
       "name": "dart_style",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/dart_style-3.1.1",
+      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/dart_style-3.1.2",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -242,12 +206,6 @@
       "languageVersion": "3.8"
     },
     {
-      "name": "frontend_server_client",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/frontend_server_client-4.0.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.0"
-    },
-    {
       "name": "genui_client",
       "rootUri": "../../",
       "packageUri": "lib/",
@@ -260,22 +218,10 @@
       "languageVersion": "3.3"
     },
     {
-      "name": "graphs",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/graphs-2.3.2",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
-    },
-    {
       "name": "http",
       "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/http-1.5.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
-    },
-    {
-      "name": "http_multi_server",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/http_multi_server-3.2.2",
-      "packageUri": "lib/",
-      "languageVersion": "3.2"
     },
     {
       "name": "http_parser",
@@ -288,18 +234,6 @@
       "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/intl-0.20.2",
       "packageUri": "lib/",
       "languageVersion": "3.3"
-    },
-    {
-      "name": "io",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/io-1.0.5",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
-    },
-    {
-      "name": "json_annotation",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/json_annotation-4.9.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.0"
     },
     {
       "name": "json_rpc_2",
@@ -356,14 +290,8 @@
       "languageVersion": "3.5"
     },
     {
-      "name": "mime",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/mime-2.0.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.2"
-    },
-    {
       "name": "mockito",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/mockito-5.5.0",
+      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/mockito-5.5.1",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -392,40 +320,16 @@
       "languageVersion": "3.0"
     },
     {
-      "name": "pool",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/pool-1.5.1",
-      "packageUri": "lib/",
-      "languageVersion": "2.12"
-    },
-    {
       "name": "pub_semver",
       "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/pub_semver-2.2.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
     {
-      "name": "pubspec_parse",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/pubspec_parse-1.5.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.6"
-    },
-    {
       "name": "rational",
       "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/rational-2.2.3",
       "packageUri": "lib/",
       "languageVersion": "2.14"
-    },
-    {
-      "name": "shelf",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/shelf-1.4.2",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
-    },
-    {
-      "name": "shelf_web_socket",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/shelf_web_socket-3.0.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.5"
     },
     {
       "name": "sky_engine",
@@ -435,7 +339,7 @@
     },
     {
       "name": "source_gen",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/source_gen-3.1.0",
+      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/source_gen-4.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -458,12 +362,6 @@
       "languageVersion": "3.3"
     },
     {
-      "name": "stream_transform",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/stream_transform-2.1.1",
-      "packageUri": "lib/",
-      "languageVersion": "3.1"
-    },
-    {
       "name": "string_scanner",
       "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/string_scanner-1.4.1",
       "packageUri": "lib/",
@@ -480,12 +378,6 @@
       "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/test_api-0.7.7",
       "packageUri": "lib/",
       "languageVersion": "3.5"
-    },
-    {
-      "name": "timing",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/timing-1.0.2",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
     },
     {
       "name": "typed_data",
@@ -564,18 +456,6 @@
       "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/web-1.1.1",
       "packageUri": "lib/",
       "languageVersion": "3.4"
-    },
-    {
-      "name": "web_socket",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/web_socket-1.0.1",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
-    },
-    {
-      "name": "web_socket_channel",
-      "rootUri": "file:///usr/local/google/home/gspencer/.pub-cache/hosted/pub.dev/web_socket_channel-3.0.3",
-      "packageUri": "lib/",
-      "languageVersion": "3.3"
     },
     {
       "name": "yaml",
