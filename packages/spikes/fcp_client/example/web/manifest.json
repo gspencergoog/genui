@@ -1,6 +1,6 @@
 {
-    "name": "example",
-    "short_name": "example",
+    "name": "fcp_client_example",
+    "short_name": "fcp_client_example",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
