@@ -10,6 +10,7 @@ library;
 
 // The service for loading the widget catalog.
 export 'src/core/catalog_service.dart';
+export 'src/core/gsp_interpreter.dart';
 // The registry for custom widget builders.
 export 'src/core/widget_catalog_registry.dart';
 // --- Data Models ---
