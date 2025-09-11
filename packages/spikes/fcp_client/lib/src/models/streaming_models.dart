@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'models.dart';
+import 'render_error.dart';
 
 /// A base type for all incoming stream messages.
 sealed class StreamMessage {
@@ -98,6 +99,7 @@ extension type ClientRequest.fromMap(Map<String, Object?> _json)
     Event? event,
     Layout? layout,
     Map<String, Object?>? state,
+    RenderError? renderError,
   }) => ClientRequest.fromMap(<String, Object?>{
     'messageType': 'ClientRequest',
     if (catalogReference != null) 'catalogReference': catalogReference.toJson(),
@@ -105,6 +107,7 @@ extension type ClientRequest.fromMap(Map<String, Object?> _json)
     if (event != null) 'event': event.toJson(),
     if (layout != null) 'layout': layout.toJson(),
     if (state != null) 'state': state,
+    if (renderError != null) 'renderError': renderError.toJson(),
   });
 
   /// A reference to a predefined base catalog.
@@ -131,6 +134,11 @@ extension type ClientRequest.fromMap(Map<String, Object?> _json)
 
   /// The state of the UI when the event was triggered.
   Map<String, Object?>? get state => _json['state'] as Map<String, Object?>?;
+
+  /// The error that occurred during rendering.
+  RenderError? get renderError => _json['renderError'] != null
+      ? RenderError.fromMap(_json['renderError'] as Map<String, Object?>)
+      : null;
 }
 
 /// A type-safe wrapper for a `CatalogReference` JSON object.

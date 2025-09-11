@@ -50,6 +50,8 @@ class GenUiView extends StatefulWidget {
 }
 
 class _GenUiViewState extends State<GenUiView> {
+  RenderError? _lastReportedError;
+
   @override
   void initState() {
     super.initState();
@@ -62,6 +64,7 @@ class _GenUiViewState extends State<GenUiView> {
     if (widget.interpreter != oldWidget.interpreter) {
       oldWidget.interpreter.removeListener(_rebuild);
       widget.interpreter.addListener(_rebuild);
+      _lastReportedError = null;
     }
   }
 
@@ -72,11 +75,30 @@ class _GenUiViewState extends State<GenUiView> {
   }
 
   void _rebuild() {
-    setState(() {});
+    final RenderError? currentError = widget.interpreter.error;
+    if (widget.onError != null &&
+        currentError != null &&
+        currentError != _lastReportedError) {
+      _lastReportedError = currentError;
+      // Schedule the callback to be called after the build is complete to avoid
+      // calling it during a build.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          widget.onError!(currentError);
+        }
+      });
+    }
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.interpreter.error != null) {
+      final RenderError error = widget.interpreter.error!;
+      return _ErrorWidget(error.errorType, error.message);
+    }
     if (!widget.interpreter.isReadyToRender) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -127,7 +149,7 @@ class _LayoutEngine extends StatelessWidget {
           currentState: interpreter.currentState,
         ),
       );
-      return _ErrorWidget(title, message);
+      return const _ErrorWidget(title, message);
     }
     final Set<String> currentPath = <String>{...visited, nodeId};
 

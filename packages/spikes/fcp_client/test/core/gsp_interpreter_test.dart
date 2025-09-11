@@ -154,19 +154,19 @@ void main() {
     testWidgets('handles malformed JSON gracefully', (
       WidgetTester tester,
     ) async {
-      expect(
-        () => interpreter.processMessage('{"messageType": "Layout", "nodes":'),
-        throwsFormatException,
-      );
+      interpreter.processMessage('{"messageType": "Layout", "nodes":');
+      await tester.pump();
+      expect(interpreter.error, isNotNull);
+      expect(interpreter.error!.errorType, 'JsonParsingError');
     });
 
     testWidgets('handles unknown message type gracefully', (
       WidgetTester tester,
     ) async {
-      expect(
-        () => interpreter.processMessage('{"messageType": "Unknown"}'),
-        throwsFormatException,
-      );
+      interpreter.processMessage('{"messageType": "Unknown"}');
+      await tester.pump();
+      expect(interpreter.error, isNotNull);
+      expect(interpreter.error!.errorType, 'JsonParsingError');
     });
   });
 }

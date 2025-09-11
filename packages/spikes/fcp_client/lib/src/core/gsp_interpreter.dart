@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import '../models/models.dart';
+import '../models/render_error.dart';
 import '../models/streaming_models.dart';
 
 /// A client-side interpreter for the GenUI Streaming Protocol (GSP).
@@ -34,6 +35,7 @@ class GspInterpreter with ChangeNotifier {
   Map<String, Object?> _state = <String, Object?>{};
   String? _rootId;
   bool _isReadyToRender = false;
+  RenderError? _error;
 
   // Public Outputs
 
@@ -51,31 +53,50 @@ class GspInterpreter with ChangeNotifier {
   /// Whether the interpreter has received enough information to render the UI.
   bool get isReadyToRender => _isReadyToRender;
 
+  /// A structured error object if a parsing or rendering error has occurred.
+  RenderError? get error => _error;
+
   /// Processes a single JSONL message from the stream.
   void processMessage(String jsonlMessage) {
+    if (_error != null) {
+      // Once an error has occurred, stop processing further messages.
+      return;
+    }
     if (jsonlMessage.isEmpty) {
       return;
     }
-    final Map<String, Object?> jsonMap =
-        json.decode(jsonlMessage) as Map<String, Object?>;
-    final StreamMessage message = StreamMessage.fromMap(jsonMap);
+    try {
+      final Map<String, Object?> jsonMap =
+          json.decode(jsonlMessage) as Map<String, Object?>;
+      final StreamMessage message = StreamMessage.fromMap(jsonMap);
 
-    switch (message) {
-      case StreamHeader():
-        _handleStreamHeader(message);
-        break;
-      case LayoutMessage():
-        _handleLayout(message);
-        break;
-      case LayoutRoot():
-        _handleLayoutRoot(message);
-        break;
-      case StateUpdateMessage():
-        _handleStateUpdate(message);
-        break;
-      case UnknownCatalogError():
-        _handleUnknownCatalogError(message);
-        break;
+      switch (message) {
+        case StreamHeader():
+          _handleStreamHeader(message);
+          break;
+        case LayoutMessage():
+          _handleLayout(message);
+          break;
+        case LayoutRoot():
+          _handleLayoutRoot(message);
+          break;
+        case StateUpdateMessage():
+          _handleStateUpdate(message);
+          break;
+        case UnknownCatalogError():
+          _handleUnknownCatalogError(message);
+          break;
+      }
+    } on FormatException catch (e, s) {
+      debugPrint('Error processing GSP message: $e\n$s');
+      _error = RenderError(
+        errorType: 'JsonParsingError',
+        message: e.toString(),
+        sourceNodeId: '@stream',
+        fullLayout: currentLayout,
+        currentState: currentState,
+      );
+      notifyListeners();
     }
   }
 
