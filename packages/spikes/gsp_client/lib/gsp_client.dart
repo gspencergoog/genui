@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-/// A client for the Flutter Composition Protocol (FCP).
+/// A client for the GenUI Streaming Protocol (GSP).
 ///
 /// This library provides the necessary components to render a Flutter UI
 /// from a JSON-based definition provided by a server.
@@ -19,5 +19,5 @@ export 'src/core/widget_catalog_registry.dart';
 export 'src/models/models.dart';
 export 'src/models/render_error.dart';
 export 'src/models/streaming_models.dart';
-export 'src/widgets/fcp_provider.dart';
+export 'src/widgets/genui_provider.dart';
 export 'src/widgets/genui_view.dart';

@@ -7,10 +7,10 @@ import 'package:flutter/widgets.dart';
 import '../constants.dart';
 import '../models/models.dart';
 
-/// A function that builds a Flutter [Widget] from an FCP [LayoutNode].
+/// A function that builds a Flutter [Widget] from a [LayoutNode].
 ///
 /// - [context]: The Flutter build context.
-/// - [node]: The FCP layout node containing the original metadata.
+/// - [node]: The layout node containing the original metadata.
 /// - [properties]: A map of resolved properties, combining static values from
 ///   the node and dynamic values from state bindings.
 /// - [children]: A map of already-built child widgets, keyed by the property
@@ -25,13 +25,13 @@ typedef CatalogWidgetBuilder =
     );
 
 /// A container for all the information needed to register a widget with the
-/// FCP client, including its name, its builder function, and its definition
+/// GSP client, including its name, its builder function, and its definition
 /// for the `WidgetCatalog`.
 class CatalogItem {
   /// Creates a catalog item with the given [name], [builder], and [definition].
   ///
   /// The [name] must match the `type` in a `LayoutNode`. The [builder] is the
-  /// function that builds the Flutter widget. The [definition] is the FCP
+  /// function that builds the Flutter widget. The [definition] is the GSP
   /// definition of the widget, including its properties and events.
   const CatalogItem({
     required this.name,
@@ -45,14 +45,14 @@ class CatalogItem {
   /// The function that builds the Flutter widget.
   final CatalogWidgetBuilder builder;
 
-  /// The FCP definition of the widget, including its properties and events.
+  /// The GSP definition of the widget, including its properties and events.
   final WidgetDefinition definition;
 }
 
 /// A registry that maps widget type strings from the catalog to concrete
 /// [CatalogWidgetBuilder] functions.
 ///
-/// This allows the FCP client to be extended with custom widget
+/// This allows the GSP client to be extended with custom widget
 /// implementations.
 class WidgetCatalogRegistry {
   final Map<String, CatalogItem> _registeredWidgets = <String, CatalogItem>{};
@@ -87,12 +87,12 @@ class WidgetCatalogRegistry {
   ///
   /// This method iterates through all the `CatalogItem` instances and
   /// compiles their definitions into a single `WidgetCatalog` object that can
-  /// be passed to the `FcpView`.
+  /// be passed to the `GenUiView`.
   ///
-  /// The [catalogVersion] defaults to [fcpVersion]. The [dataTypes] are
+  /// The [catalogVersion] defaults to [gspVersion]. The [dataTypes] are
   /// any custom data types to be included in the catalog.
   WidgetCatalog buildCatalog({
-    String catalogVersion = fcpVersion,
+    String catalogVersion = gspVersion,
     Map<String, Object?> dataTypes = const <String, Object?>{},
   }) {
     final Map<String, WidgetDefinition?> items = <String, WidgetDefinition?>{};

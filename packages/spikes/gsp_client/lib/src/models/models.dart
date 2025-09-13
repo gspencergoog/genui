@@ -23,7 +23,7 @@ extension JsonEncodeMap on Map<String, Object?> {
   }
 }
 
-/// A base extension type for FCP models that are represented as JSON objects.
+/// A base extension type for GSP models that are represented as JSON objects.
 extension type JsonObjectBase(Map<String, Object?> _json) {
   /// Returns the underlying JSON map.
   Map<String, Object?> toJson() => _json;
@@ -42,9 +42,9 @@ extension type WidgetCatalog.fromMap(Map<String, Object?> _json)
     implements JsonObjectBase {
   /// Creates a new [WidgetCatalog] from a map of [items] and [dataTypes].
   ///
-  /// The [catalogVersion] defaults to [fcpVersion].
+  /// The [catalogVersion] defaults to [gspVersion].
   factory WidgetCatalog({
-    String catalogVersion = fcpVersion,
+    String catalogVersion = gspVersion,
     required Map<String, Object?> dataTypes,
     required Map<String, WidgetDefinition?> items,
   }) => WidgetCatalog.fromMap(<String, Object?>{

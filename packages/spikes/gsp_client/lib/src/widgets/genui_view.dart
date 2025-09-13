@@ -11,7 +11,7 @@ import '../core/widget_catalog_registry.dart';
 import '../models/models.dart';
 import '../models/render_error.dart';
 import '../models/streaming_models.dart';
-import 'fcp_provider.dart';
+import 'genui_provider.dart';
 
 /// The main entry point for rendering a UI from the GenUI Streaming Protocol.
 ///
@@ -102,7 +102,7 @@ class _GenUiViewState extends State<GenUiView> {
     if (!widget.interpreter.isReadyToRender) {
       return const Center(child: CircularProgressIndicator());
     }
-    return FcpProvider(
+    return GenUiProvider(
       onEvent: widget.onEvent,
       onError: widget.onError,
       child: _LayoutEngine(
@@ -129,7 +129,7 @@ class _LayoutEngine extends StatelessWidget {
     String nodeId, [
     Set<String> visited = const <String>{},
   ]) {
-    final ValueChanged<RenderError>? onError = FcpProvider.of(context)?.onError;
+    final ValueChanged<RenderError>? onError = GenUiProvider.of(context)?.onError;
     if (visited.contains(nodeId)) {
       const String title = 'Layout Cycle Detected';
       const String message =

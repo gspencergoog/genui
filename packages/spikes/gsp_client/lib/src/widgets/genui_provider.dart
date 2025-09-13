@@ -7,14 +7,14 @@ import 'package:flutter/material.dart';
 import '../models/render_error.dart';
 import '../models/streaming_models.dart';
 
-/// An [InheritedWidget] that provides FCP-related data to the widget tree.
+/// An [InheritedWidget] that provides GSP-related data to the widget tree.
 ///
 /// This is used to pass the [onEvent] and [onError] callbacks down to widgets
 /// that need to fire events or report errors, without having to pass them
 /// through many layers of widget constructors.
-class FcpProvider extends InheritedWidget {
-  /// Creates an [FcpProvider] that provides callbacks to its descendants.
-  const FcpProvider({
+class GenUiProvider extends InheritedWidget {
+  /// Creates a [GenUiProvider] that provides callbacks to its descendants.
+  const GenUiProvider({
     super.key,
     required super.child,
     this.onEvent,
@@ -28,13 +28,13 @@ class FcpProvider extends InheritedWidget {
   /// A callback function that is invoked when a rendering error occurs.
   final ValueChanged<RenderError>? onError;
 
-  /// Retrieves the [FcpProvider] from the given [context].
-  static FcpProvider? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<FcpProvider>();
+  /// Retrieves the [GenUiProvider] from the given [context].
+  static GenUiProvider? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<GenUiProvider>();
   }
 
   @override
-  bool updateShouldNotify(FcpProvider oldWidget) {
+  bool updateShouldNotify(GenUiProvider oldWidget) {
     return onEvent != oldWidget.onEvent || onError != oldWidget.onError;
   }
 }

@@ -5,9 +5,9 @@
 import 'dart:async';
 
 import 'package:dart_schema_builder/dart_schema_builder.dart';
-import 'package:gsp_client/gsp_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gsp_client/gsp_client.dart';
 
 void main() {
   group('GenUiView', () {
@@ -79,10 +79,10 @@ void main() {
       );
 
       streamController.add(
-        '{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {}}',
+        '''{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {}}''',
       );
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": "Hello"}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": "Hello"}}]}''',
       );
       streamController.add('{"messageType": "LayoutRoot", "rootId": "root"}');
       await tester.pumpAndSettle();
@@ -100,10 +100,10 @@ void main() {
       );
 
       streamController.add(
-        '{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {}}',
+        '''{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {}}''',
       );
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["child1"]}}, {"id": "child1", "type": "Column", "properties": {"children": ["root"]}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["child1"]}}, {"id": "child1", "type": "Column", "properties": {"children": ["root"]}}]}''',
       );
       streamController.add('{"messageType": "LayoutRoot", "rootId": "root"}');
       await tester.pumpAndSettle();
@@ -121,10 +121,10 @@ void main() {
       );
 
       streamController.add(
-        '{"messageType": "StreamHeader", "formatVersion": "1.o.0", "initialState": {}}',
+        '''{"messageType": "StreamHeader", "formatVersion": "1.o.0", "initialState": {}}''',
       );
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "MissingWidget"}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "MissingWidget"}]}''',
       );
       streamController.add('{"messageType": "LayoutRoot", "rootId": "root"}');
       await tester.pumpAndSettle();
@@ -142,10 +142,10 @@ void main() {
       );
 
       streamController.add(
-        '{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {"name": "World"}}',
+        '''{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {"name": "World"}}''',
       );
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": "Hello, \${name}!"}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": "Hello, \${name}!"}}]}''',
       );
       streamController.add('{"messageType": "LayoutRoot", "rootId": "root"}');
       await tester.pumpAndSettle();
@@ -161,10 +161,10 @@ void main() {
       );
 
       streamController.add(
-        '{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {"name": "World"}}',
+        '''{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {"name": "World"}}''',
       );
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": {"\$bind": "name"}}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": {"\$bind": "name"}}}]}''',
       );
       streamController.add('{"messageType": "LayoutRoot", "rootId": "root"}');
       await tester.pumpAndSettle();
@@ -182,10 +182,10 @@ void main() {
       );
 
       streamController.add(
-        '{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {}}',
+        '''{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {}}''',
       );
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["child1"]}}, {"id": "child1", "type": "Text", "properties": {"data": "Child 1"}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["child1"]}}, {"id": "child1", "type": "Text", "properties": {"data": "Child 1"}}]}''',
       );
       streamController.add('{"messageType": "LayoutRoot", "rootId": "root"}');
       await tester.pumpAndSettle();
@@ -195,7 +195,7 @@ void main() {
 
       // Now add a child to the column.
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["child1", "child2"]}}, {"id": "child2", "type": "Text", "properties": {"data": "Child 2"}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["child1", "child2"]}}, {"id": "child2", "type": "Text", "properties": {"data": "Child 2"}}]}''',
       );
       await tester.pumpAndSettle();
 
@@ -213,10 +213,10 @@ void main() {
       );
 
       streamController.add(
-        '{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {}}',
+        '''{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {}}''',
       );
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["child1", "child2"]}}, {"id": "child1", "type": "Text", "properties": {"data": "Child 1"}}, {"id": "child2", "type": "Text", "properties": {"data": "Child 2"}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["child1", "child2"]}}, {"id": "child1", "type": "Text", "properties": {"data": "Child 1"}}, {"id": "child2", "type": "Text", "properties": {"data": "Child 2"}}]}''',
       );
       streamController.add('{"messageType": "LayoutRoot", "rootId": "root"}');
       await tester.pumpAndSettle();
@@ -226,7 +226,7 @@ void main() {
 
       // Now remove child2 from the column.
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["child1"]}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["child1"]}}]}''',
       );
       await tester.pumpAndSettle();
 
@@ -242,10 +242,10 @@ void main() {
       );
 
       streamController.add(
-        '{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {"name": "Initial"}}',
+        '''{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {"name": "Initial"}}''',
       );
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": {"\$bind": "name"}}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": {"\$bind": "name"}}}]}''',
       );
       streamController.add('{"messageType": "LayoutRoot", "rootId": "root"}');
       await tester.pumpAndSettle();
@@ -268,10 +268,10 @@ void main() {
       );
 
       streamController.add(
-        '{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {}}',
+        '''{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {}}''',
       );
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": "Initial Text"}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": "Initial Text"}}]}''',
       );
       streamController.add('{"messageType": "LayoutRoot", "rootId": "root"}');
       await tester.pumpAndSettle();
@@ -280,7 +280,7 @@ void main() {
 
       // Now update the properties of the same widget.
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": "Updated Text"}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": "Updated Text"}}]}''',
       );
       await tester.pumpAndSettle();
 
@@ -320,10 +320,10 @@ void main() {
       );
 
       streamController.add(
-        '{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {}}',
+        '''{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {}}''',
       );
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["col1", "col2"]}}, {"id": "col1", "type": "Column", "properties": {"children": ["movable_text"]}}, {"id": "col2", "type": "Column", "properties": {}}, {"id": "movable_text", "type": "Text", "properties": {"data": "Movable"}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["col1", "col2"]}}, {"id": "col1", "type": "Column", "properties": {"children": ["movable_text"]}}, {"id": "col2", "type": "Column", "properties": {}}, {"id": "movable_text", "type": "Text", "properties": {"data": "Movable"}}]}''',
       );
       streamController.add('{"messageType": "LayoutRoot", "rootId": "root"}');
       await tester.pumpAndSettle();
@@ -345,7 +345,7 @@ void main() {
 
       // Now move the text to the second column.
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "col1", "type": "Column", "properties": {}}, {"id": "col2", "type": "Column", "properties": {"children": ["movable_text"]}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "col1", "type": "Column", "properties": {}}, {"id": "col2", "type": "Column", "properties": {"children": ["movable_text"]}}]}''',
       );
       await tester.pumpAndSettle();
 
@@ -373,10 +373,10 @@ void main() {
       );
 
       streamController.add(
-        '{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {}}',
+        '''{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {}}''',
       );
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["text_a", "text_b"]}}, {"id": "text_a", "type": "Text", "properties": {"data": "A"}}, {"id": "text_b", "type": "Text", "properties": {"data": "B"}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["text_a", "text_b"]}}, {"id": "text_a", "type": "Text", "properties": {"data": "A"}}, {"id": "text_b", "type": "Text", "properties": {"data": "B"}}]}''',
       );
       streamController.add('{"messageType": "LayoutRoot", "rootId": "root"}');
       await tester.pumpAndSettle();
@@ -386,7 +386,7 @@ void main() {
 
       // Now reorder the children.
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["text_b", "text_a"]}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Column", "properties": {"children": ["text_b", "text_a"]}}]}''',
       );
       await tester.pumpAndSettle();
 
@@ -404,10 +404,10 @@ void main() {
       );
 
       streamController.add(
-        '{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {"user": {"name": "Alice", "address": {"city": "Initial City"}}}}',
+        '''{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {"user": {"name": "Alice", "address": {"city": "Initial City"}}}}''',
       );
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": "\${user.address.city}"}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": "\${user.address.city}"}}]}''',
       );
       streamController.add('{"messageType": "LayoutRoot", "rootId": "root"}');
       await tester.pumpAndSettle();
@@ -416,14 +416,14 @@ void main() {
 
       // Now update a nested property.
       streamController.add(
-        '{"messageType": "StateUpdate", "state": {"user": {"address": {"city": "Updated City"}}}}',
+        '''{"messageType": "StateUpdate", "state": {"user": {"address": {"city": "Updated City"}}}}''',
       );
       await tester.pumpAndSettle();
 
       expect(find.text('Updated City'), findsOneWidget);
       expect(
         interpreter.currentState['user'],
-        isA<Map>().having(
+        isA<Map<dynamic, dynamic>>().having(
           (Map<dynamic, dynamic> m) => m['name'],
           'name',
           'Alice',
@@ -441,10 +441,10 @@ void main() {
       );
 
       streamController.add(
-        '{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {"name": "Alice"}}',
+        '''{"messageType": "StreamHeader", "formatVersion": "1.0.0", "initialState": {"name": "Alice"}}''',
       );
       streamController.add(
-        '{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": "\${name}"}}]}',
+        '''{"messageType": "Layout", "nodes": [{"id": "root", "type": "Text", "properties": {"data": "\${name}"}}]}''',
       );
       streamController.add('{"messageType": "LayoutRoot", "rootId": "root"}');
       await tester.pumpAndSettle();
