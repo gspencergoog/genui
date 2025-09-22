@@ -2,58 +2,76 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
-
 import 'component.dart';
-import 'data_node.dart';
 
+/// A sealed class for all messages in the GULF Streaming UI Protocol.
 sealed class GulfStreamMessage {
+  /// Creates a [GulfStreamMessage] from a JSON object.
   factory GulfStreamMessage.fromJson(Map<String, dynamic> json) {
-    final type = json['messageType'];
-    switch (type) {
-      case 'StreamHeader':
-        return StreamHeader.fromJson(json);
-      case 'ComponentUpdate':
-        return ComponentUpdate.fromJson(json);
-      case 'DataModelUpdate':
-        return DataModelUpdate.fromJson(json);
-      case 'UIRoot':
-        return UiRoot.fromJson(json);
-      default:
-        throw Exception('Unknown messageType: $type');
+    if (json.containsKey('streamHeader')) {
+      return StreamHeader.fromJson(
+        json['streamHeader'] as Map<String, dynamic>,
+      );
     }
+    if (json.containsKey('beginRendering')) {
+      return BeginRendering.fromJson(
+        json['beginRendering'] as Map<String, dynamic>,
+      );
+    }
+    if (json.containsKey('componentUpdate')) {
+      return ComponentUpdate.fromJson(
+        json['componentUpdate'] as Map<String, dynamic>,
+      );
+    }
+    if (json.containsKey('dataModelUpdate')) {
+      return DataModelUpdate.fromJson(
+        json['dataModelUpdate'] as Map<String, dynamic>,
+      );
+    }
+    throw Exception('Unknown message type in JSON: $json');
   }
-
-  Map<String, dynamic> toJson();
 }
 
+/// A message that contains the version of the protocol.
 class StreamHeader implements GulfStreamMessage {
+  /// Creates a [StreamHeader].
   const StreamHeader({required this.version});
 
+  /// Creates a [StreamHeader] from a JSON object.
   factory StreamHeader.fromJson(Map<String, dynamic> json) {
     return StreamHeader(version: json['version'] as String);
   }
 
+  /// The version of the protocol.
   final String version;
-
-  @override
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{'messageType': 'StreamHeader', 'version': version};
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is StreamHeader && other.version == version;
-  }
-
-  @override
-  int get hashCode => version.hashCode;
 }
 
+/// A message that signals the client to begin rendering the UI.
+class BeginRendering implements GulfStreamMessage {
+  /// Creates a [BeginRendering].
+  const BeginRendering({required this.root, this.styles});
+
+  /// Creates a [BeginRendering] from a JSON object.
+  factory BeginRendering.fromJson(Map<String, dynamic> json) {
+    return BeginRendering(
+      root: json['root'] as String,
+      styles: json['styles'] as Map<String, dynamic>?,
+    );
+  }
+
+  /// The ID of the root component.
+  final String root;
+
+  /// The styles for the UI.
+  final Map<String, dynamic>? styles;
+}
+
+/// A message that contains a list of components to update.
 class ComponentUpdate implements GulfStreamMessage {
+  /// Creates a [ComponentUpdate].
   const ComponentUpdate({required this.components});
 
+  /// Creates a [ComponentUpdate] from a JSON object.
   factory ComponentUpdate.fromJson(Map<String, dynamic> json) {
     return ComponentUpdate(
       components: (json['components'] as List<dynamic>)
@@ -62,87 +80,26 @@ class ComponentUpdate implements GulfStreamMessage {
     );
   }
 
+  /// The list of components to update.
   final List<Component> components;
-
-  @override
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'messageType': 'ComponentUpdate',
-      'components': components.map((c) => c.toJson()).toList(),
-    };
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is ComponentUpdate && listEquals(other.components, components);
-  }
-
-  @override
-  int get hashCode => Object.hashAll(components);
 }
 
+/// A message that contains a data model update.
 class DataModelUpdate implements GulfStreamMessage {
-  const DataModelUpdate({required this.nodes});
+  /// Creates a [DataModelUpdate].
+  const DataModelUpdate({this.path, required this.contents});
 
+  /// Creates a [DataModelUpdate] from a JSON object.
   factory DataModelUpdate.fromJson(Map<String, dynamic> json) {
     return DataModelUpdate(
-      nodes: (json['nodes'] as List<dynamic>)
-          .map((e) => DataModelNode.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      path: json['path'] as String?,
+      contents: json['contents'],
     );
   }
 
-  final List<DataModelNode> nodes;
+  /// The path to the data to update.
+  final String? path;
 
-  @override
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'messageType': 'DataModelUpdate',
-      'nodes': nodes.map((n) => n.toJson()).toList(),
-    };
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is DataModelUpdate && listEquals(other.nodes, nodes);
-  }
-
-  @override
-  int get hashCode => Object.hashAll(nodes);
-}
-
-class UiRoot implements GulfStreamMessage {
-  const UiRoot({required this.root, required this.dataModelRoot});
-
-  factory UiRoot.fromJson(Map<String, dynamic> json) {
-    return UiRoot(
-      root: json['root'] as String,
-      dataModelRoot: json['dataModelRoot'] as String,
-    );
-  }
-
-  final String root;
-  final String dataModelRoot;
-
-  @override
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'messageType': 'UIRoot',
-      'root': root,
-      'dataModelRoot': dataModelRoot,
-    };
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is UiRoot &&
-        other.root == root &&
-        other.dataModelRoot == dataModelRoot;
-  }
-
-  @override
-  int get hashCode => Object.hash(root, dataModelRoot);
+  /// The new contents of the data.
+  final dynamic contents;
 }

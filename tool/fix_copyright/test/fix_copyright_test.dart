@@ -43,6 +43,12 @@ $prefix found in the LICENSE file.''';
   late List<String> error;
   late FakeProcessManager processManager;
 
+  void mockGitLsFiles({List<String> paths = const [], required String stdout}) {
+    processManager.mockCommands.add(
+      MockCommand(command: ['git', 'ls-files', ...paths], stdout: stdout),
+    );
+  }
+
   setUp(() {
     fileSystem = MemoryFileSystem();
     log = <String>[];
@@ -51,7 +57,7 @@ $prefix found in the LICENSE file.''';
     processManager.mockCommands = [
       MockCommand(
         command: ['git', 'rev-parse', '--show-toplevel'],
-        exitCode: 128,
+        stdout: '/',
       ),
     ];
   });
@@ -59,7 +65,6 @@ $prefix found in the LICENSE file.''';
   Future<int> runFixCopyrights({
     List<String> paths = const <String>[],
     bool force = false,
-    bool skipSubmodules = true,
     String year = year,
   }) async {
     return fixCopyrights(
@@ -74,6 +79,7 @@ $prefix found in the LICENSE file.''';
   }
 
   test('updates a file with an incorrect date', () async {
+    mockGitLsFiles(paths: ['test.dart'], stdout: 'test.dart');
     final testFile = fileSystem.file('test.dart')
       ..writeAsStringSync(getBadCopyright());
     final result = await runFixCopyrights(paths: ['test.dart']);
@@ -87,6 +93,7 @@ $prefix found in the LICENSE file.''';
   });
 
   test('updates a file with an incorrect date when forced', () async {
+    mockGitLsFiles(paths: ['test.dart'], stdout: 'test.dart');
     final testFile = fileSystem.file('test.dart')
       ..writeAsStringSync(getBadCopyright());
     final result = await runFixCopyrights(paths: ['test.dart'], force: true);
@@ -100,6 +107,7 @@ $prefix found in the LICENSE file.''';
   });
 
   test('updates a file with a non-matching copyright', () async {
+    mockGitLsFiles(paths: ['test.dart'], stdout: 'test.dart');
     final testFile = fileSystem.file('test.dart')
       ..writeAsStringSync(wrongCopyright);
     final result = await runFixCopyrights(paths: ['test.dart']);
@@ -113,6 +121,7 @@ $prefix found in the LICENSE file.''';
   });
 
   test('updates a file with a non-matching copyright when forced', () async {
+    mockGitLsFiles(paths: ['test.dart'], stdout: 'test.dart');
     final testFile = fileSystem.file('test.dart')
       ..writeAsStringSync(wrongCopyright);
     final result = await runFixCopyrights(paths: ['test.dart'], force: true);
@@ -126,6 +135,7 @@ $prefix found in the LICENSE file.''';
   });
 
   test('updates a file with no copyright', () async {
+    mockGitLsFiles(paths: ['test.dart'], stdout: 'test.dart');
     final testFile = fileSystem.file('test.dart')
       ..writeAsStringSync(randomPreamble);
     final result = await runFixCopyrights(paths: ['test.dart']);
@@ -139,6 +149,7 @@ $prefix found in the LICENSE file.''';
   });
 
   test('updates a file with no copyright when forced', () async {
+    mockGitLsFiles(paths: ['test.dart'], stdout: 'test.dart');
     final testFile = fileSystem.file('test.dart')
       ..writeAsStringSync(randomPreamble);
     final result = await runFixCopyrights(paths: ['test.dart'], force: true);
@@ -155,6 +166,7 @@ $prefix found in the LICENSE file.''';
   });
 
   test('updates a shell script with a shebang and bad copyright', () async {
+    mockGitLsFiles(paths: ['test.sh'], stdout: 'test.sh');
     final testFile = fileSystem.file('test.sh')
       ..writeAsStringSync(
         '$bashShebang\n${getBadCopyright(prefix: '#')}\n$randomShellPreamble',
@@ -174,6 +186,7 @@ $prefix found in the LICENSE file.''';
   });
 
   test('updates a file with an unrecognized shebang', () async {
+    mockGitLsFiles(paths: ['test.sh'], stdout: 'test.sh');
     final testFile = fileSystem.file('test.sh')
       ..writeAsStringSync(
         '$badShebang\n${getBadCopyright(prefix: "#")}\n$randomPreamble',
@@ -193,15 +206,13 @@ $prefix found in the LICENSE file.''';
   });
 
   test('does not update a file that is OK', () async {
+    mockGitLsFiles(paths: ['test.dart'], stdout: 'test.dart');
     final testFile = fileSystem.file('test.dart')
       ..writeAsStringSync('$copyright\n\n$randomPreamble');
     final result = await runFixCopyrights(paths: ['test.dart']);
     expect(result, equals(0));
     expect(log, isEmpty);
-    expect(
-      error,
-      contains('Warning: not a git repository. Cannot check for submodules.'),
-    );
+    expect(error, isEmpty);
     expect(
       testFile.readAsStringSync(),
       equals('$copyright\n\n$randomPreamble'),
@@ -209,6 +220,7 @@ $prefix found in the LICENSE file.''';
   });
 
   test('updates a directory of files', () async {
+    mockGitLsFiles(stdout: 'test1.dart\ntest2.dart\ntest3.dart\ntest4.dart');
     final testFile1 = fileSystem.file('test1.dart')
       ..writeAsStringSync(getBadCopyright());
     final testFile2 = fileSystem.file('test2.dart')
@@ -237,18 +249,17 @@ $prefix found in the LICENSE file.''';
   });
 
   test('does not update an empty file', () async {
+    mockGitLsFiles(paths: ['test.dart'], stdout: 'test.dart');
     final testFile = fileSystem.file('test.dart')..writeAsStringSync('');
     final result = await runFixCopyrights(paths: ['test.dart'], force: true);
     expect(result, equals(0));
     expect(log, isEmpty);
-    expect(
-      error,
-      contains('Warning: not a git repository. Cannot check for submodules.'),
-    );
+    expect(error, isEmpty);
     expect(testFile.readAsStringSync(), isEmpty);
   });
 
   test('updates a file with case-insensitive copyright', () async {
+    mockGitLsFiles(paths: ['test.dart'], stdout: 'test.dart');
     final testFile = fileSystem.file('test.dart')
       ..writeAsStringSync(getBadCopyright().toLowerCase());
     final result = await runFixCopyrights(paths: ['test.dart'], force: true);
@@ -262,6 +273,7 @@ $prefix found in the LICENSE file.''';
   });
 
   test('updates a file with windows line endings', () async {
+    mockGitLsFiles(paths: ['test.dart'], stdout: 'test.dart');
     final testFile = fileSystem.file('test.dart')
       ..writeAsStringSync(getBadCopyright().replaceAll('\n', '\r\n'));
     final result = await runFixCopyrights(paths: ['test.dart'], force: true);
@@ -275,6 +287,7 @@ $prefix found in the LICENSE file.''';
   });
 
   test('updates an xml file', () async {
+    mockGitLsFiles(paths: ['test.xml'], stdout: 'test.xml');
     const xmlPreamble = '<?xml version="1.0" encoding="utf-8"?>\n<root/>';
     const xmlCopyright = '''
 <!-- Copyright 2025 The Flutter Authors.
@@ -295,141 +308,6 @@ found in the LICENSE file. -->''';
         '<?xml version="1.0" encoding="utf-8"?>\n$xmlCopyright\n\n<root/>',
       ),
     );
-  });
-
-  group('submodule handling', () {
-    setUp(() {
-      fileSystem.directory('/submodule').createSync();
-      fileSystem
-          .file('/submodule/test.dart')
-          .writeAsStringSync(getBadCopyright());
-      fileSystem.file('/test.dart').writeAsStringSync(getBadCopyright());
-    });
-
-    test('skips submodules by default', () async {
-      processManager.mockCommands = [
-        MockCommand(
-          command: ['git', 'rev-parse', '--show-toplevel'],
-          stdout: '/',
-        ),
-        MockCommand(
-          command: ['git', 'submodule', 'status', '--recursive'],
-          stdout:
-              ' 1234567890abcdef1234567890abcdef12345678 submodule (v1.2.3)',
-        ),
-      ];
-
-      final result = await runFixCopyrights(force: true);
-
-      expect(result, equals(1));
-      expect(log, contains('/test.dart'));
-      expect(log, contains('Skipping submodule: ./submodule'));
-      expect(log, isNot(contains('/submodule/test.dart')));
-      expect(
-        error,
-        contains('Found 1 files which have out-of-compliance copyrights.'),
-      );
-      expect(
-        fileSystem.file('/test.dart').readAsStringSync(),
-        startsWith(copyright),
-      );
-      expect(
-        fileSystem.file('/submodule/test.dart').readAsStringSync(),
-        equals(getBadCopyright()),
-      );
-      expect(processManager.commands, hasLength(2));
-    });
-
-    test('processes submodules when --no-skip-submodules is passed', () async {
-      processManager.mockCommands = []; // No git commands should be run.
-
-      final result = await runFixCopyrights(force: true, skipSubmodules: false);
-
-      expect(result, equals(1));
-      expect(log, unorderedEquals(['/test.dart', '/submodule/test.dart']));
-      expect(
-        error,
-        contains('Found 2 files which have out-of-compliance copyrights.'),
-      );
-      expect(
-        fileSystem.file('/test.dart').readAsStringSync(),
-        startsWith(copyright),
-      );
-      expect(
-        fileSystem.file('/submodule/test.dart').readAsStringSync(),
-        startsWith(copyright),
-      );
-      expect(processManager.commands, isEmpty);
-    });
-
-    test('handles non-git repository gracefully', () async {
-      processManager.mockCommands = [
-        MockCommand(
-          command: ['git', 'rev-parse', '--show-toplevel'],
-          exitCode: 128,
-        ),
-      ];
-
-      final result = await runFixCopyrights(force: true);
-
-      expect(result, equals(1));
-      expect(log, unorderedEquals(['/test.dart', '/submodule/test.dart']));
-      expect(
-        error,
-        contains('Warning: not a git repository. Cannot check for submodules.'),
-      );
-      expect(
-        error,
-        contains('Found 2 files which have out-of-compliance copyrights.'),
-      );
-      expect(
-        fileSystem.file('/test.dart').readAsStringSync(),
-        startsWith(copyright),
-      );
-      expect(
-        fileSystem.file('/submodule/test.dart').readAsStringSync(),
-        startsWith(copyright),
-      );
-      expect(processManager.commands, hasLength(1));
-    });
-
-    test('handles git submodule status failure gracefully', () async {
-      processManager.mockCommands = [
-        MockCommand(
-          command: ['git', 'rev-parse', '--show-toplevel'],
-          stdout: '/',
-        ),
-        MockCommand(
-          command: ['git', 'submodule', 'status', '--recursive'],
-          exitCode: 1,
-        ),
-      ];
-
-      final result = await runFixCopyrights(force: true);
-
-      expect(result, equals(1));
-      expect(log, unorderedEquals(['/test.dart', '/submodule/test.dart']));
-      expect(
-        error,
-        contains(
-          'Warning: could not get submodule status. Not skipping any '
-          'submodules.',
-        ),
-      );
-      expect(
-        error,
-        contains('Found 2 files which have out-of-compliance copyrights.'),
-      );
-      expect(
-        fileSystem.file('/test.dart').readAsStringSync(),
-        startsWith(copyright),
-      );
-      expect(
-        fileSystem.file('/submodule/test.dart').readAsStringSync(),
-        startsWith(copyright),
-      );
-      expect(processManager.commands, hasLength(2));
-    });
   });
 }
 

@@ -2,274 +2,646 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
+import 'package:equatable/equatable.dart';
 
-class Component {
+import '../utils/json_utils.dart';
+
+/// An exception that is thrown when an unknown component type is encountered.
+class UnknownComponentException implements Exception {
+  UnknownComponentException(this.type);
+
+  /// The unknown component type.
+  final String type;
+
+  @override
+  String toString() => 'Unknown component: $type';
+}
+
+/// A component in the UI.
+class Component extends Equatable {
   const Component({
     required this.id,
-    required this.type,
-    this.value,
-    this.level,
-    this.description,
-    this.direction,
-    this.children,
-    this.distribution,
-    this.alignment,
-    this.child,
-    this.tabItems,
-    this.axis,
-    this.color,
-    this.thickness,
-    this.entryPointChild,
-    this.contentChild,
-    this.label,
-    this.action,
-    this.textFieldType,
-    this.validationRegexp,
-    this.enableDate = true,
-    this.enableTime = false,
-    this.outputFormat,
-    this.options,
-    this.maxAllowedSelections = 1,
-    this.minValue = 0,
-    this.maxValue = 100,
+    this.weight,
+    required this.componentProperties,
   });
 
+  /// Creates a [Component] from a JSON object.
   factory Component.fromJson(Map<String, dynamic> json) {
     return Component(
       id: json['id'] as String,
-      type: json['type'] as String,
-      value: json['value'] != null
-          ? Value.fromJson(json['value'] as Map<String, dynamic>)
-          : null,
-      level: json['level'] as int?,
-      description: json['description'] as String?,
-      direction: json['direction'] as String?,
-      children: json['children'] != null
-          ? Children.fromJson(json['children'] as Map<String, dynamic>)
-          : null,
-      distribution: json['distribution'] as String?,
-      alignment: json['alignment'] as String?,
-      child: json['child'] as String?,
-      tabItems: (json['tabItems'] as List<dynamic>?)
-          ?.map((e) => TabItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      axis: json['axis'] as String?,
-      color: json['color'] as String?,
-      thickness: (json['thickness'] as num?)?.toDouble(),
-      entryPointChild: json['entryPointChild'] as String?,
-      contentChild: json['contentChild'] as String?,
-      label: json['label'] as String?,
-      action: json['action'] != null
-          ? Action.fromJson(json['action'] as Map<String, dynamic>)
-          : null,
-      textFieldType: json['textFieldType'] as String?,
-      validationRegexp: json['validationRegexp'] as String?,
-      enableDate: json['enableDate'] as bool? ?? true,
-      enableTime: json['enableTime'] as bool? ?? false,
-      outputFormat: json['outputFormat'] as String?,
-      options: (json['options'] as List<dynamic>?)
-          ?.map((e) => Option.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      maxAllowedSelections: json['maxAllowedSelections'] as int? ?? 1,
-      minValue: (json['min_value'] as num?)?.toDouble() ?? 0,
-      maxValue: (json['max_value'] as num?)?.toDouble() ?? 100,
+      weight: JsonUtils.parseDouble(json['weight']),
+      componentProperties: ComponentProperties.fromJson(
+        json['componentProperties'] as Map<String, dynamic>,
+      ),
     );
   }
 
+  /// The unique ID of the component.
   final String id;
-  final String type;
-  final Value? value;
-  final int? level;
-  final String? description;
-  final String? direction;
-  final Children? children;
-  final String? distribution;
-  final String? alignment;
-  final String? child;
-  final List<TabItem>? tabItems;
-  final String? axis;
-  final String? color;
-  final double? thickness;
-  final String? entryPointChild;
-  final String? contentChild;
-  final String? label;
-  final Action? action;
-  final String? textFieldType;
-  final String? validationRegexp;
-  final bool enableDate;
-  final bool enableTime;
-  final String? outputFormat;
-  final List<Option>? options;
-  final int maxAllowedSelections;
-  final double minValue;
-  final double maxValue;
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'id': id,
-      'type': type,
-      if (value != null) 'value': value!.toJson(),
-      if (level != null) 'level': level,
-      if (description != null) 'description': description,
-      if (direction != null) 'direction': direction,
-      if (children != null) 'children': children!.toJson(),
-      if (distribution != null) 'distribution': distribution,
-      if (alignment != null) 'alignment': alignment,
-      if (child != null) 'child': child,
-      if (tabItems != null)
-        'tabItems': tabItems!.map((e) => e.toJson()).toList(),
-      if (axis != null) 'axis': axis,
-      if (color != null) 'color': color,
-      if (thickness != null) 'thickness': thickness,
-      if (entryPointChild != null) 'entryPointChild': entryPointChild,
-      if (contentChild != null) 'contentChild': contentChild,
-      if (label != null) 'label': label,
-      if (action != null) 'action': action!.toJson(),
-      if (textFieldType != null) 'textFieldType': textFieldType,
-      if (validationRegexp != null) 'validationRegexp': validationRegexp,
-      'enableDate': enableDate,
-      'enableTime': enableTime,
-      if (outputFormat != null) 'outputFormat': outputFormat,
-      if (options != null) 'options': options!.map((e) => e.toJson()).toList(),
-      'maxAllowedSelections': maxAllowedSelections,
-      'min_value': minValue,
-      'max_value': maxValue,
-    };
-  }
+  /// The weight of the component in a layout.
+  final double? weight;
+
+  /// The properties of the component.
+  final ComponentProperties componentProperties;
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Component &&
-        other.id == id &&
-        other.type == type &&
-        other.value == value &&
-        other.level == level &&
-        other.description == description &&
-        other.direction == direction &&
-        other.children == children &&
-        other.distribution == distribution &&
-        other.alignment == alignment &&
-        other.child == child &&
-        listEquals(other.tabItems, tabItems) &&
-        other.axis == axis &&
-        other.color == color &&
-        other.thickness == thickness &&
-        other.entryPointChild == entryPointChild &&
-        other.contentChild == contentChild &&
-        other.label == label &&
-        other.action == action &&
-        other.textFieldType == textFieldType &&
-        other.validationRegexp == validationRegexp &&
-        other.enableDate == enableDate &&
-        other.enableTime == enableTime &&
-        other.outputFormat == outputFormat &&
-        listEquals(other.options, options) &&
-        other.maxAllowedSelections == maxAllowedSelections &&
-        other.minValue == minValue &&
-        other.maxValue == maxValue;
-  }
-
-  @override
-  int get hashCode => Object.hashAll([
-    id,
-    type,
-    value,
-    level,
-    description,
-    direction,
-    children,
-    distribution,
-    alignment,
-    child,
-    tabItems,
-    axis,
-    color,
-    thickness,
-    entryPointChild,
-    contentChild,
-    label,
-    action,
-    textFieldType,
-    validationRegexp,
-    enableDate,
-    enableTime,
-    outputFormat,
-    options,
-    maxAllowedSelections,
-    minValue,
-    maxValue,
-  ]);
+  List<Object?> get props => [id, weight, componentProperties];
 }
 
-class Value {
-  const Value({
+/// A sealed class for the properties of a component.
+sealed class ComponentProperties extends Equatable {
+  const ComponentProperties();
+
+  /// Creates a [ComponentProperties] from a JSON object.
+  factory ComponentProperties.fromJson(Map<String, dynamic> json) {
+    final type = json.keys.first;
+    final properties = json[type] as Map<String, dynamic>;
+    switch (type) {
+      case 'Heading':
+        return HeadingProperties.fromJson(properties);
+      case 'Text':
+        return TextProperties.fromJson(properties);
+      case 'Image':
+        return ImageProperties.fromJson(properties);
+      case 'Video':
+        return VideoProperties.fromJson(properties);
+      case 'AudioPlayer':
+        return AudioPlayerProperties.fromJson(properties);
+      case 'Row':
+        return RowProperties.fromJson(properties);
+      case 'Column':
+        return ColumnProperties.fromJson(properties);
+      case 'List':
+        return ListProperties.fromJson(properties);
+      case 'Card':
+        return CardProperties.fromJson(properties);
+      case 'Tabs':
+        return TabsProperties.fromJson(properties);
+      case 'Divider':
+        return DividerProperties.fromJson(properties);
+      case 'Modal':
+        return ModalProperties.fromJson(properties);
+      case 'Button':
+        return ButtonProperties.fromJson(properties);
+      case 'CheckBox':
+        return CheckBoxProperties.fromJson(properties);
+      case 'TextField':
+        return TextFieldProperties.fromJson(properties);
+      case 'DateTimeInput':
+        return DateTimeInputProperties.fromJson(properties);
+      case 'MultipleChoice':
+        return MultipleChoiceProperties.fromJson(properties);
+      case 'Slider':
+        return SliderProperties.fromJson(properties);
+      default:
+        throw UnknownComponentException(type);
+    }
+  }
+
+  @override
+  List<Object?> get props => [];
+
+  /// The type of the component.
+  String get componentType;
+}
+
+/// An interface for components that have children.
+abstract class HasChildren {
+  /// The children of the component.
+  Children get children;
+}
+
+/// The properties for a heading component.
+class HeadingProperties extends ComponentProperties {
+  const HeadingProperties({required this.text, required this.level});
+
+  factory HeadingProperties.fromJson(Map<String, dynamic> json) {
+    return HeadingProperties(
+      text: BoundValue.fromJson(json['text'] as Map<String, dynamic>),
+      level: json['level'] as String,
+    );
+  }
+
+  /// The text of the heading.
+  final BoundValue text;
+
+  /// The level of the heading.
+  final String level;
+
+  @override
+  List<Object?> get props => [text, level];
+
+  @override
+  String get componentType => 'Heading';
+}
+
+/// The properties for a text component.
+class TextProperties extends ComponentProperties {
+  const TextProperties({required this.text});
+
+  factory TextProperties.fromJson(Map<String, dynamic> json) {
+    return TextProperties(
+      text: BoundValue.fromJson(json['text'] as Map<String, dynamic>),
+    );
+  }
+
+  /// The text of the component.
+  final BoundValue text;
+
+  @override
+  List<Object?> get props => [text];
+
+  @override
+  String get componentType => 'Text';
+}
+
+/// The properties for an image component.
+class ImageProperties extends ComponentProperties {
+  const ImageProperties({required this.url});
+
+  factory ImageProperties.fromJson(Map<String, dynamic> json) {
+    return ImageProperties(
+      url: BoundValue.fromJson(json['url'] as Map<String, dynamic>),
+    );
+  }
+
+  /// The URL of the image.
+  final BoundValue url;
+
+  @override
+  List<Object?> get props => [url];
+
+  @override
+  String get componentType => 'Image';
+}
+
+/// The properties for a video component.
+class VideoProperties extends ComponentProperties {
+  const VideoProperties({required this.url});
+
+  factory VideoProperties.fromJson(Map<String, dynamic> json) {
+    return VideoProperties(
+      url: BoundValue.fromJson(json['url'] as Map<String, dynamic>),
+    );
+  }
+
+  /// The URL of the video.
+  final BoundValue url;
+
+  @override
+  List<Object?> get props => [url];
+
+  @override
+  String get componentType => 'Video';
+}
+
+/// The properties for an audio player component.
+class AudioPlayerProperties extends ComponentProperties {
+  const AudioPlayerProperties({required this.url, this.description});
+
+  factory AudioPlayerProperties.fromJson(Map<String, dynamic> json) {
+    return AudioPlayerProperties(
+      url: BoundValue.fromJson(json['url'] as Map<String, dynamic>),
+      description: json['description'] != null
+          ? BoundValue.fromJson(json['description'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  /// The URL of the audio.
+  final BoundValue url;
+
+  /// The description of the audio.
+  final BoundValue? description;
+
+  @override
+  List<Object?> get props => [url, description];
+
+  @override
+  String get componentType => 'AudioPlayer';
+}
+
+/// The properties for a row component.
+class RowProperties extends ComponentProperties implements HasChildren {
+  const RowProperties({
+    required this.children,
+    this.distribution,
+    this.alignment,
+  });
+
+  factory RowProperties.fromJson(Map<String, dynamic> json) {
+    return RowProperties(
+      children: Children.fromJson(json['children'] as Map<String, dynamic>),
+      distribution: json['distribution'] as String?,
+      alignment: json['alignment'] as String?,
+    );
+  }
+
+  @override
+  final Children children;
+
+  /// The distribution of the children in the row.
+  final String? distribution;
+
+  /// The alignment of the children in the row.
+  final String? alignment;
+
+  @override
+  List<Object?> get props => [children, distribution, alignment];
+
+  @override
+  String get componentType => 'Row';
+}
+
+/// The properties for a column component.
+class ColumnProperties extends ComponentProperties implements HasChildren {
+  const ColumnProperties({
+    required this.children,
+    this.distribution,
+    this.alignment,
+  });
+
+  factory ColumnProperties.fromJson(Map<String, dynamic> json) {
+    return ColumnProperties(
+      children: Children.fromJson(json['children'] as Map<String, dynamic>),
+      distribution: json['distribution'] as String?,
+      alignment: json['alignment'] as String?,
+    );
+  }
+
+  @override
+  final Children children;
+
+  /// The distribution of the children in the column.
+  final String? distribution;
+
+  /// The alignment of the children in the column.
+  final String? alignment;
+
+  @override
+  List<Object?> get props => [children, distribution, alignment];
+
+  @override
+  String get componentType => 'Column';
+}
+
+/// The properties for a list component.
+class ListProperties extends ComponentProperties implements HasChildren {
+  const ListProperties({
+    required this.children,
+    this.direction,
+    this.alignment,
+  });
+
+  factory ListProperties.fromJson(Map<String, dynamic> json) {
+    return ListProperties(
+      children: Children.fromJson(json['children'] as Map<String, dynamic>),
+      direction: json['direction'] as String?,
+      alignment: json['alignment'] as String?,
+    );
+  }
+
+  @override
+  final Children children;
+
+  /// The direction of the list.
+  final String? direction;
+
+  /// The alignment of the children in the list.
+  final String? alignment;
+
+  @override
+  List<Object?> get props => [children, direction, alignment];
+
+  @override
+  String get componentType => 'List';
+}
+
+/// The properties for a card component.
+class CardProperties extends ComponentProperties {
+  const CardProperties({required this.child});
+
+  factory CardProperties.fromJson(Map<String, dynamic> json) {
+    return CardProperties(child: json['child'] as String);
+  }
+
+  /// The child of the card.
+  final String child;
+
+  @override
+  List<Object?> get props => [child];
+
+  @override
+  String get componentType => 'Card';
+}
+
+/// The properties for a tabs component.
+class TabsProperties extends ComponentProperties {
+  const TabsProperties({required this.tabItems});
+
+  factory TabsProperties.fromJson(Map<String, dynamic> json) {
+    return TabsProperties(
+      tabItems: (json['tabItems'] as List<dynamic>)
+          .map((e) => TabItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  /// The items in the tab bar.
+  final List<TabItem> tabItems;
+
+  @override
+  List<Object?> get props => [tabItems];
+
+  @override
+  String get componentType => 'Tabs';
+}
+
+/// The properties for a divider component.
+class DividerProperties extends ComponentProperties {
+  const DividerProperties({this.axis, this.color, this.thickness});
+
+  factory DividerProperties.fromJson(Map<String, dynamic> json) {
+    return DividerProperties(
+      axis: json['axis'] as String?,
+      color: json['color'] as String?,
+      thickness: JsonUtils.parseDouble(json['thickness']),
+    );
+  }
+
+  /// The axis of the divider.
+  final String? axis;
+
+  /// The color of the divider.
+  final String? color;
+
+  /// The thickness of the divider.
+  final double? thickness;
+
+  @override
+  List<Object?> get props => [axis, color, thickness];
+
+  @override
+  String get componentType => 'Divider';
+}
+
+/// The properties for a modal component.
+class ModalProperties extends ComponentProperties {
+  const ModalProperties({
+    required this.entryPointChild,
+    required this.contentChild,
+  });
+
+  factory ModalProperties.fromJson(Map<String, dynamic> json) {
+    return ModalProperties(
+      entryPointChild: json['entryPointChild'] as String,
+      contentChild: json['contentChild'] as String,
+    );
+  }
+
+  /// The child that triggers the modal.
+  final String entryPointChild;
+
+  /// The child that is displayed in the modal.
+  final String contentChild;
+
+  @override
+  List<Object?> get props => [entryPointChild, contentChild];
+
+  @override
+  String get componentType => 'Modal';
+}
+
+/// The properties for a button component.
+class ButtonProperties extends ComponentProperties {
+  const ButtonProperties({required this.label, required this.action});
+
+  factory ButtonProperties.fromJson(Map<String, dynamic> json) {
+    return ButtonProperties(
+      label: BoundValue.fromJson(json['label'] as Map<String, dynamic>),
+      action: Action.fromJson(json['action'] as Map<String, dynamic>),
+    );
+  }
+
+  /// The label of the button.
+  final BoundValue label;
+
+  /// The action to perform when the button is tapped.
+  final Action action;
+
+  @override
+  List<Object?> get props => [label, action];
+
+  @override
+  String get componentType => 'Button';
+}
+
+/// The properties for a checkbox component.
+class CheckBoxProperties extends ComponentProperties {
+  const CheckBoxProperties({required this.label, required this.value});
+
+  factory CheckBoxProperties.fromJson(Map<String, dynamic> json) {
+    return CheckBoxProperties(
+      label: BoundValue.fromJson(json['label'] as Map<String, dynamic>),
+      value: BoundValue.fromJson(json['value'] as Map<String, dynamic>),
+    );
+  }
+
+  /// The label of the checkbox.
+  final BoundValue label;
+
+  /// The value of the checkbox.
+  final BoundValue value;
+
+  @override
+  List<Object?> get props => [label, value];
+
+  @override
+  String get componentType => 'CheckBox';
+}
+
+/// The properties for a text field component.
+class TextFieldProperties extends ComponentProperties {
+  const TextFieldProperties({
+    this.text,
+    required this.label,
+    this.type,
+    this.validationRegexp,
+  });
+
+  factory TextFieldProperties.fromJson(Map<String, dynamic> json) {
+    return TextFieldProperties(
+      text: json['text'] != null
+          ? BoundValue.fromJson(json['text'] as Map<String, dynamic>)
+          : null,
+      label: BoundValue.fromJson(json['label'] as Map<String, dynamic>),
+      type: json['type'] as String?,
+      validationRegexp: json['validationRegexp'] as String?,
+    );
+  }
+
+  /// The text of the text field.
+  final BoundValue? text;
+
+  /// The label of the text field.
+  final BoundValue label;
+
+  /// The type of the text field.
+  final String? type;
+
+  /// The validation regular expression for the text field.
+  final String? validationRegexp;
+
+  @override
+  List<Object?> get props => [text, label, type, validationRegexp];
+
+  @override
+  String get componentType => 'TextField';
+}
+
+/// The properties for a date/time input component.
+class DateTimeInputProperties extends ComponentProperties {
+  const DateTimeInputProperties({
+    required this.value,
+    this.enableDate,
+    this.enableTime,
+    this.outputFormat,
+  });
+
+  factory DateTimeInputProperties.fromJson(Map<String, dynamic> json) {
+    return DateTimeInputProperties(
+      value: BoundValue.fromJson(json['value'] as Map<String, dynamic>),
+      enableDate: json['enableDate'] as bool?,
+      enableTime: json['enableTime'] as bool?,
+      outputFormat: json['outputFormat'] as String?,
+    );
+  }
+
+  /// The value of the date/time input.
+  final BoundValue value;
+
+  /// Whether to enable the date picker.
+  final bool? enableDate;
+
+  /// Whether to enable the time picker.
+  final bool? enableTime;
+
+  /// The output format of the date/time input.
+  final String? outputFormat;
+
+  @override
+  List<Object?> get props => [value, enableDate, enableTime, outputFormat];
+
+  @override
+  String get componentType => 'DateTimeInput';
+}
+
+/// The properties for a multiple choice component.
+class MultipleChoiceProperties extends ComponentProperties {
+  const MultipleChoiceProperties({
+    required this.selections,
+    this.options,
+    this.maxAllowedSelections,
+  });
+
+  factory MultipleChoiceProperties.fromJson(Map<String, dynamic> json) {
+    return MultipleChoiceProperties(
+      selections: BoundValue.fromJson(
+        json['selections'] as Map<String, dynamic>,
+      ),
+      options: (json['options'] as List<dynamic>?)
+          ?.map((e) => Option.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      maxAllowedSelections: json['maxAllowedSelections'] as int?,
+    );
+  }
+
+  /// The selected values.
+  final BoundValue selections;
+
+  /// The options for the multiple choice component.
+  final List<Option>? options;
+
+  /// The maximum number of allowed selections.
+  final int? maxAllowedSelections;
+
+  @override
+  List<Object?> get props => [selections, options, maxAllowedSelections];
+
+  @override
+  String get componentType => 'MultipleChoice';
+}
+
+/// The properties for a slider component.
+class SliderProperties extends ComponentProperties {
+  const SliderProperties({required this.value, this.minValue, this.maxValue});
+
+  factory SliderProperties.fromJson(Map<String, dynamic> json) {
+    return SliderProperties(
+      value: BoundValue.fromJson(json['value'] as Map<String, dynamic>),
+      minValue: JsonUtils.parseDouble(json['minValue']),
+      maxValue: JsonUtils.parseDouble(json['maxValue']),
+    );
+  }
+
+  /// The value of the slider.
+  final BoundValue value;
+
+  /// The minimum value of the slider.
+  final double? minValue;
+
+  /// The maximum value of the slider.
+  final double? maxValue;
+
+  @override
+  List<Object?> get props => [value, minValue, maxValue];
+
+  @override
+  String get componentType => 'Slider';
+}
+
+/// A value that can be either a literal or a data binding.
+class BoundValue extends Equatable {
+  const BoundValue({
     this.path,
     this.literalString,
     this.literalNumber,
     this.literalBoolean,
-    this.literalObject,
-    this.literalArray,
   });
 
-  factory Value.fromJson(Map<String, dynamic> json) {
-    return Value(
+  factory BoundValue.fromJson(Map<String, dynamic> json) {
+    return BoundValue(
       path: json['path'] as String?,
       literalString: json['literalString'] as String?,
-      literalNumber: (json['literalNumber'] as num?)?.toDouble(),
+      literalNumber: JsonUtils.parseDouble(json['literalNumber']),
       literalBoolean: json['literalBoolean'] as bool?,
-      literalObject: json['literalObject'] as Map<String, dynamic>?,
-      literalArray: json['literalArray'] as List<dynamic>?,
     );
   }
 
+  /// The path to the value in the data model.
   final String? path;
+
+  /// The literal string value.
   final String? literalString;
+
+  /// The literal number value.
   final double? literalNumber;
+
+  /// The literal boolean value.
   final bool? literalBoolean;
-  final Map<String, dynamic>? literalObject;
-  final List<dynamic>? literalArray;
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      if (path != null) 'path': path,
-      if (literalString != null) 'literalString': literalString,
-      if (literalNumber != null) 'literalNumber': literalNumber,
-      if (literalBoolean != null) 'literalBoolean': literalBoolean,
-      if (literalObject != null) 'literalObject': literalObject,
-      if (literalArray != null) 'literalArray': literalArray,
-    };
-  }
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Value &&
-        other.path == path &&
-        other.literalString == literalString &&
-        other.literalNumber == literalNumber &&
-        other.literalBoolean == literalBoolean &&
-        mapEquals(other.literalObject, literalObject) &&
-        listEquals(other.literalArray, literalArray);
-  }
-
-  @override
-  int get hashCode {
-    return Object.hash(
-      path,
-      literalString,
-      literalNumber,
-      literalBoolean,
-      literalObject,
-      literalArray,
-    );
-  }
+  List<Object?> get props => [
+    path,
+    literalString,
+    literalNumber,
+    literalBoolean,
+  ];
 }
 
-class Children {
+/// The children of a component.
+class Children extends Equatable {
   const Children({this.explicitList, this.template});
 
   factory Children.fromJson(Map<String, dynamic> json) {
@@ -283,30 +655,18 @@ class Children {
     );
   }
 
+  /// The explicit list of children.
   final List<String>? explicitList;
+
+  /// The template for the children.
   final Template? template;
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      if (explicitList != null) 'explicitList': explicitList,
-      if (template != null) 'template': template!.toJson(),
-    };
-  }
-
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Children &&
-        listEquals(other.explicitList, explicitList) &&
-        other.template == template;
-  }
-
-  @override
-  int get hashCode => Object.hash(explicitList, template);
+  List<Object?> get props => [explicitList, template];
 }
 
-class Template {
+/// A template for a list of children.
+class Template extends Equatable {
   const Template({required this.componentId, required this.dataBinding});
 
   factory Template.fromJson(Map<String, dynamic> json) {
@@ -316,151 +676,98 @@ class Template {
     );
   }
 
+  /// The ID of the component to use as a template.
   final String componentId;
+
+  /// The data binding for the template.
   final String dataBinding;
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'componentId': componentId,
-      'dataBinding': dataBinding,
-    };
-  }
-
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Template &&
-        other.componentId == componentId &&
-        other.dataBinding == dataBinding;
-  }
-
-  @override
-  int get hashCode => Object.hash(componentId, dataBinding);
+  List<Object?> get props => [componentId, dataBinding];
 }
 
-class TabItem {
+/// An item in a tab bar.
+class TabItem extends Equatable {
   const TabItem({required this.title, required this.child});
 
   factory TabItem.fromJson(Map<String, dynamic> json) {
     return TabItem(
-      title: json['title'] as String,
+      title: BoundValue.fromJson(json['title'] as Map<String, dynamic>),
       child: json['child'] as String,
     );
   }
 
-  final String title;
+  /// The title of the tab.
+  final BoundValue title;
+
+  /// The child of the tab.
   final String child;
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{'title': title, 'child': child};
-  }
-
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is TabItem && other.title == title && other.child == child;
-  }
-
-  @override
-  int get hashCode => Object.hash(title, child);
+  List<Object?> get props => [title, child];
 }
 
-class Action {
-  const Action({required this.action, this.staticContext, this.dynamicContext});
+/// An action to perform when a widget is interacted with.
+class Action extends Equatable {
+  const Action({required this.action, this.context});
 
   factory Action.fromJson(Map<String, dynamic> json) {
     return Action(
       action: json['action'] as String,
-      staticContext: json['staticContext'] as Map<String, dynamic>?,
-      dynamicContext: (json['dynamicContext'] as List<dynamic>?)
-          ?.map((e) => DynamicContextItem.fromJson(e as Map<String, dynamic>))
+      context: (json['context'] as List<dynamic>?)
+          ?.map((e) => ContextItem.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 
+  /// The name of the action.
   final String action;
-  final Map<String, dynamic>? staticContext;
-  final List<DynamicContextItem>? dynamicContext;
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'action': action,
-      if (staticContext != null) 'staticContext': staticContext,
-      if (dynamicContext != null)
-        'dynamicContext': dynamicContext!.map((e) => e.toJson()).toList(),
-    };
-  }
+  /// The context of the action.
+  final List<ContextItem>? context;
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Action &&
-        other.action == action &&
-        mapEquals(other.staticContext, staticContext) &&
-        listEquals(other.dynamicContext, dynamicContext);
-  }
-
-  @override
-  int get hashCode => Object.hash(action, staticContext, dynamicContext);
+  List<Object?> get props => [action, context];
 }
 
-class DynamicContextItem {
-  const DynamicContextItem({required this.key, required this.value});
+/// An item in the context of an action.
+class ContextItem extends Equatable {
+  const ContextItem({required this.key, required this.value});
 
-  factory DynamicContextItem.fromJson(Map<String, dynamic> json) {
-    return DynamicContextItem(
+  factory ContextItem.fromJson(Map<String, dynamic> json) {
+    return ContextItem(
       key: json['key'] as String,
-      value: Value.fromJson(json['value'] as Map<String, dynamic>),
+      value: BoundValue.fromJson(json['value'] as Map<String, dynamic>),
     );
   }
 
+  /// The key of the context item.
   final String key;
-  final Value value;
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{'key': key, 'value': value.toJson()};
-  }
+  /// The value of the context item.
+  final BoundValue value;
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is DynamicContextItem &&
-        other.key == key &&
-        other.value == value;
-  }
-
-  @override
-  int get hashCode => Object.hash(key, value);
+  List<Object?> get props => [key, value];
 }
 
-class Option {
+/// An option in a multiple choice component.
+class Option extends Equatable {
   const Option({required this.label, required this.value});
 
   factory Option.fromJson(Map<String, dynamic> json) {
     return Option(
-      label: json['label'] as String,
+      label: BoundValue.fromJson(json['label'] as Map<String, dynamic>),
       value: json['value'] as String,
     );
   }
 
-  final String label;
+  /// The label of the option.
+  final BoundValue label;
+
+  /// The value of the option.
   final String value;
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{'label': label, 'value': value};
-  }
-
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Option && other.label == label && other.value == value;
-  }
-
-  @override
-  int get hashCode => Object.hash(label, value);
+  List<Object?> get props => [label, value];
 }
