@@ -1,0 +1,6 @@
+ignoredBuiltDependencies:
+  - "@firebase/util"
+  - esbuild
+  - node
+  - protobufjs
+  - unrs-resolver
