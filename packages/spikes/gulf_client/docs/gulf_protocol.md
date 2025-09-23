@@ -133,7 +133,7 @@ The following is a complete, minimal example of a JSONL stream that renders a us
 {"componentUpdate": {"components": [{"id": "profile_card", "componentProperties": {"Card": {"child": "card_content"}}}]}}
 {"componentUpdate": {"components": [{"id": "card_content", "componentProperties": {"Column": {"children": {"explicitList": ["header_row", "bio_text"]}}}}]}}
 {"componentUpdate": {"components": [{"id": "header_row", "componentProperties": {"Row": {"alignment": "center", "children": {"explicitList": ["avatar", "name_column"]}}}}]}}
-{"componentUpdate": {"components": [{"id": "avatar", "componentProperties": {"Image": {"url": {"literalString": "[https://www.example.com/profile.jpg)"}}}}]}}
+{"componentUpdate": {"components": [{"id": "avatar", "componentProperties": {"Image": {"url": {"literalString": "https://www.example.com/profile.jpg"}}}}]}}
 {"componentUpdate": {"components": [{"id": "name_column", "componentProperties": {"Column": {"alignment": "start", "children": {"explicitList": ["name_text", "handle_text"]}}}}]}}
 {"componentUpdate": {"components": [{"id": "name_text", "componentProperties": {"Heading": {"level": "3", "text": {"literalString": "Flutter Fan"}}}}]}}
 {"componentUpdate": {"components": [{"id": "handle_text", "componentProperties": {"Text": {"text": {"literalString": "@flutterdev"}}}}]}}
@@ -400,7 +400,7 @@ Before sending the `ClientEvent`, the client **must** iterate over this `context
 
 ### 5.3. Event Flow Example
 
-1.  **Component Definition** (from `componentUpdate`):
+1.  **Component Definition:** (from `componentUpdate`):
 
     ```json
     {
@@ -420,7 +420,7 @@ Before sending the `ClientEvent`, the client **must** iterate over this `context
     }
     ```
 
-2.  **Data Model** (from `dataModelUpdate`):
+2.  **Data Model:** (from `dataModelUpdate`):
 
     ```json
     {
@@ -461,7 +461,7 @@ A robust client-side interpreter for GULF should be composed of several key comp
 - **Component Buffer:** A `Map<String, Component>` that stores all component instances by their `id`. This is populated by `componentUpdate` messages.
 - **Data Model Store:** A `Map<String, dynamic>` (or similar) that holds the application state. This is built and modified by `dataModelUpdate` messages.
 - **Interpreter State:** A state machine to track if the client is ready to render (e.g., a `_isReadyToRender` boolean that is set to `true` by `beginRendering`).
-- **`**WidgetRegistry**`**:\*\*\*\* A developer-provided map (e.g., `Map<String, WidgetBuilder>`) that associates component type strings ("Row", "Text") with functions that build native widgets.
+- **`WidgetRegistry`**: A developer-provided map (e.g., `Map<String, WidgetBuilder>`) that associates component type strings ("Row", "Text") with functions that build native widgets.
 - **Binding Resolver:** A utility that can take a `BoundValue` (e.g., `{ "path": "user.name" }`) and resolve it against the Data Model Store.
 - **Event Handler:** A function, exposed to the `WidgetRegistry`, that constructs and sends the `ClientEvent` message to the configured REST API endpoint.
 
@@ -471,13 +471,13 @@ This section provides the formal, consolidated JSON Schema (`gulf_schema.json`) 
 
 ```json
 {
-  "title": "A2A UI Protocol Message",
-  "description": "A single message in the A2A streaming UI protocol. Exactly ONE of the properties in this object must be set, corresponding to the specific message type.",
+  "title": "GULF UI Protocol Message",
+  "description": "A single message in the GULF streaming UI protocol. Exactly ONE of the properties in this object must be set, corresponding to the specific message type.",
   "type": "object",
   "properties": {
     "streamHeader": {
       "title": "StreamHeader Message",
-      "description": "A schema for a StreamHeader message in the A2A streaming UI protocol.",
+      "description": "A schema for a StreamHeader message in the GULF streaming UI protocol.",
       "type": "object",
       "properties": {
         "version": {
@@ -489,7 +489,7 @@ This section provides the formal, consolidated JSON Schema (`gulf_schema.json`) 
     },
     "beginRendering": {
       "title": "BeginRendering Message",
-      "description": "A schema for a BeginRendering message in the A2A streaming UI protocol. This message signals that the UI can now be rendered and provides initial root component and styling information.",
+      "description": "A schema for a BeginRendering message in the GULF streaming UI protocol. This message signals that the UI can now be rendered and provides initial root component and styling information.",
       "type": "object",
       "properties": {
         "root": {
@@ -520,7 +520,7 @@ This section provides the formal, consolidated JSON Schema (`gulf_schema.json`) 
     },
     "componentUpdate": {
       "title": "ComponentUpdate Message",
-      "description": "A schema for a ComponentUpdate message in the A2A streaming UI protocol.",
+      "description": "A schema for a ComponentUpdate message in the GULF streaming UI protocol.",
       "type": "object",
       "properties": {
         "components": {
