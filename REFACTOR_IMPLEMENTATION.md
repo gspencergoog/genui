@@ -6,7 +6,7 @@ This document outlines the detailed, phased plan for refactoring the `genui_serv
 
 *This section will be updated after each phase to track progress, learnings, and any deviations from the plan.*
 
--   **Current Status:** Phase 2 is complete. Awaiting approval for the commit before proceeding to Phase 3.
+-   **Current Status:** Phase 4 is complete. Awaiting approval for the commit before proceeding to Phase 5.
 
 ## Phased Implementation
 
@@ -55,44 +55,44 @@ This phase involves creating strongly-typed Zod schemas based on the `gulf_schem
 -   [x] Run `git diff` to verify the changes that have been made.
 -   [x] Present the following commit message for approval: `feat(server): define Zod schemas and Genkit tools for GULF protocol`.
 -   [x] Update the "Journal" section in this document.
--   [ ] Wait for approval before committing the changes or moving on.
+-   [x] Wait for approval before committing the changes or moving on.
 
 ### Phase 3: Core Flow and System Prompt
 
 This phase implements the main `gulfFlow` and the critical system prompt that will guide the LLM to use the new tools correctly.
 
--   [ ] Create a new file: `packages/spikes/gulf_server/src/flow.ts`.
--   [ ] Define the new `gulfFlow` using `ai.defineFlow`.
--   [ ] Implement the new system prompt as a function that takes the client `catalog` schema and injects it. The prompt will instruct the LLM on how to build a UI incrementally using the new tools.
--   [ ] Implement the main body of the flow to call `ai.generateStream()` with the new system prompt, the conversation history, and the GULF tools.
--   [ ] Update `src/index.ts` to export and serve the `gulfFlow`.
+-   [x] Create a new file: `packages/spikes/gulf_server/src/flow.ts`.
+-   [x] Define the new `gulfFlow` using `ai.defineFlow`.
+-   [x] Implement the new system prompt as a function that takes the client `catalog` schema and injects it. The prompt will instruct the LLM on how to build a UI incrementally using the new tools.
+-   [x] Implement the main body of the flow to call `ai.generateStream()` with the new system prompt, the conversation history, and the GULF tools.
+-   [x] Update `src/index.ts` to export and serve the `gulfFlow`.
 
 #### Post-Phase 3 Actions
 
--   [ ] Run the project's TypeScript linter/formatter to clean up the code.
--   [ ] Run `pnpm tsc --noEmit` to check for any compilation errors.
--   [ ] Run `git diff` to verify the changes that have been made.
--   [ ] Present the following commit message for approval: `feat(server): implement core gulfFlow and system prompt for tool-based generation`.
--   [ ] Update the "Journal" section in this document.
--   [ ] Wait for approval before committing the changes or moving on.
+-   [x] Run the project's TypeScript linter/formatter to clean up the code.
+-   [x] Run `pnpm tsc --noEmit` to check for any compilation errors.
+-   [x] Run `git diff` to verify the changes that have been made.
+-   [x] Present the following commit message for approval: `feat(server): implement core gulfFlow and system prompt for tool-based generation`.
+-   [x] Update the "Journal" section in this document.
+-   [x] Wait for approval before committing the changes or moving on.
 
 ### Phase 4: Tool Handling and Streaming Logic
 
 This phase adds the logic to handle the tool calls from the LLM and serialize their output into the GULF JSONL stream.
 
--   [ ] In `packages/spikes/gulf_server/src/flow.ts`, add the streaming logic to the `gulfFlow`.
--   [ ] As `toolRequest` chunks are received from the `ai.generateStream()` call, inspect the tool name.
--   [ ] Based on the tool name, construct the appropriate GULF message object (e.g., `{ "componentUpdate": ... }`).
--   [ ] Serialize the object to a JSON string and use the `streamingCallback` to send it to the client.
--   [ ] Immediately send a `toolResponse` back to the LLM so it can continue its work.
+-   [x] In `packages/spikes/gulf_server/src/flow.ts`, add the streaming logic to the `gulfFlow`.
+-   [x] As `toolRequest` chunks are received from the `ai.generateStream()` call, inspect the tool name.
+-   [x] Based on the tool name, construct the appropriate GULF message object (e.g., `{ "componentUpdate": ... }`).
+-   [x] Serialize the object to a JSON string and use the `streamingCallback` to send it to the client.
+-   [x] Immediately send a `toolResponse` back to the LLM so it can continue its work.
 
 #### Post-Phase 4 Actions
 
--   [ ] Run the project's TypeScript linter/formatter to clean up the code.
--   [ ] Run `pnpm tsc --noEmit` to check for any compilation errors.
--   [ ] Run `git diff` to verify the changes that have been made.
--   [ ] Present the following commit message for approval: `feat(server): implement GULF JSONL streaming from tool requests`.
--   [ ] Update the "Journal" section in this document.
+-   [x] Run the project's TypeScript linter/formatter to clean up the code.
+-   [x] Run `pnpm tsc --noEmit` to check for any compilation errors.
+-   [x] Run `git diff` to verify the changes that have been made.
+-   [x] Present the following commit message for approval: `feat(server): implement GULF JSONL streaming from tool requests`.
+-   [x] Update the "Journal" section in this document.
 -   [ ] Wait for approval before committing the changes or moving on.
 
 ### Phase 5: Testing and Finalization

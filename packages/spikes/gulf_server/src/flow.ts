@@ -98,8 +98,24 @@ export const gulfFlow = ai.defineFlow(
 
       for await (const chunk of stream) {
         if (chunk.toolRequests) {
-          logger.info("Yielding tool request from AI.");
-          streamingCallback(chunk);
+          for (const toolRequest of chunk.toolRequests) {
+            logger.info({ toolRequest }, 'Received tool request from AI.');
+            let gulfMessage = {};
+            switch (toolRequest.toolRequest.name) {
+              case 'componentUpdate':
+                gulfMessage = { componentUpdate: toolRequest.toolRequest.input };
+                break;
+              case 'dataModelUpdate':
+                gulfMessage = { dataModelUpdate: toolRequest.toolRequest.input };
+                break;
+              case 'beginRendering':
+                gulfMessage = { beginRendering: toolRequest.toolRequest.input };
+                break;
+            }
+            const jsonl = JSON.stringify(gulfMessage);
+            // streamingCallback({ content: jsonl + '\n' });
+            // toolRequest.confirm({ status: 'ok' });
+          }
         }
       }
 
