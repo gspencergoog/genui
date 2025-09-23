@@ -6,7 +6,7 @@ This document outlines the detailed, phased plan for refactoring the `genui_serv
 
 *This section will be updated after each phase to track progress, learnings, and any deviations from the plan.*
 
--   **Current Status:** Phase 1 is complete. Awaiting approval for the commit before proceeding to Phase 2.
+-   **Current Status:** Phase 2 is complete. Awaiting approval for the commit before proceeding to Phase 3.
 
 ## Phased Implementation
 
@@ -29,32 +29,32 @@ This phase focuses on creating a new, isolated environment for the GULF server i
 -   [x] Run `git diff` to verify the changes that have been made.
 -   [x] Present the following commit message for approval: `feat(server): scaffold new gulf_server package for GULF protocol implementation`.
 -   [x] Update the "Journal" section in this document.
--   [ ] Wait for approval before committing the changes or moving on.
+-   [x] Wait for approval before committing the changes or moving on.
 
 ### Phase 2: GULF Schema and Tool Definitions
 
 This phase involves creating strongly-typed Zod schemas based on the `gulf_schema.json` and defining the new Genkit tools that the LLM will use.
 
--   [ ] Create a new file: `packages/spikes/gulf_server/src/gulf_schemas.ts`.
--   [ ] In this file, define Zod schemas for the GULF components and tool inputs, referencing `gulf_schema.json` as the source of truth.
+-   [x] Create a new file: `packages/spikes/gulf_server/src/gulf_schemas.ts`.
+-   [x] In this file, define Zod schemas for the GULF components and tool inputs, referencing `gulf_schema.json` as the source of truth.
     -   `gulfComponentSchema`
     -   `componentUpdateToolSchema`
     -   `dataModelUpdateToolSchema`
     -   `beginRenderingToolSchema`
--   [ ] Create a new file: `packages/spikes/gulf_server/src/tools.ts`.
--   [ ] In this file, define the new Genkit tools using `ai.defineTool`:
+-   [x] Create a new file: `packages/spikes/gulf_server/src/tools.ts`.
+-   [x] In this file, define the new Genkit tools using `ai.defineTool`:
     -   `componentUpdateTool`
     -   `dataModelUpdateTool`
     -   `beginRenderingTool`
--   [ ] The implementation of these tools will be simple placeholders for now (e.g., they can just log their input). The flow will handle the actual logic.
+-   [x] The implementation of these tools will be simple placeholders for now (e.g., they can just log their input). The flow will handle the actual logic.
 
 #### Post-Phase 2 Actions
 
--   [ ] Run the project's TypeScript linter/formatter to clean up the code.
--   [ ] Run `pnpm tsc --noEmit` to check for any compilation errors.
--   [ ] Run `git diff` to verify the changes that have been made.
--   [ ] Present the following commit message for approval: `feat(server): define Zod schemas and Genkit tools for GULF protocol`.
--   [ ] Update the "Journal" section in this document.
+-   [x] Run the project's TypeScript linter/formatter to clean up the code.
+-   [x] Run `pnpm tsc --noEmit` to check for any compilation errors.
+-   [x] Run `git diff` to verify the changes that have been made.
+-   [x] Present the following commit message for approval: `feat(server): define Zod schemas and Genkit tools for GULF protocol`.
+-   [x] Update the "Journal" section in this document.
 -   [ ] Wait for approval before committing the changes or moving on.
 
 ### Phase 3: Core Flow and System Prompt
