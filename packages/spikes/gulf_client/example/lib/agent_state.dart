@@ -14,27 +14,47 @@ class AgentState with ChangeNotifier {
 
   final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   GulfInterpreter? _interpreter;
-  A2AGulfConnector? _connector;
+  GulfConnector? _connector;
   AgentCard? _agentCard;
-  final _urlController = TextEditingController(text: 'http://localhost:10002');
+  ServerType _serverType = ServerType.a2a;
+  final _a2aUrlController = TextEditingController(
+    text: 'http://localhost:10002',
+  );
+  final _genkitUrlController = TextEditingController(
+    text: 'http://localhost:3400/gulfFlow',
+  );
 
   GlobalKey<ScaffoldMessengerState> get scaffoldMessengerKey =>
       _scaffoldMessengerKey;
   GulfInterpreter? get interpreter => _interpreter;
-  A2AGulfConnector? get connector => _connector;
+  GulfConnector? get connector => _connector;
   AgentCard? get agentCard => _agentCard;
-  TextEditingController get urlController => _urlController;
+  ServerType get serverType => _serverType;
+  TextEditingController get a2aUrlController => _a2aUrlController;
+  TextEditingController get genkitUrlController => _genkitUrlController;
 
   @override
   void dispose() {
-    _urlController.dispose();
+    _a2aUrlController.dispose();
+    _genkitUrlController.dispose();
     _connector?.dispose();
     _interpreter?.dispose();
     super.dispose();
   }
 
+  void setServerType(ServerType type) {
+    if (_serverType != type) {
+      _serverType = type;
+      unawaited(_fetchCard());
+      notifyListeners();
+    }
+  }
+
   Future<void> fetchCard() async {
-    final url = Uri.tryParse(_urlController.text);
+    final urlText = _serverType == ServerType.a2a
+        ? _a2aUrlController.text
+        : _genkitUrlController.text;
+    final url = Uri.tryParse(urlText);
     if (url == null) {
       _scaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(content: Text('Invalid URL')),
@@ -46,7 +66,7 @@ class AgentState with ChangeNotifier {
     _connector?.dispose();
     _interpreter?.dispose();
 
-    final newConnector = A2AGulfConnector(url: url);
+    final newConnector = createGulfConnector(type: _serverType, url: url);
     try {
       final card = await newConnector.getAgentCard();
       _connector = newConnector;

@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:gulf_client/gulf_client.dart';
 import 'package:provider/provider.dart';
 
 import 'agent_state.dart';
@@ -20,14 +21,24 @@ class SettingsView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextField(
-              controller: agentState.urlController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Enter agent URL',
-                labelText: 'Agent URL',
+            if (agentState.serverType == ServerType.a2a)
+              TextField(
+                controller: agentState.a2aUrlController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Enter A2A agent URL',
+                  labelText: 'A2A Agent URL',
+                ),
+              )
+            else
+              TextField(
+                controller: agentState.genkitUrlController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Enter Genkit server URL',
+                  labelText: 'Genkit Server URL',
+                ),
               ),
-            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: agentState.fetchCard,

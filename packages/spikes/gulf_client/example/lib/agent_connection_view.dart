@@ -125,8 +125,23 @@ class _AgentConnectionViewState extends State<AgentConnectionView>
                     );
                   },
                 ),
+                const Spacer(),
+                SegmentedButton<ServerType>(
+                  segments: const [
+                    ButtonSegment(value: ServerType.a2a, label: Text('A2A')),
+                    ButtonSegment(
+                      value: ServerType.genkit,
+                      label: Text('Genkit'),
+                    ),
+                  ],
+                  selected: {agentState.serverType},
+                  onSelectionChanged: (selection) {
+                    agentState.setServerType(selection.first);
+                  },
+                ),
               ],
             ),
+          const SizedBox(height: 8),
           Expanded(
             child: Card(
               elevation: 2,

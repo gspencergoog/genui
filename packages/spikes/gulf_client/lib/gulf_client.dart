@@ -11,6 +11,7 @@ library;
 export 'src/core/a2a_gulf_connector.dart';
 export 'src/core/genkit_gulf_connector.dart';
 export 'src/core/gulf_connector.dart';
+export 'src/core/gulf_connector_factory.dart';
 export 'src/core/interpreter.dart';
 export 'src/core/widget_registry.dart';
 export 'src/models/chat_message.dart';
