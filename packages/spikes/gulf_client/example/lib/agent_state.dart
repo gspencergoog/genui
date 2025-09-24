@@ -14,14 +14,14 @@ class AgentState with ChangeNotifier {
 
   final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   GulfInterpreter? _interpreter;
-  GulfAgentConnector? _connector;
+  A2AGulfConnector? _connector;
   AgentCard? _agentCard;
   final _urlController = TextEditingController(text: 'http://localhost:10002');
 
   GlobalKey<ScaffoldMessengerState> get scaffoldMessengerKey =>
       _scaffoldMessengerKey;
   GulfInterpreter? get interpreter => _interpreter;
-  GulfAgentConnector? get connector => _connector;
+  A2AGulfConnector? get connector => _connector;
   AgentCard? get agentCard => _agentCard;
   TextEditingController get urlController => _urlController;
 
@@ -46,7 +46,7 @@ class AgentState with ChangeNotifier {
     _connector?.dispose();
     _interpreter?.dispose();
 
-    final newConnector = GulfAgentConnector(url: url);
+    final newConnector = A2AGulfConnector(url: url);
     try {
       final card = await newConnector.getAgentCard();
       _connector = newConnector;

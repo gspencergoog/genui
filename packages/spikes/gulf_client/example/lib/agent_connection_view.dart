@@ -71,7 +71,7 @@ class _AgentConnectionViewState extends State<AgentConnectionView>
     _scrollToBottom();
     agentState.connector!.connectAndSend(
       message,
-      onResponse: (response) {
+      onResponse: (String response) {
         setState(() {
           _chatHistory.add(ChatMessage(text: response, isUser: false));
         });
