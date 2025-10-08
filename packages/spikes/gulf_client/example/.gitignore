@@ -11,6 +11,7 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
+submodules/JSON-Schema-Test-Suite/
 
 # IntelliJ related
 *.iml
