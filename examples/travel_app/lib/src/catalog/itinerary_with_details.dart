@@ -1,31 +1,37 @@
-// Copyright 2025 The Flutter Authors. All rights reserved.
+// Copyright 2025 The Flutter Authors.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-/// @docImport 'itinerary_item.dart';
+/// @docImport 'itinerary_entry.dart';
 library;
 
-import 'package:dart_schema_builder/dart_schema_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_genui/flutter_genui.dart';
+import 'package:json_schema_builder/json_schema_builder.dart';
+
+import '../widgets/dismiss_notification.dart';
 
 final _schema = S.object(
   description:
-      'Widget to show an itinerary or a plan for travel. Use this only for '
-      'refined plans where you have already shown the user filter options '
-      'etc.',
+      'Widget to show an itinerary or a plan for travel. This should contain '
+      'a list of ItineraryDay widgets.',
   properties: {
-    'title': S.string(description: 'The title of the itinerary.'),
-    'subheading': S.string(description: 'The subheading of the itinerary.'),
-    'imageChildId': S.string(
-      description:
-          'The ID of the Image widget to display. The Image fit should '
-          "typically be 'cover'.  Be sure to create an Image widget with a "
-          'matching ID.',
+    'title': A2uiSchemas.stringReference(
+      description: 'The title of the itinerary.',
     ),
-    'child': S.string(
+    'subheading': A2uiSchemas.stringReference(
+      description: 'The subheading of the itinerary.',
+    ),
+    'imageChildId': A2uiSchemas.componentReference(
       description:
-          '''The ID of a child widget to display in a modal. This should typically be a Column which contains a sequence of ItineraryItems, Text, TravelCarousel etc. Most of the content should be the trip details shown in ItineraryItems, but try to break it up with other elements showing related content. If there are multiple sections to the itinerary, you can use the TabbedSections to break them up.''',
+          'The ID of the Image widget to display. The Image fit '
+          "should typically be 'cover'. Be sure to create an Image widget "
+          'with a matching ID.',
+    ),
+    'child': A2uiSchemas.componentReference(
+      description:
+          'The ID of a child widget to display in a modal. This should '
+          'typically be a Column which contains a sequence of ItineraryDays.',
     ),
   },
   required: ['title', 'subheading', 'imageChildId', 'child'],
@@ -33,8 +39,8 @@ final _schema = S.object(
 
 extension type _ItineraryWithDetailsData.fromMap(Map<String, Object?> _json) {
   factory _ItineraryWithDetailsData({
-    required String title,
-    required String subheading,
+    required JsonMap title,
+    required JsonMap subheading,
     required String imageChildId,
     required String child,
   }) => _ItineraryWithDetailsData.fromMap({
@@ -44,8 +50,8 @@ extension type _ItineraryWithDetailsData.fromMap(Map<String, Object?> _json) {
     'child': child,
   });
 
-  String get title => _json['title'] as String;
-  String get subheading => _json['subheading'] as String;
+  JsonMap get title => _json['title'] as JsonMap;
+  JsonMap get subheading => _json['subheading'] as JsonMap;
   String get imageChildId => _json['imageChildId'] as String;
   String get child => _json['child'] as String;
 }
@@ -57,8 +63,7 @@ extension type _ItineraryWithDetailsData.fromMap(Map<String, Object?> _json) {
 /// prominent image to give the user a quick overview of the proposed trip.
 ///
 /// When tapped, it presents a modal bottom sheet containing the detailed
-/// breakdown of the itinerary, which is typically composed of a `Column` of
-/// [itineraryItem] widgets and other supplemental content.
+/// breakdown of the itinerary.
 final itineraryWithDetails = CatalogItem(
   name: 'ItineraryWithDetails',
   dataSchema: _schema,
@@ -69,7 +74,7 @@ final itineraryWithDetails = CatalogItem(
         required buildChild,
         required dispatchEvent,
         required context,
-        required values,
+        required dataContext,
       }) {
         final itineraryWithDetailsData = _ItineraryWithDetailsData.fromMap(
           data as Map<String, Object?>,
@@ -77,9 +82,16 @@ final itineraryWithDetails = CatalogItem(
         final child = buildChild(itineraryWithDetailsData.child);
         final imageChild = buildChild(itineraryWithDetailsData.imageChildId);
 
+        final titleNotifier = dataContext.subscribeToString(
+          itineraryWithDetailsData.title,
+        );
+        final subheadingNotifier = dataContext.subscribeToString(
+          itineraryWithDetailsData.subheading,
+        );
+
         return _ItineraryWithDetails(
-          title: itineraryWithDetailsData.title,
-          subheading: itineraryWithDetailsData.subheading,
+          titleNotifier: titleNotifier,
+          subheadingNotifier: subheadingNotifier,
           imageChild: imageChild,
           child: child,
         );
@@ -87,14 +99,14 @@ final itineraryWithDetails = CatalogItem(
 );
 
 class _ItineraryWithDetails extends StatelessWidget {
-  final String title;
-  final String subheading;
+  final ValueNotifier<String?> titleNotifier;
+  final ValueNotifier<String?> subheadingNotifier;
   final Widget imageChild;
   final Widget child;
 
   const _ItineraryWithDetails({
-    required this.title,
-    required this.subheading,
+    required this.titleNotifier,
+    required this.subheadingNotifier,
     required this.imageChild,
     required this.child,
   });
@@ -109,35 +121,62 @@ class _ItineraryWithDetails extends StatelessWidget {
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
           ),
+          clipBehavior: Clip.antiAlias,
+          backgroundColor: Colors.transparent,
           builder: (BuildContext context) {
-            return FractionallySizedBox(
-              heightFactor: 0.9,
-              child: Scaffold(
-                appBar: AppBar(
-                  leading: IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ),
-                body: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            return NotificationListener<DismissNotification>(
+              onNotification: (notification) {
+                Navigator.of(context).pop();
+                return true;
+              },
+              child: FractionallySizedBox(
+                heightFactor: 0.9,
+                child: Scaffold(
+                  body: Stack(
                     children: [
-                      SizedBox(
-                        width: double.infinity,
-                        height: 200, // You can adjust this height as needed
-                        child: imageChild,
-                      ),
-                      const SizedBox(height: 16.0),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          title,
-                          style: Theme.of(context).textTheme.headlineMedium,
+                      SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              height:
+                                  200, // You can adjust this height as needed
+                              child: imageChild,
+                            ),
+                            const SizedBox(height: 16.0),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0,
+                              ),
+                              child: ValueListenableBuilder<String?>(
+                                valueListenable: titleNotifier,
+                                builder: (context, title, _) => Text(
+                                  title ?? '',
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.headlineMedium,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16.0),
+                            child,
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 16.0),
-                      child,
+                      Positioned(
+                        top: 16.0,
+                        right: 16.0,
+                        child: Material(
+                          color: Colors.white.withAlpha((255 * 0.8).round()),
+                          shape: const CircleBorder(),
+                          clipBehavior: Clip.antiAlias,
+                          child: IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -150,9 +189,7 @@ class _ItineraryWithDetails extends StatelessWidget {
         child: Row(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(
-                8.0,
-              ), // Adjust radius as needed
+              borderRadius: BorderRadius.circular(8.0),
               child: SizedBox(height: 100, width: 100, child: imageChild),
             ),
             const SizedBox(width: 8.0),
@@ -160,10 +197,19 @@ class _ItineraryWithDetails extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: Theme.of(context).textTheme.headlineSmall),
-                  Text(
-                    subheading,
-                    style: Theme.of(context).textTheme.titleMedium,
+                  ValueListenableBuilder<String?>(
+                    valueListenable: titleNotifier,
+                    builder: (context, title, _) => Text(
+                      title ?? '',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ),
+                  ValueListenableBuilder<String?>(
+                    valueListenable: subheadingNotifier,
+                    builder: (context, subheading, _) => Text(
+                      subheading ?? '',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                   ),
                 ],
               ),

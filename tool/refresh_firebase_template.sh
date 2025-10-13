@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2025 The Flutter Authors. All rights reserved.
+# Copyright 2025 The Flutter Authors.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
@@ -29,7 +29,6 @@ TOOL_DIR=$(dirname "$0")
 PROJECT_ID="fluttergenui"
 
 EXAMPLES=(
-    "minimal_genui"
     "simple_chat"
     "travel_app"
 )

@@ -1,8 +1,9 @@
-// Copyright 2025 The Flutter Authors. All rights reserved.
+// Copyright 2025 The Flutter Authors.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_genui/flutter_genui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:travel_app/src/catalog/tabbed_sections.dart';
 
@@ -25,8 +26,14 @@ void main() {
       final catalogItem = tabbedSections;
       final data = {
         'sections': [
-          {'title': 'Tab 1', 'child': 'child1'},
-          {'title': 'Tab 2', 'child': 'child2'},
+          {
+            'title': {'literalString': 'Tab 1'},
+            'child': 'child1',
+          },
+          {
+            'title': {'literalString': 'Tab 2'},
+            'child': 'child2',
+          },
         ],
       };
 
@@ -41,11 +48,11 @@ void main() {
                     builder: (context) {
                       return catalogItem.widgetBuilder(
                         data: data,
-                        id: 'test_tabbed_sections',
+                        id: 'testId',
                         buildChild: mockBuildChild,
                         dispatchEvent: (event) {},
                         context: context,
-                        values: {},
+                        dataContext: DataContext(DataModel(), '/'),
                       );
                     },
                   ),
@@ -74,59 +81,6 @@ void main() {
       // Verify that the content of the second tab is now displayed
       expect(find.text('Content for Tab 1'), findsNothing);
       expect(find.text('Content for Tab 2'), findsOneWidget);
-    });
-
-    testWidgets('renders with fixed height when height is provided', (
-      WidgetTester tester,
-    ) async {
-      // Mock buildChild function
-      Widget mockBuildChild(String id) {
-        return const Text('Content');
-      }
-
-      // Create a CatalogItem instance with test data including height
-      final catalogItem = tabbedSections;
-      final data = {
-        'sections': [
-          {'title': 'Tab 1', 'child': 'child1'},
-        ],
-        'height': 200.0,
-      };
-
-      // Build the widget
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Column(
-              children: [
-                Builder(
-                  builder: (context) {
-                    return catalogItem.widgetBuilder(
-                      data: data,
-                      id: 'test_tabbed_sections_height',
-                      buildChild: mockBuildChild,
-                      dispatchEvent: (event) {},
-                      context: context,
-                      values: {},
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-
-      // Verify that the SizedBox with the specified height is present
-      expect(
-        find.byWidgetPredicate(
-          (widget) => widget is SizedBox && widget.height == 200.0,
-        ),
-        findsOneWidget,
-      );
-
-      // Verify that the content is displayed
-      expect(find.text('Content'), findsOneWidget);
     });
   });
 }

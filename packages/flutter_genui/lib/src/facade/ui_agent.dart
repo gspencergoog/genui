@@ -1,16 +1,14 @@
-// Copyright 2025 The Flutter Authors. All rights reserved.
+// Copyright 2025 The Flutter Authors.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 import 'dart:async';
 
-import 'package:dart_schema_builder/dart_schema_builder.dart';
 import 'package:flutter/foundation.dart';
+import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../ai_client/ai_client.dart';
-import '../ai_client/gemini_ai_client.dart';
 import '../core/genui_manager.dart';
-import '../model/catalog.dart';
 import '../model/chat_message.dart';
 import '../model/ui_models.dart';
 
@@ -25,38 +23,25 @@ const _maxConversationLength = 1000;
 class UiAgent {
   /// Creates a new [UiAgent].
   ///
-  /// The [instruction] is a system prompt that guides the AI's behavior.
-  ///
-  /// The [catalog] defines the set of widgets available to the AI. If not
-  /// provided, a default catalog of core widgets is used.
-  ///
   /// Callbacks like [onSurfaceAdded] and [onSurfaceDeleted] can be provided to
   /// react to UI changes initiated by the AI.
-  UiAgent(
-    String instruction, {
-    Catalog? catalog,
+  UiAgent({
     this.onSurfaceAdded,
     this.onSurfaceDeleted,
-    this.okToUpdateSurfaces = false,
+    this.onTextResponse,
     this.onWarning,
-  }) : _genUiManager = GenUiManager(catalog: catalog) {
-    final technicalPrompt = _technicalPrompt(
-      okToUpdate: okToUpdateSurfaces,
-      okToDelete: onSurfaceDeleted != null,
-      okToAdd: onSurfaceAdded != null,
+    required GenUiManager genUiManager,
+    required AiClient aiClient,
+  }) : _genUiManager = genUiManager,
+       _aiClient = aiClient {
+    _aiClient.activeRequests.addListener(_handleActivityUpdates);
+    _aiMessageSubscription = _genUiManager.surfaceUpdates.listen(
+      _handleAiMessage,
     );
-
-    _aiClient = GeminiAiClient(
-      systemInstruction: '$instruction\n\n$technicalPrompt',
-      tools: _genUiManager.getTools(),
+    _userMessageSubscription = _genUiManager.onSubmit.listen(
+      _handleUserMessage,
     );
-    _aiClient.activeRequests.addListener(_onActivityUpdates);
-    _aiMessageSubscription = _genUiManager.surfaceUpdates.listen(_onAiMessage);
-    _userMessageSubscription = _genUiManager.userInput.listen(_onUserMessage);
   }
-
-  /// Whether the AI is allowed to update existing surfaces.
-  final bool okToUpdateSurfaces;
 
   final GenUiManager _genUiManager;
 
@@ -73,14 +58,14 @@ class UiAgent {
 
   /// Disposes of the resources used by this agent.
   void dispose() {
-    _aiClient.activeRequests.removeListener(_onActivityUpdates);
+    _aiClient.activeRequests.removeListener(_handleActivityUpdates);
     _aiMessageSubscription.cancel();
     _userMessageSubscription.cancel();
     _genUiManager.dispose();
     _aiClient.dispose();
   }
 
-  void _onUserMessage(UserMessage message) async {
+  void _handleUserMessage(UserMessage message) async {
     _addMessage(message);
 
     final result = await _aiClient.generateContent<Map<String, Object?>>(
@@ -102,21 +87,25 @@ class UiAgent {
     );
     if (result == null) {
       onWarning?.call('No result was returned by generateContent');
+      return;
     }
-    final success = result!['success'] as bool? ?? false;
+    final success = result['success'] as bool? ?? false;
+    final messageText = result['message'] as String? ?? '';
     if (!success) {
-      final message = result['message'] as String? ?? '';
-      onWarning?.call('generateContent failed with message: $message');
+      onWarning?.call('generateContent failed with message: $messageText');
+    }
+    if (messageText.isNotEmpty) {
+      onTextResponse?.call(messageText);
+      _addMessage(AiTextMessage.text(messageText));
     }
   }
 
-  void _onAiMessage(GenUiUpdate update) {
+  void _handleAiMessage(GenUiUpdate update) {
     if (update is SurfaceAdded) {
       if (onSurfaceAdded == null) {
         onWarning?.call(
           'AI attempted to add a surface (${update.surfaceId}), '
-          'but it is not allowed to add surfaces, '
-          'because onSurfaceAdded handler is not set.',
+          'but onSurfaceAdded handler is not set.',
         );
         return;
       }
@@ -136,19 +125,12 @@ class UiAgent {
         return;
       }
       final message = AiUiMessage(
-        definition: UiDefinition.fromMap({}),
+        definition: UiDefinition(surfaceId: update.surfaceId),
         surfaceId: update.surfaceId,
       );
       _addMessage(message);
       onSurfaceDeleted!.call(update);
     } else if (update is SurfaceUpdated) {
-      if (!okToUpdateSurfaces) {
-        onWarning?.call(
-          'AI attempted to update a surface (${update.surfaceId}), '
-          'but it is not allowed to update surfaces.',
-        );
-        return;
-      }
       final message = AiUiMessage(
         definition: update.definition,
         surfaceId: update.surfaceId,
@@ -164,7 +146,7 @@ class UiAgent {
     }
   }
 
-  void _onActivityUpdates() {
+  void _handleActivityUpdates() {
     _isProcessing.value = _aiClient.activeRequests.value > 0;
   }
 
@@ -176,6 +158,9 @@ class UiAgent {
 
   /// A callback for when a surface is deleted by the AI.
   final ValueChanged<SurfaceRemoved>? onSurfaceDeleted;
+
+  /// A callback for when a text response is received from the AI.
+  final ValueChanged<String>? onTextResponse;
 
   /// A [ValueListenable] that indicates whether the agent is currently
   /// processing a request.
@@ -192,42 +177,4 @@ class UiAgent {
     _addMessage(message);
     await _aiClient.generateContent(List.of(_conversation), Schema.object());
   }
-}
-
-/// Generates the technical prompt for the AI.
-///
-/// In future we may want to specify which surfaces can be updated/deleted.
-String _technicalPrompt({
-  required bool okToUpdate,
-  required bool okToDelete,
-  required bool okToAdd,
-}) {
-  var updateInstruction = okToUpdate
-      ? '''You can update existing surfaces using the `addOrUpdateSurface` tool.
-      When updating a surface, if you are adding new UI to an existing surface, you should usually create a container widget (like a Column) to hold both the existing and new UI, and set that container as the new root.'''
-      : 'Do not update existing surfaces.';
-
-  var deleteInstruction = okToDelete
-      ? 'Use the `deleteSurface` tool to remove UI that is no longer relevant.'
-      : 'Do not delete existing surfaces.';
-
-  var addInstruction = okToAdd
-      ? 'You can add new surfaces using the `addOrUpdateSurface` tool.'
-      : 'Do not add new surfaces.';
-
-  return '''
-Use the provided tools to build and manage the user interface in response to the user's requests.
-
-$addInstruction
-
-$updateInstruction
-
-$deleteInstruction
-
-When you are asking for information from the user, you should always include at least one submit button of some kind or another submitting element (like carousel) so that the user can indicate that they are done
-providing information.
-
-After you have modified the UI, be sure to use the provideFinalOutput to give
-control back to the user so they can respond.
-''';
 }

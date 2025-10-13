@@ -1,4 +1,4 @@
-// Copyright 2025 The Flutter Authors. All rights reserved.
+// Copyright 2025 The Flutter Authors.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -134,10 +134,32 @@ final class InternalMessage extends ChatMessage {
 /// It can be a text message, or selections in UI.
 final class UserMessage extends ChatMessage {
   /// Creates a [UserMessage] with the given [parts].
-  const UserMessage(this.parts);
+  UserMessage(this.parts);
 
   /// Creates a [UserMessage] with the given [text].
   factory UserMessage.text(String text) => UserMessage([TextPart(text)]);
+
+  /// The parts of the user's message.
+  final List<MessagePart> parts;
+
+  /// The text content of the user's message.
+  late final String text = parts
+      .whereType<TextPart>()
+      .map((p) => p.text)
+      .join('\n');
+}
+
+/// A message representing a user's interaction with the UI.
+///
+/// This is intended for internal use and is not typically displayed to the
+/// user.
+final class UserUiInteractionMessage extends ChatMessage {
+  /// Creates a [UserUiInteractionMessage] with the given [parts].
+  const UserUiInteractionMessage(this.parts);
+
+  /// Creates a [UserUiInteractionMessage] with the given [text].
+  factory UserUiInteractionMessage.text(String text) =>
+      UserUiInteractionMessage([TextPart(text)]);
 
   /// The parts of the user's message.
   final List<MessagePart> parts;

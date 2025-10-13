@@ -1,4 +1,4 @@
-// Copyright 2025 The Flutter Authors. All rights reserved.
+// Copyright 2025 The Flutter Authors.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -14,16 +14,16 @@ class Conversation extends StatelessWidget {
     super.key,
     required this.messages,
     required this.manager,
-    required this.onEvent,
     this.userPromptBuilder,
     this.showInternalMessages = false,
+    this.scrollController,
   });
 
   final List<ChatMessage> messages;
-  final UiEventCallback onEvent;
   final GenUiManager manager;
   final UserPromptBuilder? userPromptBuilder;
   final bool showInternalMessages;
+  final ScrollController? scrollController;
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +31,12 @@ class Conversation extends StatelessWidget {
       if (showInternalMessages) {
         return true;
       }
-      return message is! InternalMessage && message is! ToolResponseMessage;
+      return message is! InternalMessage &&
+          message is! ToolResponseMessage &&
+          message is! UserUiInteractionMessage;
     }).toList();
     return ListView.builder(
+      controller: scrollController,
       itemCount: renderedMessages.length,
       itemBuilder: (context, index) {
         final message = renderedMessages[index];
@@ -69,11 +72,17 @@ class Conversation extends StatelessWidget {
                 key: message.uiKey,
                 host: manager,
                 surfaceId: message.surfaceId,
-                onEvent: onEvent,
               ),
             );
           case InternalMessage():
             return InternalMessageWidget(content: message.text);
+          case UserUiInteractionMessage():
+            return InternalMessageWidget(
+              content: message.parts
+                  .whereType<TextPart>()
+                  .map((part) => part.text)
+                  .join('\n'),
+            );
           case ToolResponseMessage():
             return InternalMessageWidget(content: message.results.toString());
         }

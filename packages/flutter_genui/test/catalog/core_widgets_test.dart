@@ -1,4 +1,4 @@
-// Copyright 2025 The Flutter Authors. All rights reserved.
+// Copyright 2025 The Flutter Authors.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -8,30 +8,34 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Core Widgets', () {
-    final testCatalog = Catalog([
-      elevatedButton,
-      text,
-      checkboxGroup,
-      column,
-      radioGroup,
-      textField,
-    ]);
+    final testCatalog = CoreCatalogItems.asCatalog();
+
+    UserMessage? message;
+    GenUiManager? manager;
 
     Future<void> pumpWidgetWithDefinition(
       WidgetTester tester,
-      Map<String, Object?> definition,
-      UiEventCallback onEvent,
+      String rootId,
+      List<Component> components,
     ) async {
-      final manager = GenUiManager(catalog: testCatalog);
-      manager.addOrUpdateSurface('testSurface', definition);
+      message = null;
+      manager?.dispose();
+      manager = GenUiManager(
+        catalog: testCatalog,
+        configuration: const GenUiConfiguration(),
+      );
+      manager!.onSubmit.listen((event) => message = event);
+      const surfaceId = 'testSurface';
+      manager!.handleMessage(
+        SurfaceUpdate(surfaceId: surfaceId, components: components),
+      );
+      manager!.handleMessage(
+        BeginRendering(surfaceId: surfaceId, root: rootId),
+      );
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: GenUiSurface(
-              host: manager,
-              surfaceId: 'testSurface',
-              onEvent: onEvent,
-            ),
+            body: GenUiSurface(host: manager!, surfaceId: surfaceId),
           ),
         ),
       );
@@ -40,98 +44,124 @@ void main() {
     testWidgets('ElevatedButton renders and handles taps', (
       WidgetTester tester,
     ) async {
-      UiEvent? event;
-      final definition = {
-        'root': 'button',
-        'widgets': [
-          {
-            'id': 'button',
-            'widget': {
-              'ElevatedButton': {'child': 'text'},
+      final components = [
+        const Component(
+          id: 'button',
+          componentProperties: {
+            'ElevatedButton': {
+              'child': 'text',
+              'action': {'actionName': 'testAction'},
             },
           },
-          {
-            'id': 'text',
-            'widget': {
-              'Text': {'text': 'Click Me'},
+        ),
+        const Component(
+          id: 'text',
+          componentProperties: {
+            'Text': {
+              'text': {'literalString': 'Click Me'},
             },
           },
-        ],
-      };
+        ),
+      ];
 
-      await pumpWidgetWithDefinition(tester, definition, (e) => event = e);
+      await pumpWidgetWithDefinition(tester, 'button', components);
 
       expect(find.text('Click Me'), findsOneWidget);
-      await tester.tap(find.byType(ElevatedButton));
 
-      expect(event, isNotNull);
-      expect(event!.widgetId, 'button');
-      expect(event!.eventType, 'onTap');
+      expect(message, null);
+      await tester.tap(find.byType(ElevatedButton));
+      expect(message, isNotNull);
+    });
+
+    testWidgets('Text renders from data model', (WidgetTester tester) async {
+      final components = [
+        const Component(
+          id: 'text',
+          componentProperties: {
+            'Text': {
+              'text': {'path': '/myText'},
+            },
+          },
+        ),
+      ];
+
+      await pumpWidgetWithDefinition(tester, 'text', components);
+      manager!
+          .dataModelForSurface('testSurface')
+          .update('/myText', 'Hello from data model');
+      await tester.pumpAndSettle();
+
+      expect(find.text('Hello from data model'), findsOneWidget);
     });
 
     testWidgets('CheckboxGroup renders and handles changes', (
       WidgetTester tester,
     ) async {
-      UiEvent? event;
-      final definition = {
-        'root': 'checkboxes',
-        'widgets': [
-          {
-            'id': 'checkboxes',
-            'widget': {
-              'CheckboxGroup': {
-                'values': [true, false],
-                'labels': ['A', 'B'],
-              },
+      final components = [
+        const Component(
+          id: 'checkboxes',
+          componentProperties: {
+            'CheckboxGroup': {
+              'selectedValues': {'path': '/checkboxes'},
+              'labels': ['A', 'B'],
             },
           },
-        ],
-      };
+        ),
+      ];
 
-      await pumpWidgetWithDefinition(tester, definition, (e) => event = e);
+      await pumpWidgetWithDefinition(tester, 'checkboxes', components);
+
+      manager!.dataModels['testSurface']!.update('/checkboxes', ['A']);
+
+      await tester.pumpAndSettle();
 
       expect(find.byType(CheckboxListTile), findsNWidgets(2));
       final firstCheckbox = tester.widget<CheckboxListTile>(
         find.byType(CheckboxListTile).first,
       );
       expect(firstCheckbox.value, isTrue);
+
       await tester.tap(find.text('B'));
 
-      expect(event, isNotNull);
-      expect(event!.widgetId, 'checkboxes');
-      expect(event!.eventType, 'onChanged');
-      expect(event!.value, [true, true]);
+      expect(message, null);
+      expect(
+        manager!.dataModels['testSurface']!.getValue<List<String>>(
+          '/checkboxes',
+        ),
+        ['A', 'B'],
+      );
     });
 
     testWidgets('Column renders children', (WidgetTester tester) async {
-      final definition = {
-        'root': 'col',
-        'widgets': [
-          {
-            'id': 'col',
-            'widget': {
-              'Column': {
-                'children': ['text1', 'text2'],
-                'spacing': 16.0,
-              },
+      final components = [
+        const Component(
+          id: 'col',
+          componentProperties: {
+            'Column': {
+              'children': ['text1', 'text2'],
+              'spacing': 16.0,
             },
           },
-          {
-            'id': 'text1',
-            'widget': {
-              'Text': {'text': 'First'},
+        ),
+        const Component(
+          id: 'text1',
+          componentProperties: {
+            'Text': {
+              'text': {'literalString': 'First'},
             },
           },
-          {
-            'id': 'text2',
-            'widget': {
-              'Text': {'text': 'Second'},
+        ),
+        const Component(
+          id: 'text2',
+          componentProperties: {
+            'Text': {
+              'text': {'literalString': 'Second'},
             },
           },
-        ],
-      };
+        ),
+      ];
 
-      await pumpWidgetWithDefinition(tester, definition, (e) {});
+      await pumpWidgetWithDefinition(tester, 'col', components);
 
       expect(find.text('First'), findsOneWidget);
       expect(find.text('Second'), findsOneWidget);
@@ -146,50 +176,54 @@ void main() {
     testWidgets('RadioGroup renders and handles changes', (
       WidgetTester tester,
     ) async {
-      UiEvent? event;
-      final definition = {
-        'root': 'radios',
-        'widgets': [
-          {
-            'id': 'radios',
-            'widget': {
-              'RadioGroup': {
-                'groupValue': 'A',
-                'labels': ['A', 'B'],
-              },
+      final components = [
+        const Component(
+          id: 'radios',
+          componentProperties: {
+            'RadioGroup': {
+              'groupValue': {'path': '/radioValue'},
+              'labels': ['A', 'B'],
             },
           },
-        ],
-      };
+        ),
+      ];
 
-      await pumpWidgetWithDefinition(tester, definition, (e) => event = e);
+      await pumpWidgetWithDefinition(tester, 'radios', components);
+      manager!.dataModelForSurface('testSurface').update('/radioValue', 'A');
+      await tester.pumpAndSettle();
 
       expect(find.byType(RadioListTile<String>), findsNWidgets(2));
       await tester.tap(find.text('B'));
+      await tester.pumpAndSettle();
 
-      expect(event, isNotNull);
-      expect(event!.widgetId, 'radios');
-      expect(event!.eventType, 'onChanged');
-      expect(event!.value, 'B');
+      expect(message, null);
+      expect(
+        manager!
+            .dataModelForSurface('testSurface')
+            .getValue<String>('/radioValue'),
+        'B',
+      );
     });
 
     testWidgets('TextField renders and handles changes/submissions', (
       WidgetTester tester,
     ) async {
-      UiEvent? event;
-      final definition = {
-        'root': 'field',
-        'widgets': [
-          {
-            'id': 'field',
-            'widget': {
-              'TextField': {'value': 'initial', 'hintText': 'hint'},
+      final components = [
+        const Component(
+          id: 'field',
+          componentProperties: {
+            'TextField': {
+              'value': {'path': '/myValue'},
+              'hintText': 'hint',
+              'onSubmittedAction': {'actionName': 'submit'},
             },
           },
-        ],
-      };
+        ),
+      ];
 
-      await pumpWidgetWithDefinition(tester, definition, (e) => event = e);
+      await pumpWidgetWithDefinition(tester, 'field', components);
+      manager!.dataModelForSurface('testSurface').update('/myValue', 'initial');
+      await tester.pumpAndSettle();
 
       final textFieldFinder = find.byType(TextField);
       expect(find.widgetWithText(TextField, 'initial'), findsOneWidget);
@@ -198,18 +232,17 @@ void main() {
 
       // Test onChanged
       await tester.enterText(textFieldFinder, 'new value');
-      expect(event, isNotNull);
-      expect(event!.widgetId, 'field');
-      expect(event!.eventType, 'onChanged');
-      expect(event!.value, 'new value');
+      expect(
+        manager!
+            .dataModelForSurface('testSurface')
+            .getValue<String>('/myValue'),
+        'new value',
+      );
 
       // Test onSubmitted
-      event = null;
+      expect(message, null);
       await tester.testTextInput.receiveAction(TextInputAction.done);
-      expect(event, isNotNull);
-      expect(event!.widgetId, 'field');
-      expect(event!.eventType, 'onSubmitted');
-      expect(event!.value, 'new value');
+      expect(message, isNotNull);
     });
   });
 }

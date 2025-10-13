@@ -1,10 +1,13 @@
-// Copyright 2025 The Flutter Authors. All rights reserved.
+// Copyright 2025 The Flutter Authors.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_genui/flutter_genui.dart';
+import 'package:flutter_genui_firebase_ai/flutter_genui_firebase_ai.dart';
 import 'package:simple_chat/message.dart';
 import 'firebase_options.dart';
 import 'package:logging/logging.dart';
@@ -40,26 +43,47 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _textController = TextEditingController();
   final List<MessageController> _messages = [];
-  // TODO: Demonstrate how to create a GenerativeModel via
-  // FirebaseAI.googleAI().generativeModel and pass it as a dependency here.
-  late final UiAgent _uiAgent = UiAgent(
-    '''
-    You are a helpful assistant who chats with user,
-    giving exactly one response for each user message.
-    Your responses should contain acknowledgment
-    of the user message.
-    ''',
-    catalog: null,
-    onSurfaceAdded: _onSurfaceAdded,
-    // ignore: avoid_print
-    onWarning: (value) => print('Warning from UiAgent: $value'),
-  );
+  late final GenUiManager _genUiManager;
+  late final UiAgent _uiAgent;
   final ScrollController _scrollController = ScrollController();
 
-  void _onSurfaceAdded(SurfaceAdded surface) {
+  @override
+  void initState() {
+    super.initState();
+    final catalog = CoreCatalogItems.asCatalog();
+    _genUiManager = GenUiManager(catalog: catalog);
+    final aiClient = FirebaseAiClient(
+      systemInstruction:
+          'You are a helpful assistant who chats with a user, '
+          'giving exactly one response for each user message. '
+          'Your responses should contain acknowledgment '
+          'of the user message.'
+          '\n\n'
+          '${GenUiPromptFragments.basicChat}',
+      tools: _genUiManager.getTools(),
+    );
+    _uiAgent = UiAgent(
+      genUiManager: _genUiManager,
+      aiClient: aiClient,
+      onSurfaceAdded: _handleSurfaceAdded,
+      onTextResponse: _onTextResponse,
+      // ignore: avoid_print
+      onWarning: (value) => print('Warning from UiAgent: $value'),
+    );
+  }
+
+  void _handleSurfaceAdded(SurfaceAdded surface) {
     if (!mounted) return;
     setState(() {
       _messages.add(MessageController(surfaceId: surface.surfaceId));
+    });
+    _scrollToBottom();
+  }
+
+  void _onTextResponse(String text) {
+    if (!mounted) return;
+    setState(() {
+      _messages.add(MessageController(text: 'AI: $text'));
     });
     _scrollToBottom();
   }
@@ -119,7 +143,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Future<void> _sendMessage() async {
+  void _sendMessage() {
     final text = _textController.text;
     if (text.isEmpty) {
       return;
@@ -132,7 +156,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _scrollToBottom();
 
-    await _uiAgent.sendRequest(UserMessage([TextPart(text)]));
+    unawaited(_uiAgent.sendRequest(UserMessage([TextPart(text)])));
   }
 
   void _scrollToBottom() {

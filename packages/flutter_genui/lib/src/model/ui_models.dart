@@ -1,10 +1,18 @@
-// Copyright 2025 The Flutter Authors. All rights reserved.
+// Copyright 2025 The Flutter Authors.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 import 'dart:convert';
 
 import '../primitives/simple_items.dart';
+import 'a2ui_message.dart';
+
+/// A callback that is called when events are sent.
+typedef SendEventsCallback =
+    void Function(String surfaceId, List<UiEvent> events);
+
+/// A callback that is called when an event is dispatched.
+typedef DispatchEventCallback = void Function(UiEvent event);
 
 /// A data object that represents a user interaction event in the UI.
 ///
@@ -20,7 +28,11 @@ extension type UiEvent.fromMap(JsonMap _json) {
   /// The type of event that was triggered (e.g., 'onChanged', 'onTap').
   String get eventType => _json['eventType'] as String;
 
-  /// Whether this event should trigger a submission to the AI.
+  /// Whether this event should trigger an event.
+  ///
+  /// The event can be a submission to the AI or
+  /// a change in the UI state that should be handled by
+  /// host of the surface.
   bool get isAction => _json['isAction'] as bool;
 
   /// The value associated with the event, if any (e.g., the text in a
@@ -38,71 +50,81 @@ extension type UiEvent.fromMap(JsonMap _json) {
 ///
 /// This is used for events that should trigger a submission to the AI, such as
 /// tapping a button.
-extension type UiActionEvent.fromMap(JsonMap _json) implements UiEvent {
-  /// Creates a [UiEvent] from a set of properties.
-  UiActionEvent({
+extension type UserActionEvent.fromMap(JsonMap _json) implements UiEvent {
+  /// Creates a [UserActionEvent] from a set of properties.
+  UserActionEvent({
     String? surfaceId,
-    required String widgetId,
-    required String eventType,
+    required String actionName,
+    required String sourceComponentId,
     DateTime? timestamp,
-    Object? value,
+    JsonMap? context,
   }) : _json = {
          if (surfaceId != null) 'surfaceId': surfaceId,
-         'widgetId': widgetId,
-         'eventType': eventType,
+         'actionName': actionName,
+         'sourceComponentId': sourceComponentId,
          'timestamp': (timestamp ?? DateTime.now()).toIso8601String(),
          'isAction': true,
-         if (value != null) 'value': value,
+         'context': context ?? {},
        };
-}
 
-/// A UI event that represents a change in the UI state.
-///
-/// This is used for events that should not trigger a submission to the AI, such
-/// as entering text in a text field.
-extension type UiChangeEvent.fromMap(JsonMap _json) implements UiEvent {
-  /// Creates a [UiEvent] from a set of properties.
-  UiChangeEvent({
-    String? surfaceId,
-    required String widgetId,
-    required String eventType,
-    DateTime? timestamp,
-    Object? value,
-  }) : _json = {
-         if (surfaceId != null) 'surfaceId': surfaceId,
-         'widgetId': widgetId,
-         'eventType': eventType,
-         'timestamp': (timestamp ?? DateTime.now()).toIso8601String(),
-         'isAction': false,
-         if (value != null) 'value': value,
-       };
+  String get actionName => _json['actionName'] as String;
+  String get sourceComponentId => _json['sourceComponentId'] as String;
+  JsonMap get context => _json['context'] as JsonMap;
 }
 
 /// A data object that represents the entire UI definition.
 ///
 /// This is the root object that defines a complete UI to be rendered.
-extension type UiDefinition.fromMap(JsonMap _json) {
+class UiDefinition {
   /// The ID of the surface that this UI belongs to.
-  String get surfaceId => _json['surfaceId'] as String;
+  final String surfaceId;
 
   /// The ID of the root widget in the UI tree.
-  String get root => _json['root'] as String;
-
-  /// The original list of widget definitions.
-  List<Object?> get widgetList => _json['widgets'] as List<Object?>;
-
-  JsonMap toMap() => _json;
+  final String? rootComponentId;
 
   /// A map of all widget definitions in the UI, keyed by their ID.
-  JsonMap get widgets {
-    final widgetById = <String, Object?>{};
+  final Map<String, Component> components;
 
-    for (final widget in (_json['widgets'] as List<Object?>)) {
-      var typedWidget = widget as JsonMap;
-      widgetById[typedWidget['id'] as String] = typedWidget;
-    }
+  /// (Future) The URI of the catalog used for this surface.
+  final Uri? catalogUri;
 
-    return widgetById;
+  /// (Future) The styles for this surface.
+  final JsonMap? styles;
+
+  /// Creates a [UiDefinition].
+  UiDefinition({
+    required this.surfaceId,
+    this.rootComponentId,
+    this.components = const {},
+    this.catalogUri,
+    this.styles,
+  });
+
+  /// Creates a copy of this [UiDefinition] with the given fields replaced.
+  UiDefinition copyWith({
+    String? rootComponentId,
+    Map<String, Component>? components,
+    Uri? catalogUri,
+    JsonMap? styles,
+  }) {
+    return UiDefinition(
+      surfaceId: surfaceId,
+      rootComponentId: rootComponentId ?? this.rootComponentId,
+      components: components ?? this.components,
+      catalogUri: catalogUri ?? this.catalogUri,
+      styles: styles ?? this.styles,
+    );
+  }
+
+  /// Converts this object to a JSON map.
+  JsonMap toJson() {
+    return {
+      'surfaceId': surfaceId,
+      'rootComponentId': rootComponentId,
+      'components': components.map(
+        (key, value) => MapEntry(key, value.toJson()),
+      ),
+    };
   }
 
   /// Converts a UI definition into a blob of text

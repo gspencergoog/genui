@@ -1,10 +1,10 @@
-// Copyright 2025 The Flutter Authors. All rights reserved.
+// Copyright 2025 The Flutter Authors.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: avoid_dynamic_calls
-import 'package:dart_schema_builder/dart_schema_builder.dart';
 import 'package:flutter/material.dart';
+// ignore_for_file: avoid_dynamic_calls
+import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../../model/catalog_item.dart';
 import '../../primitives/simple_items.dart';
@@ -90,7 +90,7 @@ CrossAxisAlignment _parseCrossAxisAlignment(String? alignment) {
     case 'stretch':
       return CrossAxisAlignment.stretch;
     default:
-      return CrossAxisAlignment.center;
+      return CrossAxisAlignment.start;
   }
 }
 
@@ -104,7 +104,7 @@ final column = CatalogItem(
         required buildChild,
         required dispatchEvent,
         required context,
-        required values,
+        required dataContext,
       }) {
         final columnData = _ColumnData.fromMap(data as JsonMap);
         final childrenIds = columnData.children;
@@ -126,51 +126,62 @@ final column = CatalogItem(
           children: childrenWithSpacing,
         );
       },
-  exampleData: {
-    'root': 'advice_column',
-    'widgets': [
-      {
-        'id': 'advice_column',
-        'widget': {
-          'Column': {
-            'children': ['advice_text', 'advice_options', 'submit_button'],
+  exampleData: [
+    () => {
+      'root': 'advice_column',
+      'widgets': [
+        {
+          'id': 'advice_column',
+          'widget': {
+            'Column': {
+              'children': ['advice_text', 'advice_options', 'submit_button'],
+            },
           },
         },
-      },
-      {
-        'id': 'advice_text',
-        'widget': {
-          'Text': {'text': 'What kind of advice are you looking for?'},
-        },
-      },
-      {
-        'id': 'advice_options',
-        'widget': {
-          'RadioGroup': {
-            'labels': [
-              'Career',
-              'Personal',
-              'Financial',
-              'Health',
-              'Relationships',
-              'Other',
-            ],
-            'groupValue': '',
+        {
+          'id': 'advice_text',
+          'widget': {
+            'Text': {
+              'text': {
+                'literalString': 'What kind of advice are you looking for?',
+              },
+            },
           },
         },
-      },
-      {
-        'id': 'submit_button',
-        'widget': {
-          'ElevatedButton': {'child': 'submit_button_text'},
+        {
+          'id': 'advice_options',
+          'widget': {
+            'RadioGroup': {
+              'labels': [
+                'Career',
+                'Personal',
+                'Financial',
+                'Health',
+                'Relationships',
+                'Other',
+              ],
+              'groupValue': {'literalString': ''},
+            },
+          },
         },
-      },
-      {
-        'widget': {
-          'Text': {'text': 'Submit'},
+        {
+          'id': 'submit_button',
+          'widget': {
+            'ElevatedButton': {
+              'child': 'submit_button_text',
+              'action': {'actionName': 'submit'},
+            },
+          },
         },
-        'id': 'submit_button_text',
-      },
-    ],
-  },
+        {
+          'id': 'submit_button_text',
+          'widget': {
+            'Text': {
+              'text': {'literalString': 'Submit'},
+            },
+          },
+        },
+      ],
+    },
+  ],
 );

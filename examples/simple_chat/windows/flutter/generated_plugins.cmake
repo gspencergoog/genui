@@ -1,3 +1,7 @@
+# Copyright 2025 The Flutter Authors.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
 #
 # Generated file, do not edit.
 #
@@ -5,7 +9,6 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   firebase_auth
   firebase_core
-  url_launcher_windows
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
