@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:convert';
+
 import '../constants.dart';
 import '../json_type.dart';
 import 'boolean_schema.dart';
@@ -320,8 +322,12 @@ extension type Schema.fromMap(Map<String, Object?> _value) {
   /// The underlying map representation of the schema.
   Map<String, Object?> get value => _value;
 
-  /// A convenience method to convert the schema to a JSON-encodable map.
-  Map<String, Object?> toJson() => _value;
+  /// Convert to JSON with optional indent depth.
+  ///
+  /// No formatting occurs if indent is null.
+  String toJson({String? indent}) {
+    return JsonEncoder.withIndent(indent).convert(_value);
+  }
 
   /// Gets the value of a keyword from the schema map.
   Object? operator [](String key) => _value[key];
