@@ -59,11 +59,7 @@ class A2UIAgentExecutor implements AgentExecutor {
       return;
     }
 
-    // TODO: We need to adapt the `generateUiFlow` to accept a simpler input
-    // and to handle conversation history. For now, we'll just pass the prompt.
     const flowRequest: GenerateUiRequest = {
-      // This needs to be adapted based on how we manage the catalog.
-      // For now, we'll assume a static or default catalog.
       catalog: { type: 'object', properties: {} },
       conversation: [
         {
@@ -74,18 +70,14 @@ class A2UIAgentExecutor implements AgentExecutor {
     };
 
     try {
-      // Call the Genkit flow and get the stream
       const { stream } = generateUiFlow.stream(flowRequest);
 
-      // Process the stream from the Genkit flow
       for await (const chunk of stream) {
-        // Wrap the A2UI message in an A2A DataPart
         const dataPart: DataPart = {
           kind: 'data',
           data: { a2uiMessages: [chunk] },
         };
 
-        // Publish the data part on the event bus
         eventBus.publish({
           kind: 'message',
           messageId: uuidv4(),
@@ -97,9 +89,7 @@ class A2UIAgentExecutor implements AgentExecutor {
       }
     } catch (error) {
       console.error('Error executing Genkit flow:', error);
-      // Optionally publish an error message back to the client
     } finally {
-      // Signal that the task is finished
       eventBus.finished();
     }
   }
@@ -117,4 +107,5 @@ const requestHandler = new DefaultRequestHandler(
   new InMemoryTaskStore(),
   agentExecutor
 );
-export const appBuilder = new A2AExpressApp(requestHandler);
+const appBuilder = new A2AExpressApp(requestHandler);
+export const a2aApp = appBuilder.setupRoutes(express());
