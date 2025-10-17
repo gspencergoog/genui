@@ -1,7 +1,3 @@
-# Copyright 2025 The Flutter Authors.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
-
 lockfileVersion: '9.0'
 
 settings:
@@ -15,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      '@a2a-js/sdk':
+        specifier: ^0.3.4
+        version: 0.3.4(express@4.21.2)
       '@genkit-ai/ai':
         specifier: ^1.18.0
         version: 1.21.0(@google-cloud/firestore@7.11.6)(firebase-admin@13.5.0)(genkit@1.21.0(@google-cloud/firestore@7.11.6)(firebase-admin@13.5.0))
@@ -33,6 +32,9 @@ importers:
       '@genkit-ai/vertexai':
         specifier: ^1.18.0
         version: 1.21.0(genkit@1.21.0(@google-cloud/firestore@7.11.6)(firebase-admin@13.5.0))(zod@3.25.76)
+      a2a-js:
+        specifier: ^0.2.0
+        version: 0.2.0
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -117,6 +119,15 @@ importers:
         version: 9.0.1
 
 packages:
+
+  '@a2a-js/sdk@0.3.4':
+    resolution: {integrity: sha512-WXMk/UspvQFxesvb8hXyfPE8d3ibpiRie24Yw/5ruMqNJcdwxjfZ1G0gj6vYE/I9RAZD145CNzedpZA2cLV2JQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      express: ^4.21.2 || ^5.1.0
+    peerDependenciesMeta:
+      express:
+        optional: true
 
   '@anthropic-ai/sdk@0.24.3':
     resolution: {integrity: sha512-916wJXO6T6k8R6BAAcLhLPv/pnLGy7YSEBZXZ1XTFbLcTZE8oTy3oDW9WJf9KKZwMvVcePIfoTSvzXHRcGxkQQ==}
@@ -1774,6 +1785,10 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  a2a-js@0.2.0:
+    resolution: {integrity: sha512-JtCjTvbBVNP43mmuCqhSXk16XSKE5L4/4wbVFJsz6K2syfplNUnsZxHxnqJ0dQoe3Fy70V09uWI29uaXkNdjrg==}
+    engines: {node: '>=16.0.0'}
+
   abort-controller@3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
     engines: {node: '>=6.5'}
@@ -3082,6 +3097,9 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
+  jsonschema@1.5.0:
+    resolution: {integrity: sha512-K+A9hhqbn0f3pJX17Q/7H6yQfD/5OXgdrR5UE12gMXCiN9D5Xq2o5mddV2QEcX/bjla99ASsAAQUyMCCRWAEhw==}
+
   jsonwebtoken@9.0.2:
     resolution: {integrity: sha512-PRp66vJ865SSqOlgqS8hujT5U4AOgMfhrwYIuIhfKaoSCZcirrmASQr8CX7cUg+RMih+hgznrjp99o+W4pJLHQ==}
     engines: {node: '>=12', npm: '>=6'}
@@ -4240,6 +4258,12 @@ packages:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
 snapshots:
+
+  '@a2a-js/sdk@0.3.4(express@4.21.2)':
+    dependencies:
+      uuid: 11.1.0
+    optionalDependencies:
+      express: 4.21.2
 
   '@anthropic-ai/sdk@0.24.3':
     dependencies:
@@ -6441,6 +6465,18 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
+  a2a-js@0.2.0:
+    dependencies:
+      axios: 1.12.2
+      cors: 2.8.5
+      eventsource: 3.0.7
+      express: 5.1.0
+      jsonschema: 1.5.0
+      uuid: 11.1.0
+    transitivePeerDependencies:
+      - debug
+      - supports-color
+
   abort-controller@3.0.0:
     dependencies:
       event-target-shim: 5.0.1
@@ -8141,6 +8177,8 @@ snapshots:
   json-stable-stringify-without-jsonify@1.0.1: {}
 
   json5@2.2.3: {}
+
+  jsonschema@1.5.0: {}
 
   jsonwebtoken@9.0.2:
     dependencies:

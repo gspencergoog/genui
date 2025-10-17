@@ -413,7 +413,7 @@ describe("generateUiFlow", () => {
           /* consume */
         }
       }).rejects.toThrow(
-        "If url is provided, base64 and mimeType should not be."
+        "If url is provided, base64 should not be."
       );
     });
 
