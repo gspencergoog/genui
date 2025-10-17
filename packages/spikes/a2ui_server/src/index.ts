@@ -3,13 +3,12 @@
 // found in the LICENSE file.
 
 import express from 'express';
-import { a2aApp } from './a2a';
+import { appBuilder } from './a2a';
 
 const port = process.env.PORT || 10002;
 const app = express();
 
-// Mount the A2A routes
-app.use(a2aApp);
+appBuilder.setupRoutes(app);
 
 app.listen(port, () => {
   console.log(`🚀 A2A Server started on http://localhost:${port}`);
