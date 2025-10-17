@@ -3,11 +3,14 @@
 // found in the LICENSE file.
 
 import express from 'express';
+import cors from 'cors';
 import { appBuilder } from './a2a';
 
 const port = process.env.PORT || 10002;
 const app = express();
 
+app.use(cors());
+app.use(express.json());
 appBuilder.setupRoutes(app);
 
 app.listen(port, () => {

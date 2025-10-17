@@ -29,6 +29,7 @@ const a2uiAgentCard: AgentCard = {
       name: 'A2UI Chat',
       description: 'Generates a UI based on a chat conversation.',
       tags: ['chat'],
+      examples: [],
     },
   ],
   capabilities: {
@@ -36,6 +37,7 @@ const a2uiAgentCard: AgentCard = {
   },
   defaultInputModes: ['text/plain'],
   defaultOutputModes: ['text/plain'],
+  preferredTransport: 'JSONRPC',
 };
 
 // 2. Implement the AgentExecutor

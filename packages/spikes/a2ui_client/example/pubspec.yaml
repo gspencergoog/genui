@@ -24,6 +24,9 @@ dev_dependencies:
   dart_flutter_team_lints: ^3.5.2
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
+  test: ^1.26.3
 
 flutter:
   uses-material-design: true
