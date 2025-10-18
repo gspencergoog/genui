@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:example/main.dart' as app;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:example/main.dart' as app;
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +31,12 @@ void main() {
 
       // Verify that the agent card is displayed.
       expect(find.text('Name: A2UI Genkit Server'), findsOneWidget);
-      expect(find.text('Description: An agent that generates UIs using the A2UI protocol.'), findsOneWidget);
+      expect(
+        find.text(
+          'Description: An agent that generates UIs using the A2UI protocol.',
+        ),
+        findsOneWidget,
+      );
       expect(find.text('Version: 1.0.0'), findsOneWidget);
     });
   });

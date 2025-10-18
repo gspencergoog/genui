@@ -7,6 +7,7 @@ import 'dart:convert';
 
 import 'package:a2a/a2a.dart' hide Logger;
 import 'package:logging/logging.dart';
+import 'package:uuid/uuid.dart';
 
 final _log = Logger('A2uiAgentConnector');
 
@@ -75,6 +76,7 @@ class A2uiAgentConnector {
     void Function(String)? onResponse,
   }) async {
     final message = A2AMessage()
+      ..messageId = const Uuid().v4()
       ..role = 'user'
       ..parts = [A2ATextPart()..text = messageText];
 
@@ -89,6 +91,12 @@ class A2uiAgentConnector {
     payload.extensions = [
       'https://github.com/a2aproject/a2a-samples/extensions/a2ui/v7',
     ];
+
+    _log.fine('--- OUTGOING REQUEST ---');
+    _log.fine('URL: ${url.toString()}');
+    _log.fine('Method: message/stream');
+    _log.fine('Payload: ${jsonEncode(payload.toJson())}');
+    _log.fine('----------------------');
 
     final events = _client.sendMessageStream(payload);
 

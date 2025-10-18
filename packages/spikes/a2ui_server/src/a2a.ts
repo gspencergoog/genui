@@ -1,9 +1,8 @@
-import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import {
   AgentCard,
-  Message,
   DataPart,
+  TextPart,
 } from '@a2a-js/sdk';
 import {
   AgentExecutor,
@@ -12,7 +11,6 @@ import {
   DefaultRequestHandler,
   InMemoryTaskStore,
 } from '@a2a-js/sdk/server';
-import { A2AExpressApp } from '@a2a-js/sdk/server/express';
 import { generateUiFlow } from './generate';
 import { GenerateUiRequest } from './schemas';
 
@@ -50,8 +48,8 @@ class A2UIAgentExecutor implements AgentExecutor {
 
     // Extract the text prompt from the incoming message
     const userPrompt = message.parts
-      .filter((part: any) => part.kind === 'text')
-      .map((part: any) => (part as any).text)
+      .filter((part): part is TextPart => part.kind === 'text')
+      .map((part) => (part).text)
       .join('\n');
 
     if (!userPrompt) {
@@ -100,12 +98,10 @@ class A2UIAgentExecutor implements AgentExecutor {
   }
 }
 
-// 3. Set up the A2A Express App
+// 3. Set up the A2A Request Handler
 const agentExecutor = new A2UIAgentExecutor();
-const requestHandler = new DefaultRequestHandler(
+export const requestHandler = new DefaultRequestHandler(
   a2uiAgentCard,
   new InMemoryTaskStore(),
   agentExecutor
 );
-const appBuilder = new A2AExpressApp(requestHandler);
-export const a2aApp = appBuilder.setupRoutes(express());
