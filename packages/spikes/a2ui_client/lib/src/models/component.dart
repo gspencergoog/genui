@@ -412,23 +412,23 @@ class ModalProperties extends ComponentProperties {
 
 /// The properties for a button component.
 class ButtonProperties extends ComponentProperties {
-  const ButtonProperties({required this.label, required this.action});
+  const ButtonProperties({required this.child, required this.action});
 
   factory ButtonProperties.fromJson(Map<String, dynamic> json) {
     return ButtonProperties(
-      label: BoundValue.fromJson(json['label'] as Map<String, dynamic>),
+      child: json['child'] as String,
       action: Action.fromJson(json['action'] as Map<String, dynamic>),
     );
   }
 
-  /// The label of the button.
-  final BoundValue label;
+  /// The child of the button.
+  final String child;
 
   /// The action to perform when the button is tapped.
   final Action action;
 
   @override
-  List<Object?> get props => [label, action];
+  List<Object?> get props => [child, action];
 
   @override
   String get componentType => 'Button';

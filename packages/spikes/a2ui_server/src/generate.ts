@@ -5,15 +5,15 @@ import { logger } from "./logger";
 import { Message, Part } from "@genkit-ai/ai";
 import * as a2uiSchema from "./a2ui_schema.json";
 
-const widgetSchema = z.object({
-  id: z.string().describe("The unique ID for the widget."),
-  component: z.any().describe("The widget definition."),
+const componentSchema = z.object({
+  id: z.string().describe("The unique ID for the component."),
+  component: z.any().describe("The component definition."),
 });
 
 const uiDefinitionSchema = z.object({
   root: z.string().describe("The ID of the root widget in the UI tree."),
   components: z
-    .array(widgetSchema)
+    .array(componentSchema)
     .describe("A list of all the widget definitions for this UI surface."),
 });
 

@@ -169,6 +169,15 @@ class _LayoutEngine extends StatelessWidget {
           visited: newVisited,
         ),
       ];
+    } else if (properties is ButtonProperties) {
+      children['child'] = [
+        _buildNode(
+          context,
+          properties.child,
+          itemData: itemData,
+          visited: newVisited,
+        ),
+      ];
     } else if (properties is TabsProperties) {
       children['children'] = properties.tabItems
           .map(

@@ -187,9 +187,10 @@ describe("generateUiFlow", () => {
 
   it("should correctly transform an updateSurface tool request", async () => {
     const uiDefinition = {
-      surfaceId: "s1",
       root: "w1",
-      widgets: [{ id: "w1", widget: { type: "text", text: "Hi" } }],
+      components: [
+        { id: "w1", component: { Text: { text: { literalString: "Hi" } } } },
+      ],
     };
 
     mockGenerateStream.mockReturnValue({
@@ -226,7 +227,7 @@ describe("generateUiFlow", () => {
     expect(chunks[0]).toEqual({
       surfaceUpdate: {
         surfaceId: "s1",
-        components: uiDefinition.widgets,
+        components: uiDefinition.components,
       },
     });
     expect(chunks[1]).toEqual({

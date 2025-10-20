@@ -62,7 +62,7 @@ const uiPartSchema = z.object({
   definition: z.object({
     surfaceId: z.string(),
     root: z.string(),
-    widgets: z.array(z.record(z.unknown())),
+    components: z.array(z.record(z.unknown())),
   }),
 });
 
