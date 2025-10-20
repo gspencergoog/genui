@@ -101,6 +101,7 @@ class A2uiAgentConnector {
     final events = _client.sendMessageStream(payload);
 
     try {
+      A2AMessage? finalResponse;
       await for (final event in events) {
         const encoder = JsonEncoder.withIndent('  ');
         final prettyJson = encoder.convert(event.toJson());
@@ -134,6 +135,7 @@ class A2uiAgentConnector {
         }
 
         if (message != null) {
+          finalResponse = message;
           const encoder = JsonEncoder.withIndent('  ');
           final prettyJson = encoder.convert(message.toJson());
           _log.fine('Received A2A Message:\n$prettyJson');
@@ -141,9 +143,13 @@ class A2uiAgentConnector {
             if (part is A2ADataPart) {
               _processA2uiMessages(part.data);
             }
-            if (part is A2ATextPart) {
-              onResponse?.call(part.text);
-            }
+          }
+        }
+      }
+      if (finalResponse != null) {
+        for (final part in finalResponse.parts ?? []) {
+          if (part is A2ATextPart) {
+            onResponse?.call(part.text);
           }
         }
       }

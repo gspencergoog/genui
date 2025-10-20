@@ -116,7 +116,7 @@ class HeadingProperties extends ComponentProperties {
   factory HeadingProperties.fromJson(Map<String, dynamic> json) {
     return HeadingProperties(
       text: BoundValue.fromJson(json['text'] as Map<String, dynamic>),
-      level: json['level'] as String,
+      level: json['level'] as String? ?? '2',
     );
   }
 

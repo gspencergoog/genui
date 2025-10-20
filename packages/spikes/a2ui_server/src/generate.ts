@@ -4,6 +4,7 @@ import { googleAI } from "@genkit-ai/googleai";
 import { logger } from "./logger";
 import { Message, Part } from "@genkit-ai/ai";
 import * as a2uiSchema from "./a2ui_schema.json";
+import { v4 as uuidv4 } from "uuid";
 
 const componentSchema = z.object({
   id: z.string().describe("The unique ID for the component."),
@@ -170,21 +171,25 @@ ${JSON.stringify(events, null, 2)}
         tools: [updateSurfaceTool, deleteSurfaceTool],
       });
 
+      let toolCalled = false;
       for await (const chunk of stream) {
         logger.debug({ chunk }, "Chunk from AI");
         if (chunk.toolRequests) {
+          toolCalled = true;
           logger.info("Transforming tool request to A2UI protocol.");
           for (const toolRequest of chunk.toolRequests) {
             if (toolRequest.toolRequest.name === "updateSurface") {
               const { surfaceId, definition } = toolRequest.toolRequest
                 .input as UpdateSurfaceInput;
               const { root, components } = definition;
+              logger.info("Sending surfaceUpdate.");
               streamingCallback({
                 surfaceUpdate: {
                   surfaceId,
                   components: components,
                 },
               });
+              logger.info("Sending beginRendering.");
               streamingCallback({
                 beginRendering: {
                   surfaceId,
@@ -206,9 +211,43 @@ ${JSON.stringify(events, null, 2)}
 
       const finalResponse = await response;
       if (finalResponse.text) {
-        logger.info(
-          "Skipping final text response from AI, as it's not part of the A2UI protocol."
-        );
+        if (!toolCalled) {
+          logger.info(
+            "No tool call was made. Generating a text UI for the final response."
+          );
+          const surfaceId = `text-response-${uuidv4()}`;
+          const rootId = "root";
+          const textId = "text-message";
+          streamingCallback({
+            surfaceUpdate: {
+              surfaceId,
+              components: [
+                {
+                  id: rootId,
+                  component: {
+                    Column: { children: { explicitList: [textId] } },
+                  },
+                },
+                {
+                  id: textId,
+                  component: {
+                    Text: { text: { literalString: finalResponse.text } },
+                  },
+                },
+              ],
+            },
+          });
+          streamingCallback({
+            beginRendering: {
+              surfaceId,
+              root: rootId,
+            },
+          });
+        } else {
+          logger.info(
+            "Skipping final text response from AI, as it's not part of the A2UI protocol."
+          );
+        }
       }
 
       return finalResponse;
