@@ -87,7 +87,7 @@ When you use the 'updateSurface' tool, you MUST provide a 'surfaceId' and a 'def
 ${catalogSchemaString}
 \`\`\`
 
-After you have successfully called the 'updateSurface' tool and have received a 'toolResponse' with a status of 'updated', you should consider the user's request fulfilled. Respond with a short confirmation message to the user and then stop. Do not call the tool again unless the user asks for further changes.
+After you have successfully called the 'updateSurface' tool and have received a 'toolResponse' with a status of 'updated'. Then you should consider the user's request fulfilled. Respond with a short confirmation message to the user and then stop. Do not call the tool again unless the user asks for further changes.
 `.trim();
 
     // Transform conversation to Genkit's format

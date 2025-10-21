@@ -19,14 +19,13 @@ class UnknownComponentException implements Exception {
 
 /// A component in the UI.
 class Component extends Equatable {
-  const Component({required this.id, this.weight, required this.component});
+  const Component({required this.id, required this.component});
 
   /// Creates a [Component] from a JSON object.
   factory Component.fromJson(Map<String, dynamic> json) {
     final componentMap = json['component'] as Map<String, dynamic>;
     return Component(
-      id: json['id'] as String,
-      weight: JsonUtils.parseDouble(json['weight']),
+      id: json['id'] as String? ?? '',
       component: {
         componentMap.keys.first: ComponentProperties.fromJson(componentMap),
       },
@@ -36,14 +35,11 @@ class Component extends Equatable {
   /// The unique ID of the component.
   final String id;
 
-  /// The weight of the component in a layout.
-  final double? weight;
-
   /// The properties of the component.
   final Map<String, ComponentProperties> component;
 
   @override
-  List<Object?> get props => [id, weight, component];
+  List<Object?> get props => [id, component];
 }
 
 /// A sealed class for the properties of a component.

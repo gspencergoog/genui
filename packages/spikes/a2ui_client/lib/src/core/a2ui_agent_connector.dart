@@ -88,9 +88,7 @@ class A2uiAgentConnector {
     }
 
     final payload = A2AMessageSendParams()..message = message;
-    payload.extensions = [
-      'https://github.com/a2aproject/a2a-samples/extensions/a2ui/v7',
-    ];
+    payload.extensions = ['https://a2ui.org/ext/a2a-ui/v0.1'];
 
     _log.fine('--- OUTGOING REQUEST ---');
     _log.fine('URL: ${url.toString()}');
@@ -187,9 +185,7 @@ class A2uiAgentConnector {
       ..referenceTaskIds = [_taskId!];
 
     final payload = A2AMessageSendParams()..message = message;
-    payload.extensions = [
-      'https://github.com/a2aproject/a2a-samples/extensions/a2uiui/v7',
-    ];
+    payload.extensions = ['https://a2ui.org/ext/a2a-ui/v0.1'];
 
     try {
       await _client.sendMessage(payload);
@@ -203,20 +199,19 @@ class A2uiAgentConnector {
 
   void _processA2uiMessages(Map<String, dynamic> data) {
     _log.finer('Processing a2ui messages from data part: $data');
-    if (data.containsKey('a2uiMessages')) {
-      final messages = data['a2uiMessages'] as List;
-      _log.finer('Found ${messages.length} A2UI messages.');
-      for (final message in messages) {
-        if (!_controller.isClosed) {
-          _log.finest(
-            'Adding message to stream: '
-            '${jsonEncode(message)}',
-          );
-          _controller.add(jsonEncode(message));
-        }
+    if (data.containsKey('surfaceUpdate') ||
+        data.containsKey('dataModelUpdate') ||
+        data.containsKey('beginRendering') ||
+        data.containsKey('deleteSurface')) {
+      if (!_controller.isClosed) {
+        _log.finest(
+          'Adding message to stream: '
+          '${jsonEncode(data)}',
+        );
+        _controller.add(jsonEncode(data));
       }
     } else {
-      _log.warning('A2A data part did not contain "a2uiMessages" key.');
+      _log.warning('A2A data part did not contain any known A2UI messages.');
     }
   }
 

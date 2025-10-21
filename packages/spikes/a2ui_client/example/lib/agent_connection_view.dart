@@ -26,8 +26,8 @@ class _AgentConnectionViewState extends State<AgentConnectionView>
   final registry = WidgetRegistry();
   final _messageController = TextEditingController(
     text:
-        'Provide me a list of great italian restaurants in New York in lower '
-        'manhattan',
+        'Provide me a list of great chinese restaurants in New York in lower '
+        'Manhattan',
   );
   final List<ChatMessage> _chatHistory = [];
   final ScrollController _scrollController = ScrollController();
