@@ -103,23 +103,23 @@ function validateComponent(
     errors.push(`Component is missing an 'id'.`);
     return;
   }
-  if (!component.componentProperties) {
+  if (!component.component) {
     errors.push(
-      `Component '${component.id}' is missing 'componentProperties'.`
+      `Component '${component.id}' is missing 'component'.`
     );
     return;
   }
 
-  const componentTypes = Object.keys(component.componentProperties);
+  const componentTypes = Object.keys(component.component);
   if (componentTypes.length !== 1) {
     errors.push(
-      `Component '${component.id}' must have exactly one property in 'componentProperties', but found ${componentTypes.length}.`
+      `Component '${component.id}' must have exactly one property in 'component', but found ${componentTypes.length}.`
     );
     return;
   }
 
   const componentType = componentTypes[0];
-  const properties = component.componentProperties[componentType];
+  const properties = component.component[componentType];
 
   const checkRequired = (props: string[]) => {
     for (const prop of props) {

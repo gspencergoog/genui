@@ -26,7 +26,7 @@
                     "type": "string",
                     "description": "The unique identifier for this component."
                   },
-                  "componentProperties": {
+                  "component": {
                     "description": "A wrapper object for a single widget definition. It MUST contain exactly one key, which is the name of a widget type (e.g., 'Column', 'Text'). The value is an object containing the properties for that widget.",
                     "type": "object",
                     "minProperties": 1,
@@ -637,7 +637,7 @@
                     }
                   }
                 },
-                "required": ["id", "componentProperties"]
+                "required": ["id", "component"]
               }
             }
           },

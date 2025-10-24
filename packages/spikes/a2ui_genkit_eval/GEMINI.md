@@ -21,8 +21,8 @@ Each message corresponds to one of the four message schemas: `stream_header.json
 For each component in the `components` array, the following rules apply:
 
 *   **General**:
-    *   A component must have an `id` and a `componentProperties` object.
-    *   The `componentProperties` object must contain exactly one key, which defines the component's type (e.g., "Heading", "Text").
+    *   A component must have an `id` and a `component` object.
+    *   The `component` object must contain exactly one key, which defines the component's type (e.g., "Heading", "Text").
 
 *   **Heading**:
     *   **Required**: Must have a `text` property.

@@ -49,7 +49,7 @@ class ComponentPropertiesVisitor {
         'description': resolveValue(properties.description, itemData),
       },
       ButtonProperties() => {
-        'label': resolveValue(properties.label, itemData),
+        'child': properties.child,
         'action': _resolveAction(properties.action, itemData),
       },
       CheckBoxProperties() => {

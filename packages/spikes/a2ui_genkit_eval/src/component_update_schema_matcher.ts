@@ -25,8 +25,8 @@ export class ComponentUpdateSchemaMatcher extends SchemaMatcher {
     }
 
     for (const component of components) {
-      if (component.componentProperties?.[this.componentName]) {
-        const properties = component.componentProperties[this.componentName];
+      if (component.component?.[this.componentName]) {
+        const properties = component.component[this.componentName];
         if (!this.propertyName) {
           // Component found, no property check needed.
           return { success: true };

@@ -19,14 +19,13 @@ class UnknownComponentException implements Exception {
 
 /// A component in the UI.
 class Component extends Equatable {
-  const Component({required this.id, this.weight, required this.component});
+  const Component({required this.id, required this.component});
 
   /// Creates a [Component] from a JSON object.
   factory Component.fromJson(Map<String, dynamic> json) {
     final componentMap = json['component'] as Map<String, dynamic>;
     return Component(
-      id: json['id'] as String,
-      weight: JsonUtils.parseDouble(json['weight']),
+      id: json['id'] as String? ?? '',
       component: {
         componentMap.keys.first: ComponentProperties.fromJson(componentMap),
       },
@@ -36,14 +35,11 @@ class Component extends Equatable {
   /// The unique ID of the component.
   final String id;
 
-  /// The weight of the component in a layout.
-  final double? weight;
-
   /// The properties of the component.
   final Map<String, ComponentProperties> component;
 
   @override
-  List<Object?> get props => [id, weight, component];
+  List<Object?> get props => [id, component];
 }
 
 /// A sealed class for the properties of a component.
@@ -116,7 +112,7 @@ class HeadingProperties extends ComponentProperties {
   factory HeadingProperties.fromJson(Map<String, dynamic> json) {
     return HeadingProperties(
       text: BoundValue.fromJson(json['text'] as Map<String, dynamic>),
-      level: json['level'] as String,
+      level: json['level'] as String? ?? '2',
     );
   }
 
@@ -412,23 +408,23 @@ class ModalProperties extends ComponentProperties {
 
 /// The properties for a button component.
 class ButtonProperties extends ComponentProperties {
-  const ButtonProperties({required this.label, required this.action});
+  const ButtonProperties({required this.child, required this.action});
 
   factory ButtonProperties.fromJson(Map<String, dynamic> json) {
     return ButtonProperties(
-      label: BoundValue.fromJson(json['label'] as Map<String, dynamic>),
+      child: json['child'] as String,
       action: Action.fromJson(json['action'] as Map<String, dynamic>),
     );
   }
 
-  /// The label of the button.
-  final BoundValue label;
+  /// The child of the button.
+  final String child;
 
   /// The action to perform when the button is tapped.
   final Action action;
 
   @override
-  List<Object?> get props => [label, action];
+  List<Object?> get props => [child, action];
 
   @override
   String get componentType => 'Button';
