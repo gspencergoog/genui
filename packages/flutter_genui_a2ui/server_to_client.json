@@ -139,7 +139,43 @@
                         "description": "The name of the icon to display. This can be a literal string ('literal') or a reference to a value in the data model ('path', e.g. '/icon/name').",
                         "properties": {
                           "literalString": {
-                            "type": "string"
+                            "type": "string",
+                            "enum": [
+                              "add",
+                              "arrow_back",
+                              "arrow_forward",
+                              "build",
+                              "calendar_today",
+                              "call",
+                              "camera_alt",
+                              "check",
+                              "close",
+                              "delete",
+                              "download",
+                              "edit",
+                              "event",
+                              "favorite",
+                              "home",
+                              "info",
+                              "location_on",
+                              "lock",
+                              "lock_open",
+                              "mail",
+                              "menu",
+                              "notifications",
+                              "notifications_active",
+                              "payment",
+                              "person",
+                              "phone",
+                              "photo_library",
+                              "search",
+                              "settings",
+                              "share",
+                              "shopping_cart",
+                              "upload",
+                              "visibility_off",
+                              "visibility"
+                            ]
                           },
                           "path": {
                             "type": "string"
