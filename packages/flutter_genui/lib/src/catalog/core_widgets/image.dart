@@ -96,7 +96,7 @@ final image = CatalogItem(
             } else {
               child = Image.network(location, fit: fit);
             }
-            return SizedBox(width: 150, height: 150, child: child);
+            return SizedBox(width: 64, height: 64, child: child);
           },
         );
       },
