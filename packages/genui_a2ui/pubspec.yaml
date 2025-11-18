@@ -5,6 +5,7 @@
 name: genui_a2ui
 description: Integration package for genui and A2UI Streaming UI Protocol.
 version: 0.5.1
+publish_to: none
 homepage: https://github.com/flutter/genui/tree/main/packages/genui_a2ui
 license: BSD-3-Clause
 issue_tracker: https://github.com/flutter/genui/issues
@@ -16,7 +17,8 @@ environment:
 resolution: workspace
 
 dependencies:
-  a2a: ^3.1.0
+  a2a_dart:
+    path: ../a2a_dart
   flutter:
     sdk: flutter
   genui: ^0.5.1

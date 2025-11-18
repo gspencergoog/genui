@@ -4,121 +4,121 @@
 
 import 'dart:async';
 
-import 'package:a2a/a2a.dart' as a2a;
+import 'package:a2a_dart/a2a_dart.dart' as a2a;
 import 'package:genui/genui.dart' as genui;
 import 'package:genui_a2ui/genui_a2ui.dart';
 
 class FakeA2AClient implements a2a.A2AClient {
-  a2a.A2AAgentCard? agentCard;
-  Stream<a2a.A2ASendStreamMessageResponse> Function(a2a.A2AMessageSendParams)?
-  sendMessageStreamHandler;
-  Future<a2a.A2ASendMessageResponse> Function(a2a.A2AMessageSendParams)?
-  sendMessageHandler;
+  a2a.AgentCard? agentCard;
+  Stream<a2a.Event> Function(a2a.Message)? messageStreamHandler;
+  Future<a2a.Task> Function(a2a.Message)? messageSendHandler;
 
   int getAgentCardCalled = 0;
-  int sendMessageStreamCalled = 0;
-  int sendMessageCalled = 0;
+  int messageStreamCalled = 0;
+  int messageSendCalled = 0;
 
-  a2a.A2AMessageSendParams? lastSendMessageParams;
+  a2a.Message? lastMessage;
 
   @override
-  Future<a2a.A2AAgentCard> getAgentCard({
-    String? agentBaseUrl,
-    String agentCardPath = '/agent_card',
-  }) async {
+  String get url => 'http://fake.url';
+
+  @override
+  Future<a2a.AgentCard> getAgentCard() async {
     getAgentCardCalled++;
     if (agentCard != null) {
       return agentCard!;
     }
-    return a2a.A2AAgentCard()
-      ..name = 'Test Agent'
-      ..description = 'A test agent'
-      ..version = '1.0.0';
+    return const a2a.AgentCard(
+      name: 'Test Agent',
+      description: 'A test agent',
+      version: '1.0.0',
+      capabilities: a2a.AgentCapabilities(),
+      url: 'http://fake.url',
+      protocolVersion: '0.1.0',
+      defaultInputModes: [],
+      defaultOutputModes: [],
+      skills: [],
+    );
   }
 
   @override
-  Stream<a2a.A2ASendStreamMessageResponse> sendMessageStream(
-    a2a.A2AMessageSendParams params,
-  ) {
-    sendMessageStreamCalled++;
-    lastSendMessageParams = params;
-    if (sendMessageStreamHandler != null) {
-      return sendMessageStreamHandler!(params);
+  Stream<a2a.Event> messageStream(a2a.Message message) {
+    messageStreamCalled++;
+    lastMessage = message;
+    if (messageStreamHandler != null) {
+      return messageStreamHandler!(message);
     }
-    return Stream<a2a.A2ASendStreamMessageResponse>.fromIterable([]);
+    return Stream<a2a.Event>.fromIterable([]);
   }
 
   @override
-  Future<a2a.A2ASendMessageResponse> sendMessage(
-    a2a.A2AMessageSendParams params,
-  ) async {
-    sendMessageCalled++;
-    lastSendMessageParams = params;
-    if (sendMessageHandler != null) {
-      return sendMessageHandler!(params);
+  Future<a2a.Task> messageSend(a2a.Message message) async {
+    messageSendCalled++;
+    lastMessage = message;
+    if (messageSendHandler != null) {
+      return messageSendHandler!(message);
     }
-    return a2a.A2ASendMessageResponse();
+    return const a2a.Task(
+      id: 'fake-task-id',
+      contextId: 'fake-context-id',
+      status: a2a.TaskStatus(state: a2a.TaskState.completed),
+    );
   }
 
-  // Unimplemented methods
   @override
-  Future<a2a.A2ACancelTaskResponse> cancelTask(a2a.A2ATaskIdParams params) {
+  Future<a2a.Task> cancelTask(String taskId) {
     throw UnimplementedError();
   }
 
   @override
-  Future<a2a.A2ADeleteTaskPushNotificationConfigResponse>
-  deleteTaskPushNotificationConfig(
-    a2a.A2ADeleteTaskPushNotificationConfigParams params,
+  void close() {}
+
+  @override
+  Future<void> deletePushNotificationConfig(String taskId, String configId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<a2a.AgentCard> getAuthenticatedExtendedCard(String token) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<a2a.TaskPushNotificationConfig> getPushNotificationConfig(
+    String taskId,
+    String configId,
   ) {
     throw UnimplementedError();
   }
 
   @override
-  Future<a2a.A2AGetTaskResponse> getTask(a2a.A2ATaskQueryParams params) {
+  Future<a2a.Task> getTask(String taskId) {
     throw UnimplementedError();
   }
 
   @override
-  Future<a2a.A2AGetTaskPushNotificationConfigResponse>
-  getTaskPushNotificationConfig(
-    a2a.A2AGetTaskPushNotificationConfigParams params,
+  Future<List<a2a.PushNotificationConfig>> listPushNotificationConfigs(
+    String taskId,
   ) {
     throw UnimplementedError();
   }
 
   @override
-  Future<a2a.A2ASetTaskPushNotificationConfigResponse>
-  setTaskPushNotificationConfig(a2a.A2ATaskPushNotificationConfig params) {
+  Future<a2a.ListTasksResult> listTasks([a2a.ListTasksParams? params]) {
     throw UnimplementedError();
   }
 
   @override
-  String agentBaseUrl = '';
+  Stream<a2a.Event> resubscribeToTask(String taskId) {
+    throw UnimplementedError();
+  }
 
   @override
-  String agentCardPath = '';
-
-  @override
-  Future<a2a.A2AListTaskPushNotificationConfigResponse>
-  listTaskPushNotificationConfig(
-    a2a.A2AListTaskPushNotificationConfigParams params,
+  Future<a2a.TaskPushNotificationConfig> setPushNotificationConfig(
+    a2a.TaskPushNotificationConfig params,
   ) {
-    // TODO: implement listTaskPushNotificationConfig
     throw UnimplementedError();
   }
-
-  @override
-  Stream<a2a.A2ASendStreamMessageResponse> resubscribeTask(
-    a2a.A2ATaskIdParams params,
-  ) {
-    // TODO: implement resubscribeTask
-    throw UnimplementedError();
-  }
-
-  @override
-  // TODO: implement serviceEndpoint
-  Future<String> get serviceEndpoint => throw UnimplementedError();
 }
 
 class FakeA2uiAgentConnector implements A2uiAgentConnector {
