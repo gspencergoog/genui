@@ -147,6 +147,7 @@ void main() {
       connector.errorStream.listen(errors.add);
 
       await connector.connectAndSend(genui.UserMessage.text('Hi'));
+      await Future<void>.delayed(Duration.zero);
 
       expect(errors.length, 1);
       expect(errors.first, 'A2A Error: A2A Error (code: -1)');
