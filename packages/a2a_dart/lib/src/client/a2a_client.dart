@@ -56,7 +56,7 @@ class A2AClient {
   /// server.
   ///
   /// The [transport] parameter specifies the communication layer. If omitted,
-  /// an [HttpTransport] is created using the provided [url].
+  /// an [SseTransport] is created using the provided [url].
   ///
   /// An optional [log] instance can be provided for logging client activities.
   /// Creates an [A2AClient] instance.
@@ -65,11 +65,11 @@ class A2AClient {
   /// server (e.g., `http://localhost:8000`).
   ///
   /// An optional [transport] can be provided to customize the communication
-  /// layer. If omitted, an [HttpTransport] is created using the provided [url].
+  /// layer. If omitted, an [SseTransport] is created using the provided [url].
   ///
   /// An optional [log] instance can be provided for logging client activities.
   A2AClient({required this.url, Transport? transport, Logger? log})
-    : _transport = transport ?? HttpTransport(url: url, log: log),
+    : _transport = transport ?? SseTransport(url: url, log: log),
       _log = log;
 
   /// Creates an [A2AClient] by fetching an [AgentCard] and selecting the best
@@ -145,7 +145,7 @@ class A2AClient {
     final response = await _transport.send({
       'jsonrpc': '2.0',
       'method': 'message/send',
-      'params': message.toJson(),
+      'params': {'message': message.toJson()},
       'id': 0,
     });
     _log?.fine('Received response from message/send: $response');
@@ -171,7 +171,7 @@ class A2AClient {
     final stream = _transport.sendStream({
       'jsonrpc': '2.0',
       'method': 'message/stream',
-      'params': message.toJson(),
+      'params': {'message': message.toJson()},
     });
 
     return stream.transform(

@@ -45,7 +45,7 @@ abstract class Transport {
   /// Throws an `A2AException` for transport-level failures.
   Future<Map<String, Object?>> send(
     Map<String, Object?> request, {
-    String path = '/rpc',
+    String path = '',
   });
 
   /// Sends a JSON-RPC request to the server and initiates a stream of
