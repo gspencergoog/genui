@@ -37,7 +37,7 @@ class SseTransport extends HttpTransport {
 
   @override
   Stream<Map<String, Object?>> sendStream(Map<String, Object?> request) async* {
-    final uri = Uri.parse('$url/rpc');
+    final uri = Uri.parse(url);
     final body = jsonEncode(request);
     log?.fine('Sending SSE request to $uri with body: $body');
     final allHeaders = {

@@ -20,13 +20,13 @@ Map<String, dynamic> _$TextPartToJson(TextPart instance) => <String, dynamic>{
 
 FilePart _$FilePartFromJson(Map<String, dynamic> json) => FilePart(
   kind: json['kind'] as String? ?? 'file',
-  file: FileType.fromJson(json['file'] as Map<String, dynamic>),
+  file: FileType.fromJson(json['data'] as Map<String, dynamic>),
   metadata: json['metadata'] as Map<String, dynamic>?,
 );
 
 Map<String, dynamic> _$FilePartToJson(FilePart instance) => <String, dynamic>{
   'kind': instance.kind,
-  'file': instance.file.toJson(),
+  'data': instance.file.toJson(),
   'metadata': instance.metadata,
 };
 

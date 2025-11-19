@@ -56,7 +56,7 @@ class HttpTransport implements Transport {
   @override
   Future<Map<String, Object?>> send(
     Map<String, Object?> request, {
-    String path = '/rpc',
+    String path = '',
   }) async {
     final uri = Uri.parse('$url$path');
     log?.fine('Sending POST request to $uri with body: $request');

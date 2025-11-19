@@ -35,7 +35,7 @@ abstract class Part with _$Part {
 
     /// The file details, specifying the file's location (URI) or content
     /// (bytes).
-    required FileType file,
+    @JsonKey(name: 'data') required FileType file,
 
     /// Optional metadata associated with this file part.
     Map<String, Object?>? metadata,
