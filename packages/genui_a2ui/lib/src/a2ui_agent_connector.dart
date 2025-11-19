@@ -43,7 +43,7 @@ class A2uiAgentConnector {
     a2a.A2AClient? client,
     String? contextId,
   }) : _contextId = contextId {
-    this.client = client ?? a2a.A2AClient(url: url.toString());
+    this.client = client ?? a2a.A2AClient(url: url.toString(), log: _log);
   }
 
   /// The URL of the A2UI Agent.
