@@ -167,9 +167,7 @@ void main() {
 
       final Future<GenUiUpdate> futureUpdate =
           messageProcessor.surfaceUpdates.first;
-      messageProcessor.handleMessage(
-        const SurfaceDeletion(surfaceId: surfaceId),
-      );
+      messageProcessor.handleMessage(const DeleteSurface(surfaceId: surfaceId));
       final GenUiUpdate update = await futureUpdate;
 
       expect(update, isA<SurfaceRemoved>());

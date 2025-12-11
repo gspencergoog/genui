@@ -20,7 +20,10 @@ void main() {
         'surfaceUpdate': {
           'surfaceId': '123',
           'components': [
-            {'id': 'btn', 'props': {'component': 'Button'}}
+            {
+              'id': 'btn',
+              'props': {'component': 'Button'},
+            },
           ],
         },
       };
@@ -75,16 +78,13 @@ void main() {
       };
       final Stream<A2uiMessage> stream = protocol.parsePayload(json);
       final A2uiMessage message = await stream.single;
-      expect(message, isA<SurfaceDeletion>());
-      expect((message as SurfaceDeletion).surfaceId, '123');
+      expect(message, isA<DeleteSurface>());
+      expect((message as DeleteSurface).surfaceId, '123');
     });
 
     test('parses string payload as JSON', () async {
-       final String jsonString = jsonEncode({
-        'surfaceUpdate': {
-          'surfaceId': '123',
-          'components': [],
-        },
+      final String jsonString = jsonEncode({
+        'surfaceUpdate': {'surfaceId': '123', 'components': <Object?>[]},
       });
       final Stream<A2uiMessage> stream = protocol.parsePayload(jsonString);
       final A2uiMessage message = await stream.single;
@@ -94,12 +94,15 @@ void main() {
     test('returns correct tools', () {
       final catalog = const Catalog([], catalogId: 'cat1');
       final List<AiTool<JsonMap>> tools = protocol.getTools(catalog, (_) {});
-      expect(tools.map((t) => t.name), containsAll([
-        'surfaceUpdate',
-        'beginRendering',
-        'dataModelUpdate',
-        'deleteSurface',
-      ]));
+      expect(
+        tools.map((t) => t.name),
+        containsAll([
+          'surfaceUpdate',
+          'beginRendering',
+          'dataModelUpdate',
+          'deleteSurface',
+        ]),
+      );
     });
 
     test('returns null system preamble', () {

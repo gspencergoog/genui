@@ -98,7 +98,7 @@ class Ai extends _$Ai {
         case DataModelUpdate(:final surfaceId):
           surfaceUpdateController.add(surfaceId);
         // Shared
-        case SurfaceDeletion():
+        case DeleteSurface():
           // We only navigate on BeginRendering.
           break;
         case ErrorMessage(:final code, :final message):

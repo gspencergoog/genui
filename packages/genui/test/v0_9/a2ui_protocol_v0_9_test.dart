@@ -20,7 +20,10 @@ void main() {
         'updateComponents': {
           'surfaceId': '123',
           'components': [
-            {'id': 'btn', 'props': {'component': 'Button'}}
+            {
+              'id': 'btn',
+              'props': {'component': 'Button'},
+            },
           ],
         },
       };
@@ -34,10 +37,7 @@ void main() {
 
     test('parses CreateSurface', () async {
       final json = {
-        'createSurface': {
-          'surfaceId': '123',
-          'catalogId': 'cat1',
-        },
+        'createSurface': {'surfaceId': '123', 'catalogId': 'cat1'},
       };
       final Stream<A2uiMessage> stream = protocol.parsePayload(json);
       final A2uiMessage message = await stream.single;
@@ -68,12 +68,9 @@ void main() {
 
     test('parses JSONL string payload', () async {
       final String jsonLine = jsonEncode({
-        'updateComponents': {
-          'surfaceId': '123',
-          'components': [],
-        },
+        'updateComponents': {'surfaceId': '123', 'components': <Object?>[]},
       });
-      final Stream<A2uiMessage> stream = protocol.parsePayload('$jsonLine\n  '); // with whitespace
+      final Stream<A2uiMessage> stream = protocol.parsePayload('$jsonLine\n  ');
       final A2uiMessage message = await stream.single;
       expect(message, isA<UpdateComponents>());
     });
@@ -81,11 +78,10 @@ void main() {
     test('returns correct tools', () {
       final catalog = const Catalog([], catalogId: 'cat1');
       final List<AiTool<JsonMap>> tools = protocol.getTools(catalog, (_) {});
-      expect(tools.map((t) => t.name), containsAll([
-        'updateComponents',
-        'createSurface',
-        'deleteSurface',
-      ]));
+      expect(
+        tools.map((t) => t.name),
+        containsAll(['updateComponents', 'createSurface', 'deleteSurface']),
+      );
     });
 
     test('returns non-null system preamble', () {

@@ -5,7 +5,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-import '../core/a2ui_message_processor.dart';
 import '../model/catalog.dart';
 import '../model/catalog_item.dart';
 import '../model/data_model.dart';
@@ -14,6 +13,7 @@ import '../model/ui_models.dart';
 import '../primitives/constants.dart';
 import '../primitives/logging.dart';
 import '../primitives/simple_items.dart';
+import 'genui_host.dart';
 
 /// A callback for when a user interacts with a widget.
 typedef UiEventCallback = void Function(UiEvent event);

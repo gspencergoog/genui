@@ -278,7 +278,7 @@ class A2uiAgentConnector {
 
     try {
       if (!_controller.isClosed) {
-        final message = _protocol.parseJson(data);
+        final genui.A2uiMessage message = _protocol.parseJson(data);
         _log.finest(
           'Adding message to stream: '
           '${const JsonEncoder.withIndent('  ').convert(data)}',

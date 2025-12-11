@@ -69,7 +69,7 @@ class DeleteSurfaceTool extends AiTool<JsonMap> {
   @override
   Future<JsonMap> invoke(JsonMap args) async {
     final surfaceId = args[surfaceIdKey] as String;
-    handleMessage(SurfaceDeletion(surfaceId: surfaceId));
+    handleMessage(DeleteSurface(surfaceId: surfaceId));
     return {'status': 'Surface $surfaceId deleted.'};
   }
 }
@@ -146,10 +146,10 @@ class BeginRenderingTool extends AiTool<JsonMap> {
     final surfaceId = args[surfaceIdKey] as String;
     final root = args['root'] as String;
     final styles = args['styles'] as JsonMap?;
-    // Note: catalogId is often implicit in V0.8 or passed in args if schema supports it,
-    // explicitly passing it here if needed or using the bound one.
+    // Note: catalogId is often implicit in V0.8 or passed in args if schema
+    // supports it, explicitly passing it here if needed or using the bound one.
     // The schema has catalogId.
-    final msgCatalogId = args['catalogId'] as String? ?? catalogId;
+    final String? msgCatalogId = args['catalogId'] as String? ?? catalogId;
 
     handleMessage(
       BeginRendering(

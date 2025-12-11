@@ -33,7 +33,7 @@ sealed class A2uiMessage {
     }
     // Shared messages
     if (json.containsKey('deleteSurface')) {
-      return SurfaceDeletion.fromJson(json['deleteSurface'] as JsonMap);
+      return DeleteSurface.fromJson(json['deleteSurface'] as JsonMap);
     }
     if (json.containsKey('error')) {
       return ErrorMessage.fromJson(json['error'] as JsonMap);
@@ -250,15 +250,15 @@ final class BeginRendering extends A2uiMessageV08 {
 
 /// An A2UI message that deletes a surface.
 ///
-/// This is used in both V0.8 and V0.9, though the JSON structure might vary slightly,
-/// here we assume it's compatible or handled by protocol parsers.
-final class SurfaceDeletion extends A2uiMessage {
-  /// Creates a [SurfaceDeletion] message.
-  const SurfaceDeletion({required this.surfaceId});
+/// This is used in both V0.8 and V0.9, though the JSON structure might vary
+/// slightly, here we assume it's compatible or handled by protocol parsers.
+final class DeleteSurface extends A2uiMessage {
+  /// Creates a [DeleteSurface] message.
+  const DeleteSurface({required this.surfaceId});
 
-  /// Creates a [SurfaceDeletion] message from a JSON map.
-  factory SurfaceDeletion.fromJson(JsonMap json) {
-    return SurfaceDeletion(surfaceId: json[surfaceIdKey] as String);
+  /// Creates a [DeleteSurface] message from a JSON map.
+  factory DeleteSurface.fromJson(JsonMap json) {
+    return DeleteSurface(surfaceId: json[surfaceIdKey] as String);
   }
 
   /// The ID of the surface that this message applies to.

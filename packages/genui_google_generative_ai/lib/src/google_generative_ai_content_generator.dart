@@ -147,12 +147,7 @@ class GoogleGenerativeAiContentGenerator implements ContentGenerator {
     genUiLogger.fine('Setting up tools');
 
     // Combine available tools with protocol tools
-    final protocolTools = _protocol.getTools(
-      catalog,
-      _a2uiMessageController.add,
-    );
-
-    final allTools = [...availableTools, ...protocolTools];
+    final allTools = availableTools;
     genUiLogger.fine(
       'Available tools: ${allTools.map((t) => t.name).join(', ')}',
     );
@@ -237,8 +232,8 @@ class GoogleGenerativeAiContentGenerator implements ContentGenerator {
     genUiLogger.fine(
       'Processing ${functionCalls.length} function calls from model.',
     );
-    // Note: tools here should span all available tools including protocol tools.
-    // _generate ensures this by passing allTools.
+    // Note: tools here should span all available tools including protocol
+    // tools. _generate ensures this by passing allTools.
 
     final functionResponseParts = <google_ai.Part>[];
     for (final call in functionCalls) {
