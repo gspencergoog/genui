@@ -6,12 +6,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/v0_9.dart';
 import 'package:intl/intl.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 final _schema = S.object(
   properties: {
-    'value': A2uiSchemas.stringReference(
+    'selectedDate': Schemas.stringReference(
       description: 'The initial date of the date picker in yyyy-mm-dd format.',
     ),
     'label': S.string(description: 'Label for the date picker.'),

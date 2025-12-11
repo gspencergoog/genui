@@ -8,20 +8,20 @@ import 'package:flutter/material.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../../core/widget_utilities.dart';
-import '../../model/a2ui_schemas.dart';
 import '../../model/catalog_item.dart';
 import '../../model/ui_models.dart';
+import '../../model/v0_9/schemas.dart';
 import '../../primitives/logging.dart';
 import '../../primitives/simple_items.dart';
 
 final _schema = S.object(
   properties: {
-    'child': A2uiSchemas.componentReference(
+    'child': Schemas.componentReference(
       description:
           'The ID of a child widget. This should always be set, e.g. to the ID '
           'of a `Text` widget.',
     ),
-    'action': A2uiSchemas.action(),
+    'action': Schemas.action(),
     'primary': S.boolean(
       description: 'Whether the button invokes a primary action.',
     ),

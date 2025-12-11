@@ -6,6 +6,8 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/src/model/v0_9/messages.dart' as v0_9;
+import 'package:genui/src/model/v0_9/protocol.dart';
 
 void main() {
   group('A2uiProtocolV09', () {
@@ -29,8 +31,8 @@ void main() {
       };
       final Stream<A2uiMessage> stream = protocol.parsePayload(json);
       final A2uiMessage message = await stream.single;
-      expect(message, isA<UpdateComponents>());
-      final update = message as UpdateComponents;
+      expect(message, isA<v0_9.UpdateComponents>());
+      final update = message as v0_9.UpdateComponents;
       expect(update.surfaceId, '123');
       expect(update.components.length, 1);
     });
@@ -41,8 +43,8 @@ void main() {
       };
       final Stream<A2uiMessage> stream = protocol.parsePayload(json);
       final A2uiMessage message = await stream.single;
-      expect(message, isA<CreateSurface>());
-      final create = message as CreateSurface;
+      expect(message, isA<v0_9.CreateSurface>());
+      final create = message as v0_9.CreateSurface;
       expect(create.surfaceId, '123');
       expect(create.catalogId, 'cat1');
     });
@@ -58,8 +60,8 @@ void main() {
       };
       final Stream<A2uiMessage> stream = protocol.parsePayload(json);
       final A2uiMessage message = await stream.single;
-      expect(message, isA<UpdateDataModel>());
-      final update = message as UpdateDataModel;
+      expect(message, isA<v0_9.UpdateDataModel>());
+      final update = message as v0_9.UpdateDataModel;
       expect(update.surfaceId, '123');
       expect(update.path, '/foo');
       expect(update.value, 'bar');
@@ -72,7 +74,7 @@ void main() {
       });
       final Stream<A2uiMessage> stream = protocol.parsePayload('$jsonLine\n  ');
       final A2uiMessage message = await stream.single;
-      expect(message, isA<UpdateComponents>());
+      expect(message, isA<v0_9.UpdateComponents>());
     });
 
     test('returns correct tools', () {

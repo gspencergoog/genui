@@ -5,12 +5,12 @@
 import 'package:flutter/material.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
-import '../../model/a2ui_schemas.dart';
 import '../../model/catalog_item.dart';
+import '../../model/v0_9/schemas.dart';
 
 final _schema = S.object(
   properties: {
-    'url': A2uiSchemas.stringReference(
+    'url': Schemas.stringReference(
       description: 'The URL of the video to play.',
     ),
   },

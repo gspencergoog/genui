@@ -5,10 +5,13 @@
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../model/a2ui_message.dart';
-import '../model/a2ui_schemas.dart';
 import '../model/catalog.dart';
 import '../model/tools.dart';
 import '../model/ui_models.dart';
+import '../model/v0_8/messages.dart' as v0_8_messages;
+import '../model/v0_8/schemas.dart' as v0_8_schemas;
+import '../model/v0_9/messages.dart' as v0_9_messages;
+import '../model/v0_9/schemas.dart' as v0_9_schemas;
 import '../primitives/simple_items.dart';
 
 /// An [AiTool] for adding or updating a UI surface.
@@ -20,8 +23,8 @@ class UpdateComponentsTool extends AiTool<JsonMap> {
   UpdateComponentsTool({required this.handleMessage, required Catalog catalog})
     : super(
         name: 'updateComponents',
-        description: 'Updates a surface with a new set of components.',
-        parameters: A2uiSchemas.updateComponentsSchema(catalog),
+        description: 'Update the UI components on a surface.',
+        parameters: v0_9_schemas.Schemas.updateComponentsSchema(catalog),
       );
 
   /// The callback to invoke when adding or updating a surface.
@@ -34,7 +37,10 @@ class UpdateComponentsTool extends AiTool<JsonMap> {
       return Component.fromJson(e as JsonMap);
     }).toList();
     handleMessage(
-      UpdateComponents(surfaceId: surfaceId, components: components),
+      v0_9_messages.UpdateComponents(
+        surfaceId: surfaceId,
+        components: components,
+      ),
     );
     return {
       surfaceIdKey: surfaceId,
@@ -48,7 +54,7 @@ class UpdateComponentsTool extends AiTool<JsonMap> {
 /// This tool allows the AI to remove a UI surface that is no longer needed.
 class DeleteSurfaceTool extends AiTool<JsonMap> {
   /// Creates a [DeleteSurfaceTool].
-  DeleteSurfaceTool({required this.handleMessage})
+  DeleteSurfaceTool({required this.handleMessage, required this.messageFactory})
     : super(
         name: 'deleteSurface',
         description: 'Removes a UI surface that is no longer needed.',
@@ -66,10 +72,14 @@ class DeleteSurfaceTool extends AiTool<JsonMap> {
   /// The callback to invoke when deleting a surface.
   final void Function(A2uiMessage message) handleMessage;
 
+  /// Factory to create the version-specific `DeleteSurface`
+  /// message.
+  final A2uiMessage Function(String surfaceId) messageFactory;
+
   @override
   Future<JsonMap> invoke(JsonMap args) async {
     final surfaceId = args[surfaceIdKey] as String;
-    handleMessage(DeleteSurface(surfaceId: surfaceId));
+    handleMessage(messageFactory(surfaceId));
     return {'status': 'Surface $surfaceId deleted.'};
   }
 }
@@ -82,8 +92,8 @@ class CreateSurfaceTool extends AiTool<JsonMap> {
   CreateSurfaceTool({required this.handleMessage})
     : super(
         name: 'createSurface',
-        description: 'Signals the client to create a surface.',
-        parameters: A2uiSchemas.createSurfaceSchema(),
+        description: 'Create a new surface.',
+        parameters: v0_9_schemas.Schemas.createSurfaceSchema(),
       );
 
   /// The callback to invoke when signaling to create a surface.
@@ -93,7 +103,9 @@ class CreateSurfaceTool extends AiTool<JsonMap> {
   Future<JsonMap> invoke(JsonMap args) async {
     final surfaceId = args[surfaceIdKey] as String;
     final catalogId = args['catalogId'] as String;
-    handleMessage(CreateSurface(surfaceId: surfaceId, catalogId: catalogId));
+    handleMessage(
+      v0_9_messages.CreateSurface(surfaceId: surfaceId, catalogId: catalogId),
+    );
     return {'status': 'Surface $surfaceId created.'};
   }
 }
@@ -104,8 +116,8 @@ class SurfaceUpdateTool extends AiTool<JsonMap> {
   SurfaceUpdateTool({required this.handleMessage, required Catalog catalog})
     : super(
         name: 'surfaceUpdate',
-        description: 'Updates a surface with a new set of components.',
-        parameters: A2uiSchemas.surfaceUpdateSchema(catalog),
+        description: 'Update the UI components on a surface.',
+        parameters: v0_8_schemas.Schemas.surfaceUpdateSchema(catalog),
       );
 
   /// The callback to invoke.
@@ -117,7 +129,9 @@ class SurfaceUpdateTool extends AiTool<JsonMap> {
     final List<Component> components = (args['components'] as List).map((e) {
       return Component.fromJson(e as JsonMap);
     }).toList();
-    handleMessage(SurfaceUpdate(surfaceId: surfaceId, components: components));
+    handleMessage(
+      v0_8_messages.SurfaceUpdate(surfaceId: surfaceId, components: components),
+    );
     return {
       surfaceIdKey: surfaceId,
       'status': 'UI Surface $surfaceId updated.',
@@ -131,8 +145,8 @@ class BeginRenderingTool extends AiTool<JsonMap> {
   BeginRenderingTool({required this.handleMessage, required this.catalogId})
     : super(
         name: 'beginRendering',
-        description: ' signals the client to begin rendering.',
-        parameters: A2uiSchemas.beginRenderingSchema(),
+        description: 'Begin rendering a surface.',
+        parameters: v0_8_schemas.Schemas.beginRenderingSchema(),
       );
 
   /// The callback to invoke.
@@ -152,7 +166,7 @@ class BeginRenderingTool extends AiTool<JsonMap> {
     final String? msgCatalogId = args['catalogId'] as String? ?? catalogId;
 
     handleMessage(
-      BeginRendering(
+      v0_8_messages.BeginRendering(
         surfaceId: surfaceId,
         root: root,
         styles: styles,
@@ -169,8 +183,8 @@ class DataModelUpdateTool extends AiTool<JsonMap> {
   DataModelUpdateTool({required this.handleMessage})
     : super(
         name: 'dataModelUpdate',
-        description: 'Updates the data model.',
-        parameters: A2uiSchemas.dataModelUpdateV08Schema(),
+        description: 'Update the data model.',
+        parameters: v0_8_schemas.Schemas.dataModelUpdateSchema(),
       );
 
   /// The callback to invoke.
@@ -183,7 +197,11 @@ class DataModelUpdateTool extends AiTool<JsonMap> {
     final contents = args['contents'] as Object;
 
     handleMessage(
-      DataModelUpdate(surfaceId: surfaceId, path: path, contents: contents),
+      v0_8_messages.DataModelUpdate(
+        surfaceId: surfaceId,
+        path: path,
+        contents: contents,
+      ),
     );
     return {'status': 'Data model updated for $surfaceId'};
   }

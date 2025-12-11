@@ -6,16 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../../core/widget_utilities.dart';
-import '../../model/a2ui_schemas.dart';
 import '../../model/catalog_item.dart';
 import '../../model/data_model.dart';
+import '../../model/v0_9/schemas.dart';
 import '../../primitives/simple_items.dart';
 
 final _schema = S.object(
   properties: {
-    'value': A2uiSchemas.numberReference(),
-    'min': A2uiSchemas.numberReference(),
-    'max': A2uiSchemas.numberReference(),
+    'value': Schemas.numberReference(),
+    'min': Schemas.numberReference(),
+    'max': Schemas.numberReference(),
   },
   required: ['value'],
 );

@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/src/model/v0_9/messages.dart' as v0_9;
 
 void main() {
   group('$A2uiMessageProcessor', () {
@@ -42,13 +43,16 @@ void main() {
       ];
 
       messageProcessor.handleMessage(
-        UpdateComponents(surfaceId: surfaceId, components: components),
+        v0_9.UpdateComponents(surfaceId: surfaceId, components: components),
       );
 
       final Future<GenUiUpdate> futureUpdated =
           messageProcessor.surfaceUpdates.first;
       messageProcessor.handleMessage(
-        const CreateSurface(surfaceId: surfaceId, catalogId: standardCatalogId),
+        const v0_9.CreateSurface(
+          surfaceId: surfaceId,
+          catalogId: standardCatalogId,
+        ),
       );
       final GenUiUpdate updatedUpdate = await futureUpdated;
 
@@ -70,7 +74,7 @@ void main() {
         final Future<GenUiUpdate> futureUpdate =
             messageProcessor.surfaceUpdates.first;
         messageProcessor.handleMessage(
-          const CreateSurface(
+          const v0_9.CreateSurface(
             surfaceId: surfaceId,
             catalogId: standardCatalogId,
           ),
@@ -89,7 +93,10 @@ void main() {
       final Future<GenUiUpdate> futureCreate =
           messageProcessor.surfaceUpdates.first;
       messageProcessor.handleMessage(
-        const CreateSurface(surfaceId: surfaceId, catalogId: standardCatalogId),
+        const v0_9.CreateSurface(
+          surfaceId: surfaceId,
+          catalogId: standardCatalogId,
+        ),
       );
       final GenUiUpdate createUpdate = await futureCreate;
       expect(createUpdate, isA<SurfaceAdded>());
@@ -104,7 +111,7 @@ void main() {
       final Future<GenUiUpdate> futureUpdate =
           messageProcessor.surfaceUpdates.first;
       messageProcessor.handleMessage(
-        UpdateComponents(surfaceId: surfaceId, components: components),
+        v0_9.UpdateComponents(surfaceId: surfaceId, components: components),
       );
       final GenUiUpdate update = await futureUpdate;
 
@@ -137,16 +144,22 @@ void main() {
         );
 
         messageProcessor.handleMessage(
-          UpdateComponents(surfaceId: surfaceId, components: oldComponents),
+          v0_9.UpdateComponents(
+            surfaceId: surfaceId,
+            components: oldComponents,
+          ),
         );
         messageProcessor.handleMessage(
-          const CreateSurface(
+          const v0_9.CreateSurface(
             surfaceId: surfaceId,
             catalogId: standardCatalogId,
           ),
         );
         messageProcessor.handleMessage(
-          UpdateComponents(surfaceId: surfaceId, components: newComponents),
+          v0_9.UpdateComponents(
+            surfaceId: surfaceId,
+            components: newComponents,
+          ),
         );
 
         await expectation;
@@ -162,12 +175,14 @@ void main() {
         ),
       ];
       messageProcessor.handleMessage(
-        UpdateComponents(surfaceId: surfaceId, components: components),
+        v0_9.UpdateComponents(surfaceId: surfaceId, components: components),
       );
 
       final Future<GenUiUpdate> futureUpdate =
           messageProcessor.surfaceUpdates.first;
-      messageProcessor.handleMessage(const DeleteSurface(surfaceId: surfaceId));
+      messageProcessor.handleMessage(
+        const v0_9.DeleteSurface(surfaceId: surfaceId),
+      );
       final GenUiUpdate update = await futureUpdate;
 
       expect(update, isA<SurfaceRemoved>());

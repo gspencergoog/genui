@@ -2,77 +2,74 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:uuid/uuid.dart';
+
+import '../../core/prompt_fragments.dart';
 import '../../model/a2ui_message.dart';
-import '../../model/a2ui_schemas.dart';
 import '../../model/catalog.dart';
-import '../../model/tools.dart';
-import '../../primitives/constants.dart';
+import '../../model/ui_models.dart';
+import '../../model/v0_9/messages.dart';
 import '../../primitives/simple_items.dart';
 import 'model.dart';
 
-/// Prompt to be provided to the LLM about how to use the UI generation tools.
+/// Generates a technical prompt for GenUI.
 String genUiTechPrompt(List<String> toolNames) {
-  final toolDescription = toolNames.length > 1
-      ? 'the following UI generation tools: '
-            '${toolNames.map((name) => '"$name"').join(', ')}'
-      : 'the UI generation tool "${toolNames.first}"';
-
   return '''
-To show generated UI, use $toolDescription.
-When generating UI, always provide a unique $surfaceIdKey to identify the UI surface:
+${GenUiPromptFragments.basicChat}
 
-* To create new UI, use a new $surfaceIdKey.
-* To update existing UI, use the existing $surfaceIdKey.
-
-Use the root component id: 'root'.
-Ensure one of the generated components has an id of 'root'.
+You have access to the following tools: ${toolNames.join(', ')}.
+Use these tools to generate UI components when requested.
 ''';
 }
 
 /// Converts a [Catalog] to a [GenUiFunctionDeclaration].
 GenUiFunctionDeclaration catalogToFunctionDeclaration(
   Catalog catalog,
-  String toolName,
-  String toolDescription,
+  String name,
+  String description,
 ) {
   return GenUiFunctionDeclaration(
-    description: toolDescription,
-    name: toolName,
-    parameters: A2uiSchemas.updateComponentsSchema(catalog),
+    name: name,
+    description: description,
+    parameters: catalog.definition.value,
   );
 }
 
 /// Parses a [ToolCall] into a [ParsedToolCall].
 ParsedToolCall parseToolCall(ToolCall toolCall, String toolName) {
-  assert(toolCall.name == toolName);
+  final args = toolCall.args as JsonMap;
+  final String surfaceId = const Uuid().v4();
+  final messages = <A2uiMessage>[];
 
-  final Map<String, Object?> messageJson = {'updateComponents': toolCall.args};
-  final surfaceUpdateMessage = A2uiMessage.fromJson(messageJson);
+  if (args.containsKey('components')) {
+    final Object? components = args['components'];
+    if (components is List) {
+      messages.add(
+        UpdateComponents(
+          surfaceId: surfaceId,
+          components: components
+              .cast<JsonMap>()
+              .map(Component.fromJson)
+              .toList(),
+        ),
+      );
+    } else if (components is Map) {
+      messages.add(
+        UpdateComponents(
+          surfaceId: surfaceId,
+          components: components.values
+              .cast<JsonMap>()
+              .map(Component.fromJson)
+              .toList(),
+        ),
+      );
+    }
+  }
 
-  final surfaceId = (toolCall.args as JsonMap)[surfaceIdKey] as String;
-
-  final createSurfaceMessage = CreateSurface(
-    surfaceId: surfaceId,
-    catalogId: standardCatalogId,
+  messages.insert(
+    0,
+    CreateSurface(surfaceId: surfaceId, catalogId: 'standard'),
   );
 
-  return ParsedToolCall(
-    messages: [surfaceUpdateMessage, createSurfaceMessage],
-    surfaceId: surfaceId,
-  );
-}
-
-/// Converts a catalog example to a [ToolCall].
-ToolCall catalogExampleToToolCall(
-  JsonMap example,
-  String toolName,
-  String surfaceId,
-) {
-  final messageJson = {'updateComponents': example};
-  final surfaceUpdateMessage = A2uiMessage.fromJson(messageJson);
-
-  return ToolCall(
-    name: toolName,
-    args: {surfaceIdKey: surfaceId, 'updateComponents': surfaceUpdateMessage},
-  );
+  return ParsedToolCall(messages: messages, surfaceId: surfaceId);
 }

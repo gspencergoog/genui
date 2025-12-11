@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import '../model/catalog.dart';
 import '../model/catalog_item.dart';
 import '../model/data_model.dart';
-import '../model/tools.dart';
 import '../model/ui_models.dart';
 import '../primitives/constants.dart';
 import '../primitives/logging.dart';

@@ -7,6 +7,7 @@ import 'package:custom_backend/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/src/model/v0_9/messages.dart' as v0_9;
 
 void main() {
   setUpAll(() async {
@@ -32,8 +33,8 @@ void main() {
         );
         expect(result, isNotNull);
         expect(result!.messages.length, 2);
-        expect(result.messages[0], isA<UpdateComponents>());
-        expect(result.messages[1], isA<CreateSurface>());
+        expect(result.messages[0], isA<v0_9.CreateSurface>());
+        expect(result.messages[1], isA<v0_9.UpdateComponents>());
       },
       retry: 3,
       timeout: const Timeout(Duration(minutes: 2)),

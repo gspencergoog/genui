@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/src/model/v0_9/messages.dart' as v0_9;
 
 void main() {
   testWidgets('Slider widget renders and handles changes', (
@@ -28,10 +29,13 @@ void main() {
       ),
     ];
     manager.handleMessage(
-      UpdateComponents(surfaceId: surfaceId, components: components),
+      v0_9.UpdateComponents(surfaceId: surfaceId, components: components),
     );
     manager.handleMessage(
-      const CreateSurface(surfaceId: surfaceId, catalogId: standardCatalogId),
+      const v0_9.CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: standardCatalogId,
+      ),
     );
     manager.dataModelForSurface(surfaceId).update(DataPath('/myValue'), 0.5);
 
@@ -76,13 +80,16 @@ void main() {
       ),
     ];
     manager.handleMessage(
-      UpdateComponents(surfaceId: surfaceId, components: components),
+      v0_9.UpdateComponents(surfaceId: surfaceId, components: components),
     );
     manager.handleMessage(
-      const CreateSurface(surfaceId: surfaceId, catalogId: standardCatalogId),
+      const v0_9.CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: standardCatalogId,
+      ),
     );
     manager.handleMessage(
-      const UpdateDataModel(
+      const v0_9.UpdateDataModel(
         surfaceId: surfaceId,
         value: {'myValue': 5.0, 'myMin': 0.0, 'myMax': 10.0},
       ),
@@ -103,7 +110,7 @@ void main() {
 
     // Update min/max via data model
     manager.handleMessage(
-      const UpdateDataModel(
+      const v0_9.UpdateDataModel(
         surfaceId: surfaceId,
         value: {'myMin': 2.0, 'myMax': 8.0},
       ),

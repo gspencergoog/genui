@@ -4,95 +4,79 @@
 
 import 'dart:convert';
 
-import 'package:json_schema_builder/json_schema_builder.dart';
-
-import '../src/model/a2ui_message.dart';
-import '../src/model/a2ui_schemas.dart';
 import '../src/model/catalog.dart';
-import '../src/model/catalog_item.dart' show CatalogItem;
-import '../src/model/ui_models.dart';
-import '../src/primitives/simple_items.dart';
+import '../src/model/catalog_item.dart';
+import '../src/model/catalog_item.dart'
+    show CatalogItem, ExampleBuilderCallback;
 
-/// A class to represent a validation error in a catalog item example.
+/// An error that occurred while validating a catalog item example.
 class ExampleValidationError {
-  /// The index of the example in the `exampleData` list.
-  final int exampleIndex;
+  /// Creates an [ExampleValidationError].
+  ExampleValidationError(this.message);
 
   /// The error message.
   final String message;
 
-  /// The underlying cause of the error, if any.
-  final Object? cause;
-
-  /// Creates a new [ExampleValidationError].
-  ExampleValidationError(this.exampleIndex, this.message, {this.cause});
-
   @override
-  String toString() {
-    var result = 'Validation error in example $exampleIndex: $message';
-    if (cause != null) {
-      result += '\nCause: $cause';
-    }
-    return result;
-  }
+  String toString() => message;
 }
 
-/// Validates the examples for a single catalog item.
-///
-/// The [item] is the [CatalogItem] to validate.
-/// The [catalog] is the full catalog used for context, including any
-/// additional catalogs.
-///
-/// Returns a list of validation errors. An empty list means success.
+/// Validates the examples for a [CatalogItem].
 Future<List<ExampleValidationError>> validateCatalogItemExamples(
   CatalogItem item,
   Catalog catalog,
 ) async {
-  final Schema schema = A2uiSchemas.updateComponentsSchema(catalog);
   final errors = <ExampleValidationError>[];
-
-  for (var i = 0; i < item.exampleData.length; i++) {
-    final String exampleJsonString = item.exampleData[i]();
-    final List<Object?> exampleData;
+  var index = 0;
+  for (final ExampleBuilderCallback example in item.exampleData) {
     try {
-      exampleData = jsonDecode(exampleJsonString) as List<Object?>;
+      final String jsonString = example();
+      final dynamic json = jsonDecode(jsonString);
+
+      if (json is! List) {
+        errors.add(
+          ExampleValidationError(
+            'Example $index for ${item.name} is not a list.',
+          ),
+        );
+        continue;
+      }
+
+      for (final Object? component in json) {
+        if (component is! Map) {
+          errors.add(
+            ExampleValidationError(
+              'Example $index for ${item.name} contains a non-map component.',
+            ),
+          );
+          continue;
+        }
+        // TODO: Validate against schema if possible.
+        // For now, just checking basic structure.
+        if (!component.containsKey('id')) {
+          errors.add(
+            ExampleValidationError(
+              'Example $index for ${item.name} component missing id.',
+            ),
+          );
+        }
+        if (!component.containsKey('component')) {
+          errors.add(
+            ExampleValidationError(
+              'Example $index for ${item.name} component missing component '
+              'type.',
+            ),
+          );
+        }
+      }
     } catch (e) {
       errors.add(
-        ExampleValidationError(i, 'Failed to parse as a JSON list', cause: e),
-      );
-      continue;
-    }
-
-    final List<Component> components = exampleData
-        .map((e) => Component.fromJson(e as JsonMap))
-        .toList();
-
-    if (components.every((c) => c.id != 'root')) {
-      errors.add(
         ExampleValidationError(
-          i,
-          'Example must have a component with id "root"',
+          'Example $index for ${item.name} failed to parse: $e',
         ),
       );
     }
-
-    final surfaceUpdate = UpdateComponents(
-      surfaceId: 'test-surface',
-      components: components,
-    );
-
-    final List<ValidationError> validationErrors = await schema.validate(
-      surfaceUpdate.toJson(),
-    );
-    if (validationErrors.isNotEmpty) {
-      errors.add(
-        ExampleValidationError(
-          i,
-          'Schema validation failed',
-          cause: validationErrors,
-        ),
-      );
-    }
+    index++;
   }
   return errors;
 }

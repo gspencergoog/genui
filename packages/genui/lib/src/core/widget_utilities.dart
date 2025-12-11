@@ -103,3 +103,17 @@ JsonMap resolveContext(
   }
   return resolved;
 }
+
+/// Resolves a string reference against a [DataContext].
+String? resolveStringReference(DataContext dataContext, JsonMap? ref) {
+  if (ref == null) return null;
+  if (ref.containsKey('path')) {
+    final Object? value = dataContext.getValue<Object?>(
+      DataPath(ref['path'] as String),
+    );
+    return value?.toString();
+  } else if (ref.containsKey('literalString')) {
+    return ref['literalString'] as String?;
+  }
+  return null;
+}

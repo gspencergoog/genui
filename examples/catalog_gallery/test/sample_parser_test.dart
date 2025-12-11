@@ -5,6 +5,7 @@
 import 'package:catalog_gallery/sample_parser.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/src/model/v0_9/messages.dart' as v0_9;
 
 void main() {
   test('SampleParser parses valid sample string', () async {
@@ -23,15 +24,15 @@ description: A test description
 
     final List<A2uiMessage> messages = await sample.messages.toList();
     expect(messages.length, 2);
-    expect(messages.first, isA<UpdateComponents>());
-    expect(messages.last, isA<CreateSurface>());
+    expect(messages.first, isA<v0_9.UpdateComponents>());
+    expect(messages.last, isA<v0_9.CreateSurface>());
 
-    final update = messages.first as UpdateComponents;
+    final update = messages.first as v0_9.UpdateComponents;
     expect(update.surfaceId, 'default');
     expect(update.components.length, 1);
     expect(update.components.first.type, 'Text');
 
-    final begin = messages.last as CreateSurface;
+    final begin = messages.last as v0_9.CreateSurface;
     expect(begin.surfaceId, 'default');
   });
 

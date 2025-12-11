@@ -6,6 +6,8 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/src/model/v0_8/messages.dart' as v0_8;
+import 'package:genui/src/model/v0_8/protocol.dart';
 
 void main() {
   group('A2uiProtocolV08', () {
@@ -29,8 +31,8 @@ void main() {
       };
       final Stream<A2uiMessage> stream = protocol.parsePayload(json);
       final A2uiMessage message = await stream.single;
-      expect(message, isA<SurfaceUpdate>());
-      final update = message as SurfaceUpdate;
+      expect(message, isA<v0_8.SurfaceUpdate>());
+      final update = message as v0_8.SurfaceUpdate;
       expect(update.surfaceId, '123');
       expect(update.components.length, 1);
       expect(update.components.first.id, 'btn');
@@ -47,8 +49,8 @@ void main() {
       };
       final Stream<A2uiMessage> stream = protocol.parsePayload(json);
       final A2uiMessage message = await stream.single;
-      expect(message, isA<BeginRendering>());
-      final begin = message as BeginRendering;
+      expect(message, isA<v0_8.BeginRendering>());
+      final begin = message as v0_8.BeginRendering;
       expect(begin.surfaceId, '123');
       expect(begin.root, 'rootId');
       expect(begin.styles, {'color': 'red'});
@@ -65,8 +67,8 @@ void main() {
       };
       final Stream<A2uiMessage> stream = protocol.parsePayload(json);
       final A2uiMessage message = await stream.single;
-      expect(message, isA<DataModelUpdate>());
-      final update = message as DataModelUpdate;
+      expect(message, isA<v0_8.DataModelUpdate>());
+      final update = message as v0_8.DataModelUpdate;
       expect(update.surfaceId, '123');
       expect(update.path, '/foo');
       expect(update.contents, 'bar');
@@ -78,8 +80,8 @@ void main() {
       };
       final Stream<A2uiMessage> stream = protocol.parsePayload(json);
       final A2uiMessage message = await stream.single;
-      expect(message, isA<DeleteSurface>());
-      expect((message as DeleteSurface).surfaceId, '123');
+      expect(message, isA<v0_8.DeleteSurface>());
+      expect((message as v0_8.DeleteSurface).surfaceId, '123');
     });
 
     test('parses string payload as JSON', () async {
@@ -88,7 +90,7 @@ void main() {
       });
       final Stream<A2uiMessage> stream = protocol.parsePayload(jsonString);
       final A2uiMessage message = await stream.single;
-      expect(message, isA<SurfaceUpdate>());
+      expect(message, isA<v0_8.SurfaceUpdate>());
     });
 
     test('returns correct tools', () {

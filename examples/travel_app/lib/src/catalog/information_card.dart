@@ -4,23 +4,21 @@
 
 import 'package:flutter/material.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/v0_9.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../utils.dart';
 
 final _schema = S.object(
   properties: {
-    'imageChildId': S.string(
-      description:
-          'The ID of the Image widget to display at the top of the '
-          'card. The Image fit should typically be "cover". Be sure to create '
-          'an Image widget with a matching ID.',
+    'imageChildId': Schemas.componentReference(
+      description: 'The ID of the image to display at the top of the card.',
     ),
-    'title': A2uiSchemas.stringReference(description: 'The title of the card.'),
-    'subtitle': A2uiSchemas.stringReference(
+    'title': Schemas.stringReference(description: 'The title of the card.'),
+    'subtitle': Schemas.stringReference(
       description: 'The subtitle of the card.',
     ),
-    'body': A2uiSchemas.stringReference(
+    'body': Schemas.stringReference(
       description: 'The body text of the card. This supports markdown.',
     ),
   },

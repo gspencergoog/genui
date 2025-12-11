@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 // ignore_for_file: avoid_dynamic_calls
 import 'package:json_schema_builder/json_schema_builder.dart';
 
-import '../../model/a2ui_schemas.dart';
 import '../../model/catalog_item.dart';
 import '../../model/data_model.dart';
+import '../../model/v0_9/schemas.dart';
 import '../../primitives/simple_items.dart';
 import 'widget_helpers.dart';
 
@@ -29,7 +29,7 @@ final _schema = S.object(
       description: 'How children are aligned on the cross axis. ',
       enumValues: ['start', 'center', 'end', 'stretch', 'baseline'],
     ),
-    'children': A2uiSchemas.componentArrayReference(
+    'children': Schemas.componentArrayReference(
       description:
           'Either an explicit list of widget IDs for the children, or a '
           'template with a data binding to the list of children.',

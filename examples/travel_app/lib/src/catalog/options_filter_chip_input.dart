@@ -7,6 +7,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/v0_9.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 import 'common.dart';
@@ -30,7 +31,7 @@ final _schema = S.object(
       description: 'An icon to display on the left of the chip.',
       enumValues: TravelIcon.values.map((e) => e.name).toList(),
     ),
-    'value': A2uiSchemas.stringReference(
+    'selectedOption': Schemas.stringReference(
       description:
           'The name of the option that should be selected initially. This '
           'option must exist in the "options" list.',

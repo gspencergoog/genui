@@ -3,3 +3,5 @@
 // found in the LICENSE file.
 
 typedef JsonMap = Map<String, Object?>;
+
+const String surfaceIdKey = 'surfaceId';

@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/v0_9.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../utils.dart';
@@ -16,13 +17,13 @@ enum ItineraryEntryStatus { noBookingRequired, choiceRequired, chosen }
 final _schema = S.object(
   description: 'Widget to show an itinerary or a plan for travel.',
   properties: {
-    'title': A2uiSchemas.stringReference(
+    'title': Schemas.stringReference(
       description: 'The title of the itinerary.',
     ),
-    'subheading': A2uiSchemas.stringReference(
+    'subheading': Schemas.stringReference(
       description: 'The subheading of the itinerary.',
     ),
-    'imageChildId': A2uiSchemas.componentReference(
+    'imageChildId': Schemas.componentReference(
       description:
           'The ID of the Image widget to display. The Image fit '
           "should typically be 'cover'. Be sure to create an Image widget "
@@ -32,45 +33,23 @@ final _schema = S.object(
       description: 'A list of days in the itinerary.',
       items: S.object(
         properties: {
-          'title': A2uiSchemas.stringReference(
+          'title': Schemas.stringReference(
             description: 'The title for the day, e.g., "Day 1".',
           ),
-          'subtitle': A2uiSchemas.stringReference(
+          'subtitle': Schemas.stringReference(
             description: 'The subtitle for the day, e.g., "Arrival in Tokyo".',
           ),
-          'description': A2uiSchemas.stringReference(
+          'description': Schemas.stringReference(
             description:
                 'A short description of the day\'s plan. '
                 'This supports markdown.',
           ),
-          'imageChildId': A2uiSchemas.componentReference(
-            description:
-                'The ID of the Image widget to display. The Image fit should '
-                'typically be \'cover\'.',
-          ),
-          'entries': S.list(
-            description:
-                'A list of widget IDs for the ItineraryEntry '
-                'children for this day.',
+          'dayNumber': S.integer(),
+          'date': S.string(),
+          'activities': S.list(
             items: S.object(
               properties: {
-                'title': A2uiSchemas.stringReference(
-                  description: 'The title of the itinerary entry.',
-                ),
-                'subtitle': A2uiSchemas.stringReference(
-                  description: 'The subtitle of the itinerary entry.',
-                ),
-                'bodyText': A2uiSchemas.stringReference(
-                  description:
-                      'The body text for the entry. This supports markdown.',
-                ),
-                'address': A2uiSchemas.stringReference(
-                  description: 'The address for the entry.',
-                ),
-                'time': A2uiSchemas.stringReference(
-                  description: 'The time for the entry (formatted string).',
-                ),
-                'totalCost': A2uiSchemas.stringReference(
+                'totalCost': Schemas.stringReference(
                   description: 'The total cost for the entry.',
                 ),
                 'type': S.string(
@@ -92,7 +71,7 @@ final _schema = S.object(
                       .map((e) => e.name)
                       .toList(),
                 ),
-                'choiceRequiredAction': A2uiSchemas.action(
+                'choiceRequiredAction': Schemas.action(
                   description:
                       'The action to perform when the user needs to '
                       'make a choice. This is only used when the status is '

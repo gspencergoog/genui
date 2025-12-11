@@ -6,7 +6,6 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart';
 
-import '../model/tools.dart';
 import '../primitives/simple_items.dart';
 
 /// A callback that is called when events are sent.

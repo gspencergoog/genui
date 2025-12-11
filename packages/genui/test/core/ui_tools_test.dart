@@ -4,6 +4,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/src/model/v0_9/messages.dart' as v0_9;
 
 void main() {
   group('UI Tools', () {
@@ -48,7 +49,7 @@ void main() {
 
       await tool.invoke(args);
       genUiManager.handleMessage(
-        const CreateSurface(
+        const v0_9.CreateSurface(
           surfaceId: 'testSurface',
           catalogId: standardCatalogId,
         ),
@@ -67,7 +68,7 @@ void main() {
 
       // First, add a component to the surface so that the root can be set.
       genUiManager.handleMessage(
-        const UpdateComponents(
+        const v0_9.UpdateComponents(
           surfaceId: 'testSurface',
           components: [
             Component(

@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/src/model/v0_9/messages.dart' as v0_9;
 
 void main() {
   testWidgets('CheckBox widget renders and handles changes', (
@@ -27,10 +28,13 @@ void main() {
       ),
     ];
     manager.handleMessage(
-      UpdateComponents(surfaceId: surfaceId, components: components),
+      v0_9.UpdateComponents(surfaceId: surfaceId, components: components),
     );
     manager.handleMessage(
-      const CreateSurface(surfaceId: surfaceId, catalogId: standardCatalogId),
+      const v0_9.CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: standardCatalogId,
+      ),
     );
     manager.dataModelForSurface(surfaceId).update(DataPath('/myValue'), true);
 

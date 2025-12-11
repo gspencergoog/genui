@@ -39,7 +39,13 @@ class FirebaseAiContentGenerator implements ContentGenerator {
     this.systemInstruction,
     this.modelCreator = defaultGenerativeModelFactory,
     this.additionalTools = const [],
-  });
+    this.protocolVersion = A2uiProtocolVersion.v0_9,
+  }) : _protocol = A2uiProtocol.fromVersion(protocolVersion);
+
+  /// The version of the A2UI protocol to use.
+  final A2uiProtocolVersion protocolVersion;
+
+  final A2uiProtocol _protocol;
 
   /// The catalog of UI components available to the AI.
   final Catalog catalog;
@@ -413,7 +419,7 @@ With functions:
         // We can try to parse it as an A2uiMessage, or check for specific keys
         // Ideally A2uiMessage.fromJson would handle it or throw
         try {
-          final message = A2uiMessage.fromJson(json);
+          final A2uiMessage message = _protocol.parseJson(json);
           _a2uiMessageController.add(message);
           return;
         } catch (_) {

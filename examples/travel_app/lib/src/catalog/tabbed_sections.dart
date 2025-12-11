@@ -4,22 +4,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/v0_9.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 final _schema = S.object(
   properties: {
-    'sections': S.list(
+    'tabs': S.list(
       description: 'A list of sections to display as tabs.',
       items: S.object(
         properties: {
-          'title': A2uiSchemas.stringReference(
-            description: 'The title of the tab.',
+          'label': Schemas.stringReference(
+            description: 'The label of the tab.',
           ),
-          'child': A2uiSchemas.componentReference(
+          'childId': Schemas.componentReference(
             description: 'The ID of the child widget for the tab content.',
           ),
         },
-        required: ['child', 'title'],
+        required: ['childId', 'label'],
       ),
     ),
   },

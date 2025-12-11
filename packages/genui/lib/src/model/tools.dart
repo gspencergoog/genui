@@ -5,11 +5,7 @@
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../primitives/simple_items.dart';
-
-/// Key used in schema definition to specify the component ID.
-///
-/// This key is used in prompts.
-const surfaceIdKey = 'surfaceId';
+export '../primitives/simple_items.dart' show surfaceIdKey;
 
 /// Abstract base class for defining tools that an AI agent can invoke.
 ///

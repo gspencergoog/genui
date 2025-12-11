@@ -6,6 +6,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/v0_9.dart';
 import 'package:intl/intl.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
@@ -19,10 +20,10 @@ final _schema = S.object(
       description: 'Listings to select among.',
       items: S.string(),
     ),
-    'itineraryName': A2uiSchemas.stringReference(
+    'itineraryName': Schemas.stringReference(
       description: 'The name of the itinerary.',
     ),
-    'modifyAction': A2uiSchemas.action(
+    'modifyAction': Schemas.action(
       description:
           'The action to perform when the user wants to modify a listing '
           'selection. The listingSelectionId will be added to the context with '
@@ -177,7 +178,6 @@ class _CustomRadioState<T> extends State<_CustomRadio<T>> {
           shape: BoxShape.circle,
           border: Border.all(
             color: isSelected ? Theme.of(context).primaryColor : Colors.grey,
-            width: 2,
           ),
         ),
         child: isSelected

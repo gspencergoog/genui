@@ -13,6 +13,10 @@ import '../model/catalog.dart';
 import '../model/chat_message.dart';
 import '../model/data_model.dart';
 import '../model/ui_models.dart';
+import '../model/v0_8/messages.dart' as v0_8;
+import '../model/v0_8/protocol.dart' as v0_8_proto;
+import '../model/v0_9/messages.dart' as v0_9;
+import '../model/v0_9/protocol.dart' as v0_9_proto;
 import '../primitives/logging.dart';
 import 'genui_host.dart';
 
@@ -109,29 +113,26 @@ class A2uiMessageProcessor implements GenUiHost {
 
   /// Handles an [A2uiMessage] and updates the UI accordingly.
   void handleMessage(A2uiMessage message, {A2uiProtocol? protocol}) {
-    // If protocol is provided, delegate to it?
-    // Or just switch on message types which imply protocol?
-    // The user wants separation, so we should use the protocol if available,
-    // or determine the protocol from the message type.
+    if (protocol != null) {
+      protocol.handleMessage(message, this);
+      return;
+    }
 
-    // For now, we delegate based on type, but ideally we move this logic TO the
-    // protocol. However, we don't hold the protocol instance here usually.
-    // We can create default instances if needed, or static helpers.
-
-    if (message is A2uiMessageV08) {
-      const A2uiProtocolV08().handleMessage(message, this);
-    } else if (message is A2uiMessageV09) {
-      const A2uiProtocolV09().handleMessage(message, this);
+    // Fallback: try to guess based on type
+    if (message is v0_9.UpdateComponents ||
+        message is v0_9.UpdateDataModel ||
+        message is v0_9.CreateSurface ||
+        message is v0_9.DeleteSurface ||
+        message is v0_9.ErrorMessage) {
+      const v0_9_proto.A2uiProtocolV09().handleMessage(message, this);
+    } else if (message is v0_8.SurfaceUpdate ||
+        message is v0_8.DataModelUpdate ||
+        message is v0_8.BeginRendering ||
+        message is v0_8.DeleteSurface ||
+        message is v0_8.ErrorMessage) {
+      const v0_8_proto.A2uiProtocolV08().handleMessage(message, this);
     } else {
-      // Shared messages
-      switch (message) {
-        case DeleteSurface():
-          removeSurface(message.surfaceId);
-        case ErrorMessage(:final code, :final message):
-          genUiLogger.severe('Received A2UI Error: $code: $message');
-        default:
-          genUiLogger.warning('Unknown message type: $message');
-      }
+      genUiLogger.warning('Unknown message type: $message');
     }
   }
 }

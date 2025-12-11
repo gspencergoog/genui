@@ -6,15 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../../core/widget_utilities.dart';
-import '../../model/a2ui_schemas.dart';
 import '../../model/catalog_item.dart';
 import '../../model/data_model.dart';
+import '../../model/v0_9/schemas.dart';
 import '../../primitives/simple_items.dart';
 
 final _schema = S.object(
   properties: {
-    'value': A2uiSchemas.stringArrayReference(),
-    'options': A2uiSchemas.objectArrayReference(),
+    'value': Schemas.stringArrayReference(),
+    'options': Schemas.objectArrayReference(),
     'usageHint': S.string(
       description: 'Hint for how the choice picker should be displayed.',
       enumValues: ['multipleSelection', 'mutuallyExclusive'],

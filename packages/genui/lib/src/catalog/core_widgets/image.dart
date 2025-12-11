@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../../core/widget_utilities.dart';
-import '../../model/a2ui_schemas.dart';
 import '../../model/catalog_item.dart';
+import '../../model/v0_9/schemas.dart';
 import '../../primitives/logging.dart';
 import '../../primitives/simple_items.dart';
 
 Schema _schema({required bool enableUsageHint}) {
   final Map<String, Schema> properties = {
-    'url': A2uiSchemas.stringReference(
+    'url': Schemas.stringReference(
       description:
           'Asset path (e.g. assets/...) or network URL (e.g. https://...)',
     ),

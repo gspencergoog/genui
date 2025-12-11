@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/v0_9.dart' as v0_9;
 import 'package:genui_a2ui/genui_a2ui.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -87,20 +88,20 @@ class Ai extends _$Ai {
     contentGenerator.a2uiMessageStream.listen((message) {
       switch (message) {
         // V0.9
-        case CreateSurface(:final surfaceId):
-        case UpdateComponents(:final surfaceId):
+        case v0_9.CreateSurface(:final surfaceId):
+        case v0_9.UpdateComponents(:final surfaceId):
           surfaceUpdateController.add(surfaceId);
-        case UpdateDataModel(:final surfaceId):
+        case v0_9.UpdateDataModel(:final surfaceId):
           surfaceUpdateController.add(surfaceId);
         // V0.8
         case SurfaceUpdate(:final surfaceId):
         case BeginRendering(:final surfaceId):
         case DataModelUpdate(:final surfaceId):
           surfaceUpdateController.add(surfaceId);
-        // Shared
+        case v0_9.DeleteSurface():
         case DeleteSurface():
-          // We only navigate on BeginRendering.
           break;
+        case v0_9.ErrorMessage(:final code, :final message):
         case ErrorMessage(:final code, :final message):
           appLogger.severe('Received A2UI Error: $code: $message');
       }

@@ -7,6 +7,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/v0_9.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../tools/booking/booking_service.dart';
@@ -14,39 +15,31 @@ import '../tools/booking/model.dart';
 
 final _schema = S.object(
   properties: {
-    'title': A2uiSchemas.stringReference(
+    'title': Schemas.stringReference(
       description: 'An optional title to display above the carousel.',
+    ),
+    'selectedItemIndex': Schemas.numberReference(
+      description:
+          'The index of the currently selected item in the carousel. '
+          'This is useful for pre-selecting an item or for tracking '
+          'the user\'s selection.',
     ),
     'items': S.list(
       description: 'A list of items to display in the carousel.',
       items: S.object(
         properties: {
-          'description': A2uiSchemas.stringReference(
-            description:
-                'The short description of the carousel item. '
-                'It may include the price and location if applicable. '
-                'It should be very concise. '
-                'Example: "The Dart Inn in Sunnyvale, CA for \$150"',
+          'imageChildId': Schemas.componentReference(
+            description: 'The ID of the image to display in the carousel item.',
           ),
-          'imageChildId': A2uiSchemas.componentReference(
-            description:
-                'The ID of the Image widget to display as the carousel item '
-                'image. Be sure to create Image widgets with matching IDs.',
+          'title': S.string(description: 'The title of the carousel item.'),
+          'subtitle': S.string(
+            description: 'The subtitle of the carousel item.',
           ),
-          'listingSelectionId': S.string(
-            description:
-                'An optional ID of the listing that this item '
-                'represents. This is useful when the carousel is used to show '
-                'a list of hotels or other bookable items.',
-          ),
-          'action': A2uiSchemas.action(
-            description:
-                'The action to perform when the item is tapped. The '
-                'context for this action will include the "description" and '
-                '"listingSelectionId" of the tapped item.',
+          'action': Schemas.action(
+            description: 'The action to perform when the item is tapped.',
           ),
         },
-        required: ['description', 'imageChildId', 'action'],
+        required: ['imageChildId', 'title', 'action'],
       ),
     ),
   },

@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../../core/widget_utilities.dart';
-import '../../model/a2ui_schemas.dart';
 import '../../model/catalog_item.dart';
+import '../../model/v0_9/schemas.dart';
 import '../../primitives/simple_items.dart';
 
 final _schema = S.object(
@@ -15,8 +15,8 @@ final _schema = S.object(
     'tabItems': S.list(
       items: S.object(
         properties: {
-          'title': A2uiSchemas.stringReference(),
-          'child': A2uiSchemas.componentReference(),
+          'title': Schemas.stringReference(),
+          'child': Schemas.componentReference(),
         },
         required: ['title', 'child'],
       ),

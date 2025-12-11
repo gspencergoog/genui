@@ -10,11 +10,11 @@ import 'package:flutter/material.dart';
 
 import '../core/a2ui_message_processor.dart';
 import '../core/genui_surface.dart';
-import '../model/a2ui_message.dart';
 import '../model/catalog.dart';
 import '../model/catalog_item.dart';
 import '../model/chat_message.dart';
 import '../model/ui_models.dart';
+import '../model/v0_9/messages.dart' as v0_9;
 import '../primitives/constants.dart';
 import '../primitives/simple_items.dart';
 
@@ -86,10 +86,13 @@ class _DebugCatalogViewState extends State<DebugCatalogView> {
         }
 
         _a2uiMessageProcessor.handleMessage(
-          UpdateComponents(surfaceId: surfaceId, components: components),
+          v0_9.UpdateComponents(surfaceId: surfaceId, components: components),
         );
         _a2uiMessageProcessor.handleMessage(
-          CreateSurface(surfaceId: surfaceId, catalogId: standardCatalogId),
+          v0_9.CreateSurface(
+            surfaceId: surfaceId,
+            catalogId: standardCatalogId,
+          ),
         );
         surfaceIds.add(surfaceId);
       }

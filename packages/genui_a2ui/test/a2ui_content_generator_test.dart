@@ -100,14 +100,15 @@ void main() {
       final completer = Completer<A2uiMessage>();
       contentGenerator.a2uiMessageStream.listen(completer.complete);
 
-      final testMessage = A2uiMessage.fromJson({
-        'updateComponents': {
-          'surfaceId': 's1',
-          'components': [
-            {'id': 'c1', 'component': 'Column', 'children': <Object?>[]},
-          ],
-        },
-      });
+      final A2uiMessage testMessage =
+          A2uiProtocol.fromVersion(A2uiProtocolVersion.v0_9).parseJson({
+            'updateComponents': {
+              'surfaceId': 's1',
+              'components': [
+                {'id': 'c1', 'component': 'Column', 'children': <Object?>[]},
+              ],
+            },
+          });
       fakeConnector.addMessage(testMessage);
 
       final A2uiMessage capturedMessage = await completer.future;

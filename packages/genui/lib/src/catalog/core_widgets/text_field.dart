@@ -6,23 +6,23 @@ import 'package:flutter/material.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../../core/widget_utilities.dart';
-import '../../model/a2ui_schemas.dart';
 import '../../model/catalog_item.dart';
 import '../../model/data_model.dart';
 import '../../model/ui_models.dart';
+import '../../model/v0_9/schemas.dart';
 import '../../primitives/simple_items.dart';
 
 final _schema = S.object(
   properties: {
-    'text': A2uiSchemas.stringReference(
+    'text': Schemas.stringReference(
       description: 'The initial value of the text field.',
     ),
-    'label': A2uiSchemas.stringReference(),
+    'label': Schemas.stringReference(),
     'usageHint': S.string(
       enumValues: ['shortText', 'longText', 'number', 'date', 'obscured'],
     ),
     'validationRegexp': S.string(),
-    'onSubmittedAction': A2uiSchemas.action(),
+    'onSubmittedAction': Schemas.action(),
   },
 );
 

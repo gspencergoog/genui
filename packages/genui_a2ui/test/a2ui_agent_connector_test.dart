@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:a2a/a2a.dart' as a2a;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart' as genui;
+import 'package:genui/src/model/v0_9/messages.dart' as v0_9;
 import 'package:genui_a2ui/genui_a2ui.dart';
 
 import 'fakes.dart';
@@ -90,7 +91,7 @@ void main() {
       expect(connector.contextId, 'context1');
       expect(fakeClient.sendMessageStreamCalled, 1);
       expect(messages.length, 1);
-      expect(messages.first, isA<genui.UpdateComponents>());
+      expect(messages.first, isA<v0_9.UpdateComponents>());
     });
 
     test('connectAndSend sends multiple text parts', () async {
