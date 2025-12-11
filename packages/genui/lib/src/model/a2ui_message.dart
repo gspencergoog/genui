@@ -250,8 +250,7 @@ final class BeginRendering extends A2uiMessageV08 {
 
 /// An A2UI message that deletes a surface.
 ///
-/// This is used in both V0.8 and V0.9, though the JSON structure might vary
-/// slightly, here we assume it's compatible or handled by protocol parsers.
+/// This is used in both V0.8 and V0.9.
 final class DeleteSurface extends A2uiMessage {
   /// Creates a [DeleteSurface] message.
   const DeleteSurface({required this.surfaceId});
