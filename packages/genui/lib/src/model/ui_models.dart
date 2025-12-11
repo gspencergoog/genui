@@ -87,6 +87,9 @@ class UiDefinition {
   /// The ID of the catalog to use for rendering this surface.
   final String? catalogId;
 
+  /// The global styles to apply to the UI.
+  final JsonMap? styles;
+
   /// A map of all widget definitions in the UI, keyed by their ID.
   Map<String, Component> get components => UnmodifiableMapView(_components);
   final Map<String, Component> _components;
@@ -96,6 +99,7 @@ class UiDefinition {
     required this.surfaceId,
     this.rootComponentId,
     this.catalogId,
+    this.styles,
     Map<String, Component> components = const {},
   }) : _components = components;
 
@@ -103,12 +107,14 @@ class UiDefinition {
   UiDefinition copyWith({
     String? rootComponentId,
     String? catalogId,
+    JsonMap? styles,
     Map<String, Component>? components,
   }) {
     return UiDefinition(
       surfaceId: surfaceId,
       rootComponentId: rootComponentId ?? this.rootComponentId,
       catalogId: catalogId ?? this.catalogId,
+      styles: styles ?? this.styles,
       components: components ?? _components,
     );
   }
@@ -117,7 +123,9 @@ class UiDefinition {
   JsonMap toJson() {
     return {
       surfaceIdKey: surfaceId,
-      'rootComponentId': rootComponentId,
+      if (rootComponentId != null) 'rootComponentId': rootComponentId,
+      if (catalogId != null) 'catalogId': catalogId,
+      if (styles != null) 'styles': styles,
       'components': components.map(
         (key, value) => MapEntry(key, value.toJson()),
       ),

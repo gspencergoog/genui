@@ -7,12 +7,14 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
+
 import '../model/a2ui_message.dart';
 import '../model/catalog.dart';
 import '../model/chat_message.dart';
 import '../model/data_model.dart';
 import '../model/ui_models.dart';
 import '../primitives/logging.dart';
+import '../primitives/simple_items.dart';
 
 /// A sealed class representing an update to the UI managed by
 /// [A2uiMessageProcessor].
@@ -151,75 +153,37 @@ class A2uiMessageProcessor implements GenUiHost {
   /// Handles an [A2uiMessage] and updates the UI accordingly.
   void handleMessage(A2uiMessage message) {
     switch (message) {
+      // ---------------- V0.9 Messages ----------------
       case UpdateComponents():
-        final String surfaceId = message.surfaceId;
-        final ValueNotifier<UiDefinition?> notifier = getSurfaceNotifier(
-          surfaceId,
-        );
-
-        UiDefinition uiDefinition =
-            notifier.value ?? UiDefinition(surfaceId: surfaceId);
-        final Map<String, Component> newComponents = Map.of(
-          uiDefinition.components,
-        );
-        for (final Component component in message.components) {
-          newComponents[component.id] = component;
-        }
-        uiDefinition = uiDefinition.copyWith(components: newComponents);
-        notifier.value = uiDefinition;
-
-        // Notify UI ONLY if rendering has begun (i.e., rootComponentId is set
-        // or 'root' exists)
-        if (uiDefinition.rootComponentId != null ||
-            uiDefinition.components.containsKey('root')) {
-          genUiLogger.info('Updating surface $surfaceId');
-          _surfaceUpdates.add(SurfaceUpdated(surfaceId, uiDefinition));
-        } else {
-          genUiLogger.info(
-            'Caching components for surface $surfaceId (pre-rendering)',
-          );
-        }
+        _handleUpdateComponents(message.surfaceId, message.components);
       case CreateSurface():
-        final String surfaceId = message.surfaceId;
-        dataModelForSurface(surfaceId);
-        final ValueNotifier<UiDefinition?> notifier = getSurfaceNotifier(
-          surfaceId,
-        );
-        final isNew = notifier.value == null;
-        final UiDefinition uiDefinition =
-            notifier.value ?? UiDefinition(surfaceId: surfaceId);
-        final UiDefinition newUiDefinition = uiDefinition.copyWith(
-          catalogId: message.catalogId,
-        );
-        notifier.value = newUiDefinition;
-        genUiLogger.info('Created surface ${message.surfaceId}');
-        if (isNew) {
-          _surfaceUpdates.add(SurfaceAdded(message.surfaceId, newUiDefinition));
-        } else {
-          _surfaceUpdates.add(
-            SurfaceUpdated(message.surfaceId, newUiDefinition),
-          );
-        }
+        _handleCreateSurface(message.surfaceId, message.catalogId);
       case UpdateDataModel():
-        final String path = message.path ?? '/';
-        genUiLogger.info(
-          'Updating data model for surface ${message.surfaceId} at path '
-          '$path with contents:\n'
-          '${const JsonEncoder.withIndent('  ').convert(message.value)}',
-        );
-        final DataModel dataModel = dataModelForSurface(message.surfaceId);
-        // TODO: Handle 'op' (add/replace/remove)
-        // For now, assuming replace/add behavior similar to old update
-        dataModel.update(DataPath(path), message.value);
-
-        // Notify UI of an update if the surface is already rendering
-        final ValueNotifier<UiDefinition?> notifier = getSurfaceNotifier(
+        _handleUpdateDataModel(
           message.surfaceId,
+          message.path,
+          message.value,
+          op: message.op,
         );
-        final UiDefinition? uiDefinition = notifier.value;
-        if (uiDefinition != null && uiDefinition.rootComponentId != null) {
-          _surfaceUpdates.add(SurfaceUpdated(message.surfaceId, uiDefinition));
-        }
+
+      // ---------------- V0.8 Messages ----------------
+      case SurfaceUpdate():
+        _handleUpdateComponents(message.surfaceId, message.components);
+      case BeginRendering():
+        _handleBeginRendering(
+          message.surfaceId,
+          message.root,
+          message.styles,
+          message.catalogId,
+        );
+      case DataModelUpdate():
+        _handleUpdateDataModel(
+          message.surfaceId,
+          message.path,
+          message.contents,
+        );
+
+      // ---------------- Shared Messages ----------------
       case SurfaceDeletion():
         final String surfaceId = message.surfaceId;
         if (_surfaces.containsKey(surfaceId)) {
@@ -233,6 +197,113 @@ class A2uiMessageProcessor implements GenUiHost {
         }
       case ErrorMessage(:final code, :final message):
         genUiLogger.severe('Received A2UI Error: $code: $message');
+    }
+  }
+
+  void _handleUpdateComponents(String surfaceId, List<Component> components) {
+    final ValueNotifier<UiDefinition?> notifier = getSurfaceNotifier(surfaceId);
+
+    UiDefinition uiDefinition =
+        notifier.value ?? UiDefinition(surfaceId: surfaceId);
+    final Map<String, Component> newComponents = Map.of(
+      uiDefinition.components,
+    );
+    for (final component in components) {
+      newComponents[component.id] = component;
+    }
+    uiDefinition = uiDefinition.copyWith(components: newComponents);
+    notifier.value = uiDefinition;
+
+    // Notify UI ONLY if rendering has begun.
+    // In V0.8 this is explicit via BeginRendering.
+    // In V0.9 it might be implicit if 'root' exists or strictly 'CreateSurface' happened?
+    // We check if rootComponentId is set (V0.8 explicit) OR if 'root' exists (V0.9 implicit convention sometimes).
+    if (uiDefinition.rootComponentId != null ||
+        uiDefinition.components.containsKey('root')) {
+      genUiLogger.info('Updating surface $surfaceId');
+      _surfaceUpdates.add(SurfaceUpdated(surfaceId, uiDefinition));
+    } else {
+      genUiLogger.info(
+        'Caching components for surface $surfaceId (pre-rendering)',
+      );
+    }
+  }
+
+  void _handleCreateSurface(String surfaceId, String catalogId) {
+    dataModelForSurface(surfaceId);
+    final ValueNotifier<UiDefinition?> notifier = getSurfaceNotifier(surfaceId);
+    final isNew = notifier.value == null;
+    final UiDefinition uiDefinition =
+        notifier.value ?? UiDefinition(surfaceId: surfaceId);
+    final UiDefinition newUiDefinition = uiDefinition.copyWith(
+      catalogId: catalogId,
+    );
+    notifier.value = newUiDefinition;
+    genUiLogger.info('Created surface $surfaceId');
+    if (isNew) {
+      _surfaceUpdates.add(SurfaceAdded(surfaceId, newUiDefinition));
+    } else {
+      _surfaceUpdates.add(SurfaceUpdated(surfaceId, newUiDefinition));
+    }
+  }
+
+  void _handleUpdateDataModel(
+    String surfaceId,
+    String? path,
+    Object value, {
+    String op = 'replace',
+  }) {
+    final String actualPath = path ?? '/';
+    genUiLogger.info(
+      'Updating data model for surface $surfaceId at path '
+      '$actualPath with contents:\n'
+      '${const JsonEncoder.withIndent('  ').convert(value)}',
+    );
+    final DataModel dataModel = dataModelForSurface(surfaceId);
+    // TODO: Handle 'op' (add/replace/remove) more robustly in DataModel if needed
+    dataModel.update(DataPath(actualPath), value);
+
+    // Notify UI of an update if the surface is already rendering
+    final ValueNotifier<UiDefinition?> notifier = getSurfaceNotifier(surfaceId);
+    final UiDefinition? uiDefinition = notifier.value;
+    // We only notify if proper structure is in place
+    if (uiDefinition != null &&
+        (uiDefinition.rootComponentId != null ||
+            uiDefinition.components.containsKey('root'))) {
+      _surfaceUpdates.add(SurfaceUpdated(surfaceId, uiDefinition));
+    }
+  }
+
+  void _handleBeginRendering(
+    String surfaceId,
+    String root,
+    JsonMap? styles,
+    String? catalogId,
+  ) {
+    final ValueNotifier<UiDefinition?> notifier = getSurfaceNotifier(surfaceId);
+    final isNew =
+        notifier.value ==
+        null; // Should usually be dealing with existing cached def
+    UiDefinition uiDefinition =
+        notifier.value ?? UiDefinition(surfaceId: surfaceId);
+
+    // Update root and styles
+    // If catalogId is provided here (V0.8 style), update it too.
+    uiDefinition = uiDefinition.copyWith(
+      rootComponentId: root,
+      styles: styles,
+      catalogId: catalogId ?? uiDefinition.catalogId,
+    );
+    notifier.value = uiDefinition;
+
+    genUiLogger.info('Begin rendering surface $surfaceId with root $root');
+
+    // Always trigger an update or add since this acts as the "show" command
+    if (isNew) {
+      // Unlikely in V0.8 flow as components usually come first, but possible
+      _surfaceUpdates.add(SurfaceAdded(surfaceId, uiDefinition));
+    } else {
+      _surfaceUpdates.add(SurfaceUpdated(surfaceId, uiDefinition));
     }
   }
 }

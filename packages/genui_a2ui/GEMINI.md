@@ -24,7 +24,7 @@ This document provides context for AI agents making changes to the `genui_a2ui` 
     -   Manages connection state, task ID, and context ID.
     -   `connectAndSend()`: Key method to send a `ChatMessage` and process the streamed response. This involves parsing `A2ADataPart` for A2UI messages.
     -   `sendEvent()`: Sends user interaction data back to the server.
-    -   `_processA2uiMessages()`: Crucial for converting raw JSON data into `genui.A2uiMessage` objects.
+    -   `_processA2uiMessages()`: Uses `A2uiProtocol` to convert raw JSON data into `genui.A2uiMessage` objects, supporting multiple protocol versions (0.8, 0.9).
 
 3.  **`AgentCard`** (`lib/src/a2ui_agent_connector.dart`):
     -   Simple data class for agent metadata.

@@ -97,3 +97,94 @@ class CreateSurfaceTool extends AiTool<JsonMap> {
     return {'status': 'Surface $surfaceId created.'};
   }
 }
+
+/// An [AiTool] for updating a surface with new components (V0.8).
+class SurfaceUpdateTool extends AiTool<JsonMap> {
+  /// Creates a [SurfaceUpdateTool].
+  SurfaceUpdateTool({required this.handleMessage, required Catalog catalog})
+    : super(
+        name: 'surfaceUpdate',
+        description: 'Updates a surface with a new set of components.',
+        parameters: A2uiSchemas.surfaceUpdateSchema(catalog),
+      );
+
+  /// The callback to invoke.
+  final void Function(A2uiMessage message) handleMessage;
+
+  @override
+  Future<JsonMap> invoke(JsonMap args) async {
+    final surfaceId = args[surfaceIdKey] as String;
+    final List<Component> components = (args['components'] as List).map((e) {
+      return Component.fromJson(e as JsonMap);
+    }).toList();
+    handleMessage(SurfaceUpdate(surfaceId: surfaceId, components: components));
+    return {
+      surfaceIdKey: surfaceId,
+      'status': 'UI Surface $surfaceId updated.',
+    };
+  }
+}
+
+/// An [AiTool] for beginning rendering of a surface (V0.8).
+class BeginRenderingTool extends AiTool<JsonMap> {
+  /// Creates a [BeginRenderingTool].
+  BeginRenderingTool({required this.handleMessage, required this.catalogId})
+    : super(
+        name: 'beginRendering',
+        description: ' signals the client to begin rendering.',
+        parameters: A2uiSchemas.beginRenderingSchema(),
+      );
+
+  /// The callback to invoke.
+  final void Function(A2uiMessage message) handleMessage;
+
+  /// The catalog ID to use.
+  final String? catalogId;
+
+  @override
+  Future<JsonMap> invoke(JsonMap args) async {
+    final surfaceId = args[surfaceIdKey] as String;
+    final root = args['root'] as String;
+    final styles = args['styles'] as JsonMap?;
+    // Note: catalogId is often implicit in V0.8 or passed in args if schema supports it,
+    // explicitly passing it here if needed or using the bound one.
+    // The schema has catalogId.
+    final msgCatalogId = args['catalogId'] as String? ?? catalogId;
+
+    handleMessage(
+      BeginRendering(
+        surfaceId: surfaceId,
+        root: root,
+        styles: styles,
+        catalogId: msgCatalogId,
+      ),
+    );
+    return {'status': 'Rendering begun for $surfaceId'};
+  }
+}
+
+/// An [AiTool] for updating the data model (V0.8).
+class DataModelUpdateTool extends AiTool<JsonMap> {
+  /// Creates a [DataModelUpdateTool].
+  DataModelUpdateTool({required this.handleMessage})
+    : super(
+        name: 'dataModelUpdate',
+        description: 'Updates the data model.',
+        parameters: A2uiSchemas.dataModelUpdateV08Schema(),
+      );
+
+  /// The callback to invoke.
+  final void Function(A2uiMessage message) handleMessage;
+
+  @override
+  Future<JsonMap> invoke(JsonMap args) async {
+    final surfaceId = args[surfaceIdKey] as String;
+    final path = args['path'] as String?;
+    final contents = args['contents'] as Object;
+
+    handleMessage(
+      DataModelUpdate(surfaceId: surfaceId, path: path, contents: contents),
+    );
+    return {'status': 'Data model updated for $surfaceId'};
+  }
+}

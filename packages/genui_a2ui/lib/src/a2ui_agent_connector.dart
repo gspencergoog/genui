@@ -38,15 +38,26 @@ class AgentCard {
 /// the agent card, sending messages, and receiving the A2UI protocol stream.
 class A2uiAgentConnector {
   /// Creates a [A2uiAgentConnector] that connects to the given [url].
-  A2uiAgentConnector({required this.url, A2AClient? client, String? contextId})
-    : _contextId = contextId {
+  A2uiAgentConnector({
+    required this.url,
+    A2AClient? client,
+    String? contextId,
+    this.protocolVersion = genui.A2uiProtocolVersion.v0_9,
+  }) : _contextId = contextId,
+       _protocol = genui.A2uiProtocol.fromVersion(protocolVersion) {
     this.client = client ?? A2AClient(url.toString());
   }
+
+  /// The version of the A2UI protocol to use.
+  final genui.A2uiProtocolVersion protocolVersion;
+
+  final genui.A2uiProtocol _protocol;
 
   /// The URL of the A2UI Agent.
   final Uri url;
 
   final _controller = StreamController<genui.A2uiMessage>.broadcast();
+  // ... (rest of fields)
   final _errorController = StreamController<Object>.broadcast();
   @visibleForTesting
   late A2AClient client;
@@ -84,6 +95,7 @@ class A2uiAgentConnector {
     genui.ChatMessage chatMessage, {
     genui.A2UiClientCapabilities? clientCapabilities,
   }) async {
+    // ... (message construction)
     final List<Object> parts = (chatMessage is genui.UserMessage)
         ? chatMessage.parts
         : (chatMessage is genui.UserUiInteractionMessage)
@@ -132,7 +144,13 @@ class A2uiAgentConnector {
       message.contextId = contextId;
     }
     final payload = A2AMessageSendParams()..message = message;
-    payload.extensions = ['https://a2ui.org/ext/a2a-ui/v0.9'];
+
+    // Set extensions based on protocol version
+    if (protocolVersion == genui.A2uiProtocolVersion.v0_9) {
+      payload.extensions = ['https://a2ui.org/ext/a2a-ui/v0.9'];
+    } else {
+      payload.extensions = ['https://a2ui.org/a2a-extension/a2ui/v0.8'];
+    }
 
     _log.info('--- OUTGOING REQUEST ---');
     _log.info('URL: ${url.toString()}');
@@ -234,7 +252,13 @@ class A2uiAgentConnector {
       ..referenceTaskIds = [taskId!];
 
     final payload = A2AMessageSendParams()..message = message;
-    payload.extensions = ['https://a2ui.org/a2a-extension/a2ui/v0.8'];
+
+    // Set extensions based on protocol version
+    if (protocolVersion == genui.A2uiProtocolVersion.v0_9) {
+      payload.extensions = ['https://a2ui.org/ext/a2a-ui/v0.9'];
+    } else {
+      payload.extensions = ['https://a2ui.org/a2a-extension/a2ui/v0.8'];
+    }
 
     try {
       await client.sendMessage(payload);
@@ -251,20 +275,20 @@ class A2uiAgentConnector {
       'Processing a2ui messages from data part:\n'
       '${const JsonEncoder.withIndent('  ').convert(data)}',
     );
-    if (data.containsKey('updateComponents') ||
-        data.containsKey('updateDataModel') ||
-        data.containsKey('createSurface') ||
-        data.containsKey('deleteSurface') ||
-        data.containsKey('error')) {
+
+    try {
       if (!_controller.isClosed) {
+        final message = _protocol.parseJson(data);
         _log.finest(
           'Adding message to stream: '
           '${const JsonEncoder.withIndent('  ').convert(data)}',
         );
-        _controller.add(genui.A2uiMessage.fromJson(data));
+        _controller.add(message);
       }
-    } else {
+    } on FormatException {
       _log.warning('A2A data part did not contain any known A2UI messages.');
+    } catch (e) {
+      _log.severe('Error parsing A2UI message from data part: $e');
     }
   }
 

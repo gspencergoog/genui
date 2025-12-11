@@ -16,7 +16,12 @@ sealed class A2uiMessage {
   const A2uiMessage();
 
   /// Creates an [A2uiMessage] from a JSON map.
+  ///
+  /// This defaults to parsing as V0.9. For other versions, use
+  /// [A2uiProtocol.fromVersion(version).parseJson].
   factory A2uiMessage.fromJson(JsonMap json) {
+    // Default to V0.9 parsing behavior for backward compatibility of this API
+    // in this branch, but ideally clients should use A2uiProtocol.
     if (json.containsKey('updateComponents')) {
       return UpdateComponents.fromJson(json['updateComponents'] as JsonMap);
     }
@@ -26,6 +31,7 @@ sealed class A2uiMessage {
     if (json.containsKey('createSurface')) {
       return CreateSurface.fromJson(json['createSurface'] as JsonMap);
     }
+    // Shared messages
     if (json.containsKey('deleteSurface')) {
       return SurfaceDeletion.fromJson(json['deleteSurface'] as JsonMap);
     }
@@ -52,8 +58,20 @@ sealed class A2uiMessage {
   }
 }
 
-/// An A2UI message that updates a surface with new components.
-final class UpdateComponents extends A2uiMessage {
+/// Abstract base class for V0.8 messages.
+sealed class A2uiMessageV08 extends A2uiMessage {
+  const A2uiMessageV08();
+}
+
+/// Abstract base class for V0.9 messages.
+sealed class A2uiMessageV09 extends A2uiMessage {
+  const A2uiMessageV09();
+}
+
+// -------------------- V0.9 Messages --------------------
+
+/// An A2UI message that updates a surface with new components (V0.9).
+final class UpdateComponents extends A2uiMessageV09 {
   /// Creates a [UpdateComponents] message.
   const UpdateComponents({required this.surfaceId, required this.components});
 
@@ -82,8 +100,8 @@ final class UpdateComponents extends A2uiMessage {
   }
 }
 
-/// An A2UI message that updates the data model.
-final class UpdateDataModel extends A2uiMessage {
+/// An A2UI message that updates the data model (V0.9).
+final class UpdateDataModel extends A2uiMessageV09 {
   /// Creates a [UpdateDataModel] message.
   const UpdateDataModel({
     required this.surfaceId,
@@ -115,8 +133,8 @@ final class UpdateDataModel extends A2uiMessage {
   final Object value;
 }
 
-/// An A2UI message that signals the client to begin rendering.
-final class CreateSurface extends A2uiMessage {
+/// An A2UI message that signals the client to begin rendering (V0.9).
+final class CreateSurface extends A2uiMessageV09 {
   /// Creates a [CreateSurface] message.
   const CreateSurface({required this.surfaceId, required this.catalogId});
 
@@ -135,7 +153,105 @@ final class CreateSurface extends A2uiMessage {
   final String catalogId;
 }
 
+// -------------------- V0.8 Messages --------------------
+
+/// An A2UI message that updates a surface with new components (V0.8).
+final class SurfaceUpdate extends A2uiMessageV08 {
+  /// Creates a [SurfaceUpdate] message.
+  const SurfaceUpdate({required this.surfaceId, required this.components});
+
+  /// Creates a [SurfaceUpdate] message from a JSON map.
+  factory SurfaceUpdate.fromJson(JsonMap json) {
+    return SurfaceUpdate(
+      surfaceId: json[surfaceIdKey] as String,
+      components: (json['components'] as List<Object?>)
+          .map((e) => Component.fromJson(e as JsonMap))
+          .toList(),
+    );
+  }
+
+  /// The ID of the surface that this message applies to.
+  final String surfaceId;
+
+  /// The list of components to add or update.
+  final List<Component> components;
+
+  /// Converts this object to a JSON representation.
+  JsonMap toJson() {
+    return {
+      surfaceIdKey: surfaceId,
+      'components': components.map((c) => c.toJson()).toList(),
+    };
+  }
+}
+
+/// An A2UI message that updates the data model (V0.8).
+final class DataModelUpdate extends A2uiMessageV08 {
+  /// Creates a [DataModelUpdate] message.
+  const DataModelUpdate({
+    required this.surfaceId,
+    this.path,
+    required this.contents,
+  });
+
+  /// Creates a [DataModelUpdate] message from a JSON map.
+  factory DataModelUpdate.fromJson(JsonMap json) {
+    return DataModelUpdate(
+      surfaceId: json[surfaceIdKey] as String,
+      path: json['path'] as String?,
+      contents: json['contents'] as Object,
+    );
+  }
+
+  /// The ID of the surface that this message applies to.
+  final String surfaceId;
+
+  /// The path in the data model to update.
+  final String? path;
+
+  /// The new contents to write to the data model.
+  final Object contents;
+}
+
+/// An A2UI message that signals the client to begin rendering (V0.8).
+final class BeginRendering extends A2uiMessageV08 {
+  /// Creates a [BeginRendering] message.
+  const BeginRendering({
+    required this.surfaceId,
+    required this.root,
+    this.styles,
+    this.catalogId,
+  });
+
+  /// Creates a [BeginRendering] message from a JSON map.
+  factory BeginRendering.fromJson(JsonMap json) {
+    return BeginRendering(
+      surfaceId: json[surfaceIdKey] as String,
+      root: json['root'] as String,
+      styles: json['styles'] as JsonMap?,
+      catalogId: json['catalogId'] as String?,
+    );
+  }
+
+  /// The ID of the surface that this message applies to.
+  final String surfaceId;
+
+  /// The ID of the root component.
+  final String root;
+
+  /// The styles to apply to the UI.
+  final JsonMap? styles;
+
+  /// The ID of the catalog to use for rendering this surface.
+  final String? catalogId;
+}
+
+// -------------------- Shared Messages --------------------
+
 /// An A2UI message that deletes a surface.
+///
+/// This is used in both V0.8 and V0.9, though the JSON structure might vary slightly,
+/// here we assume it's compatible or handled by protocol parsers.
 final class SurfaceDeletion extends A2uiMessage {
   /// Creates a [SurfaceDeletion] message.
   const SurfaceDeletion({required this.surfaceId});

@@ -155,6 +155,19 @@ class A2uiSchemas {
     required: [surfaceIdKey, 'value'],
   );
 
+  /// Schema for a `dataModelUpdate` message (V0.8) which will update the given
+  /// path in the data model.
+  static Schema dataModelUpdateV08Schema() => S.object(
+    properties: {
+      surfaceIdKey: S.string(),
+      'path': S.string(),
+      'contents': S.any(
+        description: 'The new contents to write to the data model.',
+      ),
+    },
+    required: [surfaceIdKey, 'contents'],
+  );
+
   /// Schema for a `updateComponents` message which defines the components to be
   /// rendered on a surface.
   static Schema updateComponentsSchema(Catalog catalog) => S.object(
@@ -200,6 +213,59 @@ class A2uiSchemas {
       ),
     },
     required: [surfaceIdKey, 'components'],
+  );
+
+  /// Schema for a `surfaceUpdate` message (V0.8) which defines the components
+  /// to be rendered on a surface.
+  static Schema surfaceUpdateSchema(Catalog catalog) => S.object(
+    properties: {
+      surfaceIdKey: S.string(
+        description: 'The unique identifier for the UI surface to update.',
+      ),
+      'components': S.list(
+        description: 'A list of component definitions.',
+        minItems: 1,
+        items: S.object(
+          description: 'Represents a single component in a UI widget tree.',
+          properties: {
+            'id': S.string(
+              description: 'The unique identifier for this component.',
+            ),
+            'weight': S.integer(
+              description:
+                  'Optional layout weight for use in Row/Column children.',
+            ),
+            'component': S.string(
+              description: 'The type of the component.',
+              enumValues:
+                  ((catalog.definition as ObjectSchema)
+                              .properties!['components']!
+                          as ObjectSchema)
+                      .properties!
+                      .keys
+                      .toList(),
+            ),
+          },
+          required: ['id', 'component'],
+          additionalProperties: true,
+        ),
+      ),
+    },
+    required: [surfaceIdKey, 'components'],
+  );
+
+  /// Schema for a `beginRendering` message (V0.8).
+  static Schema beginRenderingSchema() => S.object(
+    properties: {
+      surfaceIdKey: S.string(),
+      'root': S.string(description: 'The ID of the root component.'),
+      'styles': S.object(
+        description: 'Global styles to apply.',
+        additionalProperties: true,
+      ),
+      'catalogId': S.string(),
+    },
+    required: [surfaceIdKey, 'root'],
   );
 
   /// Schema for an `error` message which reports an error.

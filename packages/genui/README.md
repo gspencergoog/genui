@@ -27,7 +27,7 @@ The package is built around the following main components:
 
 4.  **`ContentGenerator`**: An interface for communicating with a generative AI model. This interface uses streams to send `A2uiMessage` commands, text responses, and errors back to the `GenUiConversation`.
 
-5.  **`A2uiMessage`**: A message sent from the AI (via the `ContentGenerator`) to the UI, instructing it to perform actions like `beginRendering`, `surfaceUpdate`, `dataModelUpdate`, or `deleteSurface`.
+5.  **`A2uiMessage`**: A message sent from the AI (via the `ContentGenerator`) to the UI, instructing it to perform actions like `beginRendering`, `surfaceUpdate`, `dataModelUpdate`, or `deleteSurface`. The structure of these messages is defined by the `A2uiProtocolVersion` (0.8 or 0.9).
 
 ## How It Works
 

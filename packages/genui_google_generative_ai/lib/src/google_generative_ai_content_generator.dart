@@ -35,7 +35,13 @@ class GoogleGenerativeAiContentGenerator implements ContentGenerator {
     this.additionalTools = const [],
     this.modelName = 'models/gemini-2.5-flash',
     this.apiKey,
-  });
+    this.protocolVersion = A2uiProtocolVersion.v0_9,
+  }) : _protocol = A2uiProtocol.fromVersion(protocolVersion);
+
+  /// The version of the A2UI protocol to use.
+  final A2uiProtocolVersion protocolVersion;
+
+  final A2uiProtocol _protocol;
 
   /// The catalog of UI components available to the AI.
   final Catalog catalog;
@@ -87,6 +93,13 @@ class GoogleGenerativeAiContentGenerator implements ContentGenerator {
   @override
   ValueListenable<bool> get isProcessing => _isProcessing;
 
+  /// The default system instruction to use if none is provided.
+  ///
+  /// This is determined by the [protocolVersion].
+  String get _defaultSystemPreamble {
+    return _protocol.getSystemPreamble(catalog) ?? '';
+  }
+
   @override
   void dispose() {
     _a2uiMessageController.close();
@@ -133,7 +146,13 @@ class GoogleGenerativeAiContentGenerator implements ContentGenerator {
   }) {
     genUiLogger.fine('Setting up tools');
 
-    final allTools = availableTools;
+    // Combine available tools with protocol tools
+    final protocolTools = _protocol.getTools(
+      catalog,
+      _a2uiMessageController.add,
+    );
+
+    final allTools = [...availableTools, ...protocolTools];
     genUiLogger.fine(
       'Available tools: ${allTools.map((t) => t.name).join(', ')}',
     );
@@ -218,6 +237,9 @@ class GoogleGenerativeAiContentGenerator implements ContentGenerator {
     genUiLogger.fine(
       'Processing ${functionCalls.length} function calls from model.',
     );
+    // Note: tools here should span all available tools including protocol tools.
+    // _generate ensures this by passing allTools.
+
     final functionResponseParts = <google_ai.Part>[];
     for (final call in functionCalls) {
       genUiLogger.fine(
@@ -272,32 +294,25 @@ class GoogleGenerativeAiContentGenerator implements ContentGenerator {
     final service = serviceFactory(configuration: this);
 
     try {
-      // A local copy of the incoming messages which is updated with
-      // tool results
-      // as they are generated.
       final content = converter.toGoogleAiContent(messages);
 
+      // Get protocol tools once
+      final protocolTools = _protocol.getTools(
+        catalog,
+        _a2uiMessageController.add,
+      );
+      final allTools = [...additionalTools, ...protocolTools];
+
       final (:tools, :allowedFunctionNames) = _setupToolsAndFunctions(
-        availableTools: additionalTools,
+        availableTools: allTools,
         adapter: adapter,
       );
 
       var toolUsageCycle = 0;
       const maxToolUsageCycles = 40; // Safety break for tool loops
 
-      // Build system instruction if provided
-      final definition = const JsonEncoder.withIndent(
-        '  ',
-      ).convert(catalog.definition.toJson());
       final effectiveSystemInstruction =
-          '${systemInstruction ?? ''}\n\n'
-          'You have access to the following UI components:\n'
-          '$definition\n\n'
-          'You must output your response as a stream of JSON objects, one per '
-          'line (JSONL). Each line can be either a plain text response or a '
-          'structured A2UI message (e.g., createSurface, surfaceUpdate). '
-          'Do not wrap the JSON objects in a list or any other structure. '
-          'Just output one JSON object per line.';
+          '${systemInstruction ?? ''}\n\n$_defaultSystemPreamble';
 
       final systemInstructionContent = [
         google_ai.Content(
@@ -373,7 +388,7 @@ With functions:
 
             final result = await _processFunctionCalls(
               functionCalls: functionCalls,
-              availableTools: additionalTools,
+              availableTools: allTools,
             );
             final functionResponseParts = result.functionResponseParts;
 
@@ -420,9 +435,6 @@ With functions:
           'Latency = ${elapsed.inMilliseconds}ms',
         );
 
-        // If we reached here, it means the stream finished.
-        // If there were function calls, the loop would have continued via
-        // `continue toolLoop`. If there were no function calls, we are done.
         break;
       }
     } finally {
@@ -436,20 +448,13 @@ With functions:
       return;
     }
 
-    // If the line doesn't start with '{', it's not a JSONL object.
-    // However, we still want to emit it as text if it's not JSON.
-    // if (!line.startsWith('{')) {
-    //   genUiLogger.fine('Ignored non-JSONL line: $line');
-    //   return;
-    // }
-
     genUiLogger.fine('Processing line: $line');
 
     try {
       final json = jsonDecode(line);
       if (json is Map<String, dynamic>) {
         try {
-          final message = A2uiMessage.fromJson(json);
+          final message = _protocol.parseJson(json);
           genUiLogger.fine('Parsed A2UI message: $message');
           _a2uiMessageController.add(message);
           return;

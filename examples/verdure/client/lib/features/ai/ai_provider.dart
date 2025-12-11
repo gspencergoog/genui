@@ -86,11 +86,18 @@ class Ai extends _$Ai {
 
     contentGenerator.a2uiMessageStream.listen((message) {
       switch (message) {
+        // V0.9
         case CreateSurface(:final surfaceId):
         case UpdateComponents(:final surfaceId):
           surfaceUpdateController.add(surfaceId);
         case UpdateDataModel(:final surfaceId):
           surfaceUpdateController.add(surfaceId);
+        // V0.8
+        case SurfaceUpdate(:final surfaceId):
+        case BeginRendering(:final surfaceId):
+        case DataModelUpdate(:final surfaceId):
+          surfaceUpdateController.add(surfaceId);
+        // Shared
         case SurfaceDeletion():
           // We only navigate on BeginRendering.
           break;
