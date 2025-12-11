@@ -1,0 +1,85 @@
+// Copyright 2025 The Flutter Authors.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:genui/genui.dart';
+import 'package:genui/src/model/v0_8/messages.dart' as v0_8;
+
+void main() {
+  testWidgets('Tabs widget renders and handles taps', (
+    WidgetTester tester,
+  ) async {
+    final manager = A2uiMessageProcessor(
+      catalogs: [
+        Catalog([
+          CoreCatalogItems.tabs,
+          CoreCatalogItems.text,
+        ], catalogId: standardCatalogId),
+      ],
+    );
+    const surfaceId = 'testSurface';
+    final components = [
+      const Component(
+        id: 'root',
+        props: {
+          'component': 'Tabs',
+          'tabItems': [
+            {
+              'title': {'literalString': 'Tab 1'},
+              'child': 'text1',
+            },
+            {
+              'title': {'literalString': 'Tab 2'},
+              'child': 'text2',
+            },
+          ],
+        },
+      ),
+      const Component(
+        id: 'text1',
+        props: {
+          'component': 'Text',
+          'text': {'literalString': 'This is the first tab.'},
+        },
+      ),
+      const Component(
+        id: 'text2',
+        props: {
+          'component': 'Text',
+          'text': {'literalString': 'This is the second tab.'},
+        },
+      ),
+    ];
+    manager.handleMessage(
+      v0_8.SurfaceUpdate(surfaceId: surfaceId, components: components),
+    );
+    manager.handleMessage(
+      const v0_8.BeginRendering(
+        root: 'root',
+        surfaceId: surfaceId,
+        catalogId: standardCatalogId,
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: GenUiSurface(host: manager, surfaceId: surfaceId),
+        ),
+      ),
+    );
+
+    expect(find.text('Tab 1'), findsOneWidget);
+    expect(find.text('Tab 2'), findsOneWidget);
+    expect(find.text('This is the first tab.'), findsOneWidget);
+    expect(find.text('This is the second tab.'), findsNothing);
+
+    await tester.tap(find.text('Tab 2'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('This is the first tab.'), findsNothing);
+    expect(find.text('This is the second tab.'), findsOneWidget);
+  });
+}
