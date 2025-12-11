@@ -1,0 +1,109 @@
+// Copyright 2025 The Flutter Authors.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'package:flutter/material.dart';
+
+import '../../../model/catalog_item.dart';
+import '../../../model/data_model.dart';
+import '../../../primitives/simple_items.dart';
+import 'widget_helpers.dart';
+
+extension type ColumnData.fromMap(JsonMap _json) {
+  factory ColumnData({
+    Object? children,
+    String? distribution,
+    String? alignment,
+  }) => ColumnData.fromMap({
+    'children': children,
+    'distribution': distribution,
+    'alignment': alignment,
+  });
+
+  Object? get children => _json['children'];
+  String? get distribution => _json['distribution'] as String?;
+  String? get alignment => _json['alignment'] as String?;
+}
+
+MainAxisAlignment _parseMainAxisAlignment(String? alignment) {
+  switch (alignment) {
+    case 'start':
+      return MainAxisAlignment.start;
+    case 'center':
+      return MainAxisAlignment.center;
+    case 'end':
+      return MainAxisAlignment.end;
+    case 'spaceBetween':
+      return MainAxisAlignment.spaceBetween;
+    case 'spaceAround':
+      return MainAxisAlignment.spaceAround;
+    case 'spaceEvenly':
+      return MainAxisAlignment.spaceEvenly;
+    default:
+      return MainAxisAlignment.start;
+  }
+}
+
+CrossAxisAlignment _parseCrossAxisAlignment(String? alignment) {
+  switch (alignment) {
+    case 'start':
+      return CrossAxisAlignment.start;
+    case 'center':
+      return CrossAxisAlignment.center;
+    case 'end':
+      return CrossAxisAlignment.end;
+    case 'stretch':
+      return CrossAxisAlignment.stretch;
+    default:
+      return CrossAxisAlignment.start;
+  }
+}
+
+Widget columnBuilder(CatalogItemContext itemContext) {
+  final columnData = ColumnData.fromMap(itemContext.data as JsonMap);
+  return ComponentChildrenBuilder(
+    childrenData: columnData.children,
+    dataContext: itemContext.dataContext,
+    buildChild: itemContext.buildChild,
+    getComponent: itemContext.getComponent,
+    explicitListBuilder: (childIds, buildChild, getComponent, dataContext) {
+      return Column(
+        mainAxisAlignment: _parseMainAxisAlignment(columnData.distribution),
+        crossAxisAlignment: _parseCrossAxisAlignment(columnData.alignment),
+        mainAxisSize: MainAxisSize.min,
+        children: childIds
+            .map(
+              (componentId) => buildWeightedChild(
+                componentId: componentId,
+                dataContext: dataContext,
+                buildChild: buildChild,
+                component: getComponent(componentId)!,
+              ),
+            )
+            .toList(),
+      );
+    },
+    templateListWidgetBuilder: (context, list, componentId, dataBinding) {
+      if (list is! List) {
+        return const SizedBox.shrink();
+      }
+      return Column(
+        mainAxisAlignment: _parseMainAxisAlignment(columnData.distribution),
+        crossAxisAlignment: _parseCrossAxisAlignment(columnData.alignment),
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var i = 0; i < list.length; i++) ...[
+            buildWeightedChild(
+              componentId: componentId,
+              dataContext: itemContext.dataContext.nested(
+                DataPath('$dataBinding/$i'),
+              ),
+              buildChild: itemContext.buildChild,
+              component: itemContext.getComponent(componentId),
+            ),
+          ],
+        ],
+      );
+    },
+  );
+}

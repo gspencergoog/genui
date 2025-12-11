@@ -42,7 +42,13 @@ void main() {
                     dispatchEvent: (UiEvent event) {},
                     buildContext: context,
                     dataContext: DataContext(DataModel(), '/'),
-                    getComponent: (String componentId) => null,
+                    getComponent: (String componentId) => const Component(
+                      id: 'child1',
+                      props: {
+                        'component': 'Text',
+                        'text': {'literalString': 'Hello'},
+                      },
+                    ),
                     surfaceId: 'surfaceId',
                   ),
                 );

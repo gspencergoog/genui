@@ -8,6 +8,7 @@
 /// protocol.
 library;
 
+export 'src/catalog/v0_9/core_catalog.dart';
 export 'src/model/v0_9/messages.dart';
 export 'src/model/v0_9/protocol.dart';
 export 'src/model/v0_9/schemas.dart';

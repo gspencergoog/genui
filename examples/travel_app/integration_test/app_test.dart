@@ -170,7 +170,7 @@ final List<Map<String, Object>> _baliResponse = [
           'props': {
             'component': 'TravelIcon',
             'icon': {'literalString': 'hiking'},
-          }
+          },
         },
         {
           'id': 'budget_chip',

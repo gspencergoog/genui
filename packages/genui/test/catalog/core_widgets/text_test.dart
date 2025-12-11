@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:genui/src/catalog/core_widgets/text.dart';
+import 'package:genui/src/catalog/v0_9/core_widgets/text.dart';
 import 'package:genui/src/model/catalog_item.dart';
 import 'package:genui/src/model/data_model.dart';
 import 'package:genui/src/model/ui_models.dart';

@@ -1,0 +1,53 @@
+// Copyright 2025 The Flutter Authors.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'package:flutter/cupertino.dart' show Text;
+import 'package:flutter/material.dart' show Text;
+import 'package:flutter/widgets.dart' show Text;
+import 'package:json_schema_builder/json_schema_builder.dart';
+
+import '../../../model/catalog_item.dart';
+import '../../../model/v0_8/schemas.dart';
+import '../../core_widgets/impl/check_box_impl.dart';
+
+final _schema = S.object(
+  properties: {
+    'label': Schemas.stringReference(),
+    'value': Schemas.booleanReference(),
+  },
+  required: ['label', 'value'],
+);
+
+/// A catalog item representing a Material Design checkbox with a label.
+///
+/// This widget displays a checkbox a [Text] label. The checkbox's state
+/// is bidirectionally bound to the data model path specified in the `value`
+/// parameter.
+///
+/// ## Parameters:
+///
+/// - `label`: The text to display next to the checkbox.
+/// - `value`: The boolean value of the checkbox.
+final checkBox = CatalogItem(
+  name: 'CheckBox',
+  dataSchema: _schema,
+  widgetBuilder: checkBoxBuilder,
+  exampleData: [
+    () => '''
+      [
+        {
+          "id": "root",
+          "component": "CheckBox",
+          "label": {
+            "literalString": "Check me"
+          },
+          "value": {
+            "path": "/myValue",
+            "literalBoolean": true
+          }
+        }
+      ]
+    ''',
+  ],
+);
