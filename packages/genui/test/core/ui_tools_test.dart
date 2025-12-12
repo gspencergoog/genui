@@ -101,5 +101,54 @@ void main() {
 
       await future; // Wait for the expectation to be met.
     });
+    test('DataModelUpdateTool updates data model with properly structured '
+        'contents', () async {
+      final tool = DataModelUpdateTool(
+        handleMessage: genUiManager.handleMessage,
+      );
+      final Map<String, Object> args = {
+        surfaceIdKey: 'testSurface',
+        'path': 'user',
+        'contents': [
+          {'key': 'name', 'valueString': 'Alice'},
+        ],
+      };
+      await tool.invoke(args);
+      final DataModel dataModel = genUiManager.dataModelForSurface(
+        'testSurface',
+      );
+      expect(dataModel.getValue<String>(DataPath('user/name')), 'Alice');
+    });
+
+    test(
+      'DataModelUpdateTool updates data model with map in adjacency list',
+      () async {
+        final tool = DataModelUpdateTool(
+          handleMessage: genUiManager.handleMessage,
+        );
+        final Map<String, Object> args = {
+          surfaceIdKey: 'testSurface',
+          'path': 'config',
+          'contents': [
+            {
+              'key': 'theme',
+              'valueMap': [
+                {'key': 'mode', 'valueString': 'dark'},
+                {'key': 'version', 'valueNumber': 1},
+              ],
+            },
+          ],
+        };
+        await tool.invoke(args);
+        final DataModel dataModel = genUiManager.dataModelForSurface(
+          'testSurface',
+        );
+        // The DataModel implementation automatically converts the adjacency list into a standard Map/List structure.
+        // So we can expect nested maps here.
+        final Map<String, dynamic>? theme = dataModel
+            .getValue<Map<String, dynamic>>(DataPath('config/theme'));
+        expect(theme, {'mode': 'dark', 'version': 1});
+      },
+    );
   });
 }

@@ -16,10 +16,17 @@ void main() {
   group('GoogleGenerativeAiContentGenerator', () {
     for (final version in genui.A2uiProtocolVersion.values) {
       group('with $version', () {
+        late genui.DataBinder Function(genui.DataContext) binderFactory;
+        setUp(() {
+          binderFactory = switch (version) {
+            genui.A2uiProtocolVersion.v0_8 => genui.V08DataBinder.new,
+            genui.A2uiProtocolVersion.v0_9 => genui.V09DataBinder.new,
+          };
+        });
         test('constructor creates instance with required parameters', () {
-          final catalog = const genui.Catalog(
+          final catalog = genui.Catalog(
             <genui.CatalogItem>[],
-            binderFactory: genui.V09DataBinder.new,
+            binderFactory: binderFactory,
           );
 
           final generator = GoogleGenerativeAiContentGenerator(
@@ -35,9 +42,9 @@ void main() {
         });
 
         test('constructor accepts system instruction', () {
-          final catalog = const genui.Catalog(
+          final catalog = genui.Catalog(
             <genui.CatalogItem>[],
-            binderFactory: genui.V09DataBinder.new,
+            binderFactory: binderFactory,
           );
 
           final generator = GoogleGenerativeAiContentGenerator(
@@ -51,9 +58,9 @@ void main() {
         });
 
         test('constructor accepts additional tools', () {
-          final catalog = const genui.Catalog(
+          final catalog = genui.Catalog(
             <genui.CatalogItem>[],
-            binderFactory: genui.V09DataBinder.new,
+            binderFactory: binderFactory,
           );
           final tool = genui.DynamicAiTool<Map<String, Object?>>(
             name: 'testTool',
@@ -73,9 +80,9 @@ void main() {
         });
 
         test('streams are accessible', () {
-          final catalog = const genui.Catalog(
+          final catalog = genui.Catalog(
             <genui.CatalogItem>[],
-            binderFactory: genui.V09DataBinder.new,
+            binderFactory: binderFactory,
           );
 
           final generator = GoogleGenerativeAiContentGenerator(
@@ -91,9 +98,9 @@ void main() {
         });
 
         test('isProcessing starts as false', () {
-          final catalog = const genui.Catalog(
+          final catalog = genui.Catalog(
             <genui.CatalogItem>[],
-            binderFactory: genui.V09DataBinder.new,
+            binderFactory: binderFactory,
           );
 
           final generator = GoogleGenerativeAiContentGenerator(
@@ -106,9 +113,9 @@ void main() {
         });
 
         test('dispose closes all streams', () {
-          final catalog = const genui.Catalog(
+          final catalog = genui.Catalog(
             <genui.CatalogItem>[],
-            binderFactory: genui.V09DataBinder.new,
+            binderFactory: binderFactory,
           );
 
           final generator = GoogleGenerativeAiContentGenerator(
@@ -122,9 +129,9 @@ void main() {
         });
 
         test('token usage starts at zero', () {
-          final catalog = const genui.Catalog(
+          final catalog = genui.Catalog(
             <genui.CatalogItem>[],
-            binderFactory: genui.V09DataBinder.new,
+            binderFactory: binderFactory,
           );
 
           final generator = GoogleGenerativeAiContentGenerator(
@@ -139,9 +146,9 @@ void main() {
 
         test('isProcessing is true during request', () async {
           final generator = GoogleGenerativeAiContentGenerator(
-            catalog: const genui.Catalog(
-              {},
-              binderFactory: genui.V09DataBinder.new,
+            catalog: genui.Catalog(
+              <genui.CatalogItem>[],
+              binderFactory: binderFactory,
             ),
             protocolVersion: version,
             serviceFactory: ({required configuration}) {
@@ -172,9 +179,9 @@ void main() {
 
         test('can call a tool and return a result', () async {
           final generator = GoogleGenerativeAiContentGenerator(
-            catalog: const genui.Catalog(
-              {},
-              binderFactory: genui.V09DataBinder.new,
+            catalog: genui.Catalog(
+              <genui.CatalogItem>[],
+              binderFactory: binderFactory,
             ),
             protocolVersion: version,
             additionalTools: [
@@ -235,9 +242,9 @@ void main() {
 
         test('returns a simple text response', () async {
           final generator = GoogleGenerativeAiContentGenerator(
-            catalog: const genui.Catalog(
-              {},
-              binderFactory: genui.V09DataBinder.new,
+            catalog: genui.Catalog(
+              <genui.CatalogItem>[],
+              binderFactory: binderFactory,
             ),
             protocolVersion: version,
             serviceFactory: ({required configuration}) {

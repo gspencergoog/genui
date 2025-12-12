@@ -211,8 +211,36 @@ class A2uiSchemas {
     properties: {
       surfaceIdKey: S.string(),
       'path': S.string(),
-      'contents': S.any(
-        description: 'The new contents to write to the data model.',
+      'contents': S.list(
+        description:
+            '''An array of data entries. Each entry must contain a "key" and exactly one corresponding typed "value*" property.
+Example: [{"key": "name", "valueString": "Alice"}, {"key": "age", "valueNumber": 30}]''',
+        items: S.object(
+          description:
+              '''A single data entry. Exactly one "value*" property should be provided alongside the key.''',
+          properties: {
+            'key': S.string(description: 'The key for this data entry.'),
+            'valueString': S.string(),
+            'valueNumber': S.number(),
+            'valueBoolean': S.boolean(),
+            'valueMap': S.list(
+              description:
+                  '''Represents a map as an adjacency list. Example: [{"key": "city", "valueString": "Paris"}]''',
+              items: S.object(
+                description:
+                    '''One entry in the map. Exactly one "value*" property should be provided alongside the key.''',
+                properties: {
+                  'key': S.string(),
+                  'valueString': S.string(),
+                  'valueNumber': S.number(),
+                  'valueBoolean': S.boolean(),
+                },
+                required: ['key'],
+              ),
+            ),
+          },
+          required: ['key'],
+        ),
       ),
     },
     required: [surfaceIdKey, 'contents'],

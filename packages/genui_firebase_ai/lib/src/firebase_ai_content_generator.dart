@@ -298,9 +298,7 @@ class FirebaseAiContentGenerator implements ContentGenerator {
     final String definition = const JsonEncoder.withIndent(
       '  ',
     ).convert(catalog.definition.toJson());
-    final GeminiGenerativeModelInterface model = modelCreator(
-      configuration: this,
-      systemInstruction: Content.system(
+    final fullSystemInstruction =
         '${systemInstruction ?? ''}\n\n'
         'You have access to the following UI components:\n'
         '$definition\n\n'
@@ -308,8 +306,11 @@ class FirebaseAiContentGenerator implements ContentGenerator {
         'line (JSONL). Each line can be either a plain text response or a '
         'structured A2UI message (e.g., createSurface, surfaceUpdate). '
         'Do not wrap the JSON objects in a list or any other structure. '
-        'Just output one JSON object per line.',
-      ),
+        'Just output one JSON object per line.';
+
+    final GeminiGenerativeModelInterface model = modelCreator(
+      configuration: this,
+      systemInstruction: Content.system(fullSystemInstruction),
       tools: generativeAiTools,
       toolConfig: generativeAiTools == null
           ? null
@@ -326,7 +327,12 @@ class FirebaseAiContentGenerator implements ContentGenerator {
           .join('\n');
 
       genUiLogger.info(
-        '''****** Performing Inference ******\n$concatenatedContents
+        '''****** Performing Inference ******
+System Instruction:
+$fullSystemInstruction
+
+Content:
+$concatenatedContents
 With functions:
   '${allowedFunctionNames.join(', ')}',
   ''',

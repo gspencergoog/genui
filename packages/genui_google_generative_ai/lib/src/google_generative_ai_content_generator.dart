@@ -303,6 +303,10 @@ class GoogleGenerativeAiContentGenerator implements ContentGenerator {
         adapter: adapter,
       );
 
+      genUiLogger.info(
+        'Sending Tools: ${jsonEncode(tools?.map((t) => t.toJson()).toList())}',
+      );
+
       var toolUsageCycle = 0;
       const maxToolUsageCycles = 40; // Safety break for tool loops
 
@@ -325,7 +329,12 @@ class GoogleGenerativeAiContentGenerator implements ContentGenerator {
             .join('\n');
 
         genUiLogger.info(
-          '''****** Performing Inference ******\n$concatenatedContents
+          '''****** Performing Inference ******
+System Instruction:
+$effectiveSystemInstruction
+
+Content:
+$concatenatedContents
 With functions:
   '${allowedFunctionNames.join(', ')}',
   ''',
@@ -359,8 +368,27 @@ With functions:
           genUiLogger.fine(
             'Received candidate: content=${candidate.content}, '
             'finishReason=${candidate.finishReason}, '
-            'safetyRatings=${candidate.safetyRatings}',
+            'safetyRatings=${candidate.safetyRatings}\n'
+            'finishMessage=${candidate.finishMessage}',
           );
+
+          if (candidate.finishReason ==
+              google_ai.Candidate_FinishReason.malformedFunctionCall) {
+            genUiLogger.warning(
+              'Inference stopped due to MALFORMED_FUNCTION_CALL.',
+            );
+            if (candidate.content != null) {
+              genUiLogger.warning(
+                'Malformed content: ${jsonEncode(candidate.content)}',
+              );
+            } else {
+              genUiLogger.warning(
+                'No content returned with MALFORMED_FUNCTION_CALL. '
+                'This usually indicates the model attempted to call a function '
+                'with arguments that did not match the schema.',
+              );
+            }
+          }
 
           // Handle function calls
           final functionCalls = <google_ai.FunctionCall>[];
