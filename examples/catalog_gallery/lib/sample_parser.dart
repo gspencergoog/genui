@@ -56,7 +56,7 @@ class SampleParser {
               final dynamic json = jsonDecode(line);
               if (json is Map<String, dynamic>) {
                 return A2uiProtocol.fromVersion(
-                  A2uiProtocolVersion.v0_9,
+                  A2uiProtocolVersion.v0_8,
                 ).parseJson(json);
               }
               throw FormatException('Invalid JSON line: $line');

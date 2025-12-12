@@ -5,7 +5,6 @@
 import 'package:catalog_gallery/sample_parser.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
-import 'package:genui/src/model/v0_9/messages.dart' as v0_9;
 
 void main() {
   test('SampleParser parses valid sample string', () async {
@@ -13,8 +12,8 @@ void main() {
 name: Test Sample
 description: A test description
 ---
-{"updateComponents": {"surfaceId": "default", "components": [{"id": "text1", "component": "Text", "text": {"literalString": "Hello"}}]}}
-{"createSurface": {"surfaceId": "default", "catalogId": "standard"}}
+{"surfaceUpdate": {"surfaceId": "default", "components": [{"id": "text1", "props": {"component": "Text", "text": {"literalString": "Hello"}}}]}}
+{"beginRendering": {"surfaceId": "default", "root": "text1"}}
 ''';
 
     final Sample sample = SampleParser.parseString(sampleContent);
@@ -24,16 +23,17 @@ description: A test description
 
     final List<A2uiMessage> messages = await sample.messages.toList();
     expect(messages.length, 2);
-    expect(messages.first, isA<v0_9.UpdateComponents>());
-    expect(messages.last, isA<v0_9.CreateSurface>());
+    expect(messages.first, isA<SurfaceUpdate>());
+    expect(messages.last, isA<BeginRendering>());
 
-    final update = messages.first as v0_9.UpdateComponents;
+    final update = messages.first as SurfaceUpdate;
     expect(update.surfaceId, 'default');
     expect(update.components.length, 1);
     expect(update.components.first.type, 'Text');
 
-    final begin = messages.last as v0_9.CreateSurface;
+    final begin = messages.last as BeginRendering;
     expect(begin.surfaceId, 'default');
+    expect(begin.root, 'text1');
   });
 
   test('SampleParser throws on missing separator', () {

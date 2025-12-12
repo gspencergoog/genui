@@ -35,7 +35,7 @@ class GoogleGenerativeAiContentGenerator implements ContentGenerator {
     this.additionalTools = const [],
     this.modelName = 'models/gemini-2.5-flash',
     this.apiKey,
-    this.protocolVersion = A2uiProtocolVersion.v0_9,
+    this.protocolVersion = A2uiProtocolVersion.v0_8,
   }) : _protocol = A2uiProtocol.fromVersion(protocolVersion);
 
   /// The version of the A2UI protocol to use.

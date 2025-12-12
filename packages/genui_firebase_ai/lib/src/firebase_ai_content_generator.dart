@@ -39,7 +39,7 @@ class FirebaseAiContentGenerator implements ContentGenerator {
     this.systemInstruction,
     this.modelCreator = defaultGenerativeModelFactory,
     this.additionalTools = const [],
-    this.protocolVersion = A2uiProtocolVersion.v0_9,
+    this.protocolVersion = A2uiProtocolVersion.v0_8,
   }) : _protocol = A2uiProtocol.fromVersion(protocolVersion);
 
   /// The version of the A2UI protocol to use.

@@ -19,7 +19,7 @@ void main() {
       for (final Map<String, Object> messageJson in _baliResponse) {
         mockContentGenerator.addA2uiMessage(
           A2uiProtocol.fromVersion(
-            A2uiProtocolVersion.v0_9,
+            A2uiProtocolVersion.v0_8,
           ).parseJson(messageJson),
         );
       }
@@ -49,13 +49,7 @@ void main() {
 
 final List<Map<String, Object>> _baliResponse = [
   {
-    'createSurface': {
-      'surfaceId': 'bali_trip_planning_intro',
-      'catalogId': 'example.com:travel_v0',
-    },
-  },
-  {
-    'updateComponents': {
+    'surfaceUpdate': {
       'surfaceId': 'bali_trip_planning_intro',
       'components': [
         {
@@ -209,6 +203,13 @@ final List<Map<String, Object>> _baliResponse = [
           },
         },
       ],
+    },
+  },
+  {
+    'beginRendering': {
+      'surfaceId': 'bali_trip_planning_intro',
+      'root': 'root',
+      'catalogId': 'example.com:travel_v0',
     },
   },
 ];

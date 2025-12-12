@@ -67,6 +67,15 @@ class _SamplesViewState extends State<SamplesView> {
             }
           });
         }
+      } else if (update is SurfaceUpdated) {
+        if (!_surfaceIds.contains(update.surfaceId)) {
+          setState(() {
+            _surfaceIds.add(update.surfaceId);
+            if (_surfaceIds.length == 1) {
+              _currentSurfaceIndex = 0;
+            }
+          });
+        }
       } else if (update is SurfaceRemoved) {
         setState(() {
           _surfaceIds.remove(update.surfaceId);

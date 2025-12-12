@@ -32,6 +32,7 @@ export 'src/model/data_model.dart';
 export 'src/model/tools.dart';
 export 'src/model/ui_models.dart';
 export 'src/model/v0_8/messages.dart';
+export 'src/model/v0_8/schemas.dart';
 export 'src/primitives/constants.dart';
 export 'src/primitives/logging.dart';
 export 'src/primitives/simple_items.dart';

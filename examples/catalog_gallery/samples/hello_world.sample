@@ -2,5 +2,5 @@
 name: Test Sample
 description: This is a test sample to verify the parser.
 ---
+{"beginRendering": {"surfaceId": "default", "root": "root"}}
 {"surfaceUpdate": {"surfaceId": "default", "components": [{"id": "root", "props": { "component": "Text", "text": {"literalString": "Hello World"}}}]}}
-{"createSurface": {"surfaceId": "default"}}
