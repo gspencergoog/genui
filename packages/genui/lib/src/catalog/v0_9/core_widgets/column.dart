@@ -28,7 +28,7 @@ final _schema = S.object(
       description: 'How children are aligned on the cross axis. ',
       enumValues: ['start', 'center', 'end', 'stretch', 'baseline'],
     ),
-    'children': A2uiSchemas.componentArrayReference(
+    'children': A2uiSchemas.childrenProperty(
       description:
           'Either an explicit list of widget IDs for the children, or a '
           'template with a data binding to the list of children.',

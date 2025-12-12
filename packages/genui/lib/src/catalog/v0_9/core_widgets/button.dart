@@ -8,6 +8,8 @@ import '../../../model/catalog_item.dart';
 import '../../../model/v0_9/schemas.dart';
 import '../../core_widgets/impl/button_impl.dart';
 
+import '../context_resolution.dart' as v0_9;
+
 final _schema = S.object(
   properties: {
     'child': A2uiSchemas.componentReference(
@@ -38,7 +40,8 @@ final _schema = S.object(
 final button = CatalogItem(
   name: 'Button',
   dataSchema: _schema,
-  widgetBuilder: buttonBuilder,
+  widgetBuilder: (context) =>
+      buttonBuilder(context, resolveContext: v0_9.resolveContext),
   exampleData: [
     () => '''
       [

@@ -48,7 +48,7 @@ description: This is a test sample to verify the parser.
     expect(find.text('test'), findsOneWidget);
   });
 
-  testWidgets('Loads sample with CreateSurface before SurfaceUpdate', (
+  testWidgets('Loads sample with surfaceUpdate followed by beginRendering', (
     WidgetTester tester,
   ) async {
     final fs = MemoryFileSystem();

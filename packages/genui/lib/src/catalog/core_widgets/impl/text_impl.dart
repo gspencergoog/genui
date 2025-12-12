@@ -12,13 +12,13 @@ import '../../../model/catalog_item.dart';
 import '../../../primitives/simple_items.dart';
 
 extension type TextData.fromMap(JsonMap _json) {
-  factory TextData({required JsonMap text, String? usageHint}) =>
+  factory TextData({required Object text, String? usageHint}) =>
       TextData.fromMap({
         'text': text,
         if (usageHint != null) 'usageHint': usageHint,
       });
 
-  JsonMap get text => _json['text'] as JsonMap;
+  Object get text => _json['text'] as Object;
   String? get usageHint => _json['usageHint'] as String?;
 }
 

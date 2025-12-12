@@ -24,7 +24,9 @@ void main(List<String> args) {
     samplesDir = fs.directory(results['samples'] as String);
   } else {
     final Directory current = fs.currentDirectory;
-    final Directory defaultSamples = fs.directory('${current.path}/samples');
+    final Directory defaultSamples = fs
+        .directory(current.path)
+        .childDirectory('samples');
     if (defaultSamples.existsSync()) {
       samplesDir = defaultSamples;
     }

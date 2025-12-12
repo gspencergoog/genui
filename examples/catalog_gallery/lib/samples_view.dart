@@ -80,6 +80,9 @@ class _SamplesViewState extends State<SamplesView> {
         setState(() {
           _surfaceIds.remove(update.surfaceId);
           if (_currentSurfaceIndex >= _surfaceIds.length) {
+            _currentSurfaceIndex = _surfaceIds.length - 1;
+          }
+          if (_surfaceIds.length <= 1) {
             _currentSurfaceIndex = 0;
           }
         });

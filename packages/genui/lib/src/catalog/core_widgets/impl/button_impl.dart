@@ -28,7 +28,10 @@ extension type ButtonData.fromMap(JsonMap _json) {
   bool get primary => (_json['primary'] as bool?) ?? false;
 }
 
-Widget buttonBuilder(CatalogItemContext itemContext) {
+Widget buttonBuilder(
+  CatalogItemContext itemContext, {
+  required ContextResolver resolveContext,
+}) {
   final buttonData = ButtonData.fromMap(itemContext.data as JsonMap);
   final Widget child = itemContext.buildChild(buttonData.child);
   final JsonMap actionData = buttonData.action;

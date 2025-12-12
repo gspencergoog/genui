@@ -13,7 +13,7 @@ import '../../core_widgets/impl/list_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'children': A2uiSchemas.componentArrayReference(),
+    'children': A2uiSchemas.childrenProperty(),
     'direction': S.string(enumValues: ['vertical', 'horizontal']),
     'alignment': S.string(enumValues: ['start', 'center', 'end', 'stretch']),
   },

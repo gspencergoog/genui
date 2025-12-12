@@ -155,56 +155,65 @@ final itinerary = CatalogItem(
       [
         {
           "id": "root",
-          "component": "Itinerary",
-          "title": {
-            "literalString": "My Awesome Trip"
-          },
-          "subheading": {
-            "literalString": "A 3-day adventure"
-          },
-          "imageChildId": "image1",
-          "days": [
-            {
+          "component": {
+            "Itinerary": {
               "title": {
-                "literalString": "Day 1"
+                "literalString": "My Awesome Trip"
               },
-              "subtitle": {
-                "literalString": "Arrival and Exploration"
+              "subheading": {
+                "literalString": "A 3-day adventure"
               },
-              "description": {
-                "literalString": "Welcome to the city!"
-              },
-              "imageChildId": "image2",
-              "entries": [
+              "imageChildId": "image1",
+              "days": [
                 {
                   "title": {
-                    "literalString": "Check-in to Hotel"
+                    "literalString": "Day 1"
                   },
-                  "bodyText": {
-                    "literalString": "Check-in to your hotel and relax."
+                  "subtitle": {
+                    "literalString": "Arrival and Exploration"
                   },
-                  "time": {
-                    "literalString": "3:00 PM"
+                  "description": {
+                    "literalString": "Welcome to the city!"
                   },
-                  "type": "accommodation",
-                  "status": "noBookingRequired"
+                  "imageChildId": "image2",
+                  "entries": [
+                    {
+                      "title": {
+                        "literalString": "Check-in to Hotel"
+                      },
+                      "bodyText": {
+                        "literalString": "Check-in to your hotel and relax."
+                      },
+                      "time": {
+                        "literalString": "3:00 PM"
+                      },
+                      "type": "accommodation",
+                      "status": "noBookingRequired"
+                    }
+                  ]
                 }
               ]
             }
-          ]
+          }
         },
         {
           "id": "image1",
-          "component": "Image",
-          "url": {
-            "literalString": "assets/travel_images/canyonlands_national_park_utah.jpg"
+          "component": {
+            "Image": {
+              "url": {
+                "literalString": "assets/travel_images/canyonlands_national_park_utah.jpg"
+              }
+            }
           }
         },
         {
           "id": "image2",
-          "component": "Image",
-          "url": {
-            "literalString": "assets/travel_images/brooklyn_bridge_new_york.jpg"
+          "component": {
+            "Image": {
+              "url": {
+                "literalString": "assets/travel_images/brooklyn_bridge_new_york.jpg"
+              }
+            }
           }
         }
       ]

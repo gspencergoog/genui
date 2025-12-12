@@ -11,52 +11,68 @@ import '../catalog.dart';
 /// A2UI patterns, simplifying the creation of CatalogItem definitions.
 class A2uiSchemas {
   /// Schema for a value that can be either a literal string or a
-  /// data-bound path to a string in the DataModel. If both path and
-  /// literal are provided, the value at the path will be initialized
-  /// with the literal.
+  /// data-bound path to a string in the DataModel.
   ///
   /// If `enumValues` are provided, the string value (either literal or at the
   /// path) must be one of the values in the enum.
   static Schema stringReference({
     String? description,
     List<String>? enumValues,
-  }) => S.object(
-    description: description,
-    properties: {
-      'path': S.string(
-        description: 'A relative or absolute path in the data model.',
-        enumValues: enumValues,
-      ),
-      'literalString': S.string(enumValues: enumValues),
-    },
-  );
+  }) {
+    final literalSchema = S.string(enumValues: enumValues);
+    final pathSchema = S.object(
+      properties: {
+        'path': S.string(
+          description: 'A relative or absolute path in the data model.',
+        ),
+      },
+      required: ['path'],
+      additionalProperties: false,
+    );
+
+    // If enumValues are provided, we can't easily validate the value at the
+    // path against them in the schema itself without more complex logic, but
+    // the literal validation works.
+    return S.combined(
+      oneOf: [literalSchema, pathSchema],
+      description: description,
+    );
+  }
 
   /// Schema for a value that can be either a literal number or a
-  /// data-bound path to a number in the DataModel. If both path and
-  /// literal are provided, the value at the path will be initialized
-  /// with the literal.
-  static Schema numberReference({String? description}) => S.object(
-    description: description,
-    properties: {
-      'path': S.string(
-        description: 'A relative or absolute path in the data model.',
+  /// data-bound path to a number in the DataModel.
+  static Schema numberReference({String? description}) => S.combined(
+    oneOf: [
+      S.number(),
+      S.object(
+        properties: {
+          'path': S.string(
+            description: 'A relative or absolute path in the data model.',
+          ),
+        },
+        required: ['path'],
+        additionalProperties: false,
       ),
-      'literalNumber': S.number(),
-    },
+    ],
+    description: description,
   );
 
   /// Schema for a value that can be either a literal boolean or a
-  /// data-bound path to a boolean in the DataModel. If both path and
-  /// literal are provided, the value at the path will be initialized
-  /// with the literal.
-  static Schema booleanReference({String? description}) => S.object(
-    description: description,
-    properties: {
-      'path': S.string(
-        description: 'A relative or absolute path in the data model.',
+  /// data-bound path to a boolean in the DataModel.
+  static Schema booleanReference({String? description}) => S.combined(
+    oneOf: [
+      S.boolean(),
+      S.object(
+        properties: {
+          'path': S.string(
+            description: 'A relative or absolute path in the data model.',
+          ),
+        },
+        required: ['path'],
+        additionalProperties: false,
       ),
-      'literalBoolean': S.boolean(),
-    },
+    ],
+    description: description,
   );
 
   /// Schema for a property that holds a reference to a single child
@@ -66,15 +82,29 @@ class A2uiSchemas {
 
   /// Schema for a property that holds a list of child components,
   /// either as an explicit list of IDs or a data-bound template.
-  static Schema componentArrayReference({String? description}) => S.object(
-    description: description,
-    properties: {
-      'explicitList': S.list(items: componentReference()),
-      'template': S.object(
-        properties: {'componentId': S.string(), 'dataBinding': S.string()},
-        required: ['componentId', 'dataBinding'],
+  static Schema childrenProperty({String? description}) => S.combined(
+    oneOf: [
+      S.list(
+        items: componentReference(),
+        description: 'A static list of child component IDs.',
       ),
-    },
+      S.object(
+        description:
+            'A template for generating a dynamic list of children from a '
+            'data model list.',
+        properties: {
+          'componentId': S.string(),
+          'path': S.string(
+            description:
+                'The path to the list of component property objects in the '
+                'data model.',
+          ),
+        },
+        required: ['componentId', 'path'],
+        additionalProperties: false,
+      ),
+    ],
+    description: description,
   );
 
   /// Schema for a user-initiated action, including the action name
@@ -94,31 +124,39 @@ class A2uiSchemas {
   );
 
   /// Schema for a value that can be either a literal array of strings or a
-  /// data-bound path to an array of strings in the DataModel. If both path and
-  /// literalArray are provided, the value at the path will be
-  /// initialized with the literalArray.
-  static Schema stringArrayReference({String? description}) => S.object(
-    description: description,
-    properties: {
-      'path': S.string(
-        description: 'A relative or absolute path in the data model.',
+  /// data-bound path to an array of strings in the DataModel.
+  static Schema stringArrayReference({String? description}) => S.combined(
+    oneOf: [
+      S.list(items: S.string()),
+      S.object(
+        properties: {
+          'path': S.string(
+            description: 'A relative or absolute path in the data model.',
+          ),
+        },
+        required: ['path'],
+        additionalProperties: false,
       ),
-      'literalArray': S.list(items: S.string()),
-    },
+    ],
+    description: description,
   );
 
   /// Schema for a value that can be either a literal array of objects (maps)
-  /// or a data-bound path to an array of objects in the DataModel. If both
-  /// path and literalArray are provided, the value at the path will be
-  /// initialized with the literalArray.
-  static Schema objectArrayReference({String? description}) => S.object(
-    description: description,
-    properties: {
-      'path': S.string(
-        description: 'A relative or absolute path in the data model.',
+  /// or a data-bound path to an array of objects in the DataModel.
+  static Schema objectArrayReference({String? description}) => S.combined(
+    oneOf: [
+      S.list(items: S.object(additionalProperties: true)),
+      S.object(
+        properties: {
+          'path': S.string(
+            description: 'A relative or absolute path in the data model.',
+          ),
+        },
+        required: ['path'],
+        additionalProperties: false,
       ),
-      'literalArray': S.list(items: S.object(additionalProperties: true)),
-    },
+    ],
+    description: description,
   );
 
   /// Schema for a createSurface message, which initializes a surface.

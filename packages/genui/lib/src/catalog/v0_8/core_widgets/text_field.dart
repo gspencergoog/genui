@@ -9,6 +9,8 @@ import '../../../model/catalog_item.dart';
 import '../../../model/v0_8/schemas.dart';
 import '../../core_widgets/impl/text_field_impl.dart';
 
+import '../context_resolution.dart' as v0_8;
+
 final _schema = S.object(
   properties: {
     'text': A2uiSchemas.stringReference(
@@ -41,7 +43,8 @@ final _schema = S.object(
 final textField = CatalogItem(
   name: 'TextField',
   dataSchema: _schema,
-  widgetBuilder: textFieldBuilder,
+  widgetBuilder: (context) =>
+      textFieldBuilder(context, resolveContext: v0_8.resolveContext),
   exampleData: [
     () => '''
       [

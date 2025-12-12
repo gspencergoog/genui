@@ -12,8 +12,8 @@ import '../../../primitives/simple_items.dart';
 
 extension type TextFieldData.fromMap(JsonMap _json) {
   factory TextFieldData({
-    JsonMap? text,
-    JsonMap? label,
+    Object? text,
+    Object? label,
     String? usageHint,
     String? validationRegexp,
     JsonMap? onSubmittedAction,
@@ -25,8 +25,8 @@ extension type TextFieldData.fromMap(JsonMap _json) {
     'onSubmittedAction': onSubmittedAction,
   });
 
-  JsonMap? get text => _json['text'] as JsonMap?;
-  JsonMap? get label => _json['label'] as JsonMap?;
+  Object? get text => _json['text'];
+  Object? get label => _json['label'];
   String? get usageHint => _json['usageHint'] as String?;
   String? get validationRegexp => _json['validationRegexp'] as String?;
   JsonMap? get onSubmittedAction => _json['onSubmittedAction'] as JsonMap?;
@@ -94,10 +94,15 @@ class _TextFieldState extends State<_TextField> {
   }
 }
 
-Widget textFieldBuilder(CatalogItemContext itemContext) {
+Widget textFieldBuilder(
+  CatalogItemContext itemContext, {
+  required ContextResolver resolveContext,
+}) {
   final textFieldData = TextFieldData.fromMap(itemContext.data as JsonMap);
-  final JsonMap? valueRef = textFieldData.text;
-  final path = valueRef?['path'] as String?;
+  final Object? valueRef = textFieldData.text;
+  final String? path = valueRef is Map<String, Object?>
+      ? valueRef['path'] as String?
+      : null;
   final ValueNotifier<String?> notifier = itemContext.dataContext
       .subscribeToString(valueRef);
   final ValueNotifier<String?> labelNotifier = itemContext.dataContext

@@ -44,76 +44,73 @@ class OptionalValueBuilder<T> extends StatelessWidget {
 /// Extension methods for [DataContext] to simplify data binding.
 extension DataContextExtensions on DataContext {
   /// Subscribes to a value, which can be a literal or a data-bound path.
-  ValueNotifier<T?> subscribeToValue<T>(JsonMap? ref, String literalKey) {
+  ValueNotifier<T?> subscribeToValue<T>(Object? ref, String literalKey) {
     genUiLogger.info(
       'DataContext.subscribeToValue: ref=$ref, literalKey=$literalKey',
     );
     if (ref == null) return ValueNotifier<T?>(null);
-    final path = ref['path'] as String?;
-    final Object? literal = ref[literalKey];
+    if (ref is T) return ValueNotifier<T?>(ref as T);
 
-    if (path != null) {
-      final dataPath = DataPath(path);
-      if (literal != null) {
-        update(dataPath, literal);
+    if (ref is Map<String, Object?>) {
+      final path = ref['path'] as String?;
+      final Object? literal = ref[literalKey];
+
+      if (path != null) {
+        final dataPath = DataPath(path);
+        if (literal != null) {
+          update(dataPath, literal);
+        }
+        return subscribe<T>(dataPath);
       }
-      return subscribe<T>(dataPath);
+      if (literal is T) {
+        return ValueNotifier<T?>(literal as T?);
+      }
     }
 
-    return ValueNotifier<T?>(literal as T?);
+    return ValueNotifier<T?>(null);
   }
 
   /// Subscribes to a string value, which can be a literal or a data-bound path.
-  ValueNotifier<String?> subscribeToString(JsonMap? ref) {
+  ValueNotifier<String?> subscribeToString(Object? ref) {
     return subscribeToValue<String>(ref, 'literalString');
   }
 
   /// Subscribes to a boolean value, which can be a literal or a data-bound
   /// path.
-  ValueNotifier<bool?> subscribeToBool(JsonMap? ref) {
+  ValueNotifier<bool?> subscribeToBool(Object? ref) {
     return subscribeToValue<bool>(ref, 'literalBoolean');
   }
 
   /// Subscribes to a list of objects, which can be a literal or a data-bound
   /// path.
-  ValueNotifier<List<Object?>?> subscribeToObjectArray(JsonMap? ref) {
+  ValueNotifier<List<Object?>?> subscribeToObjectArray(Object? ref) {
     return subscribeToValue<List<Object?>>(ref, 'literalArray');
   }
 }
 
-/// Resolves a context map definition against a [DataContext].
-///
-JsonMap resolveContext(
+/// A function types that resolves a context map definition against a
+/// [DataContext].
+typedef ContextResolver =
+    JsonMap Function(
   DataContext dataContext,
   Map<String, Object?> contextDefinitions,
-) {
-  final resolved = <String, Object?>{};
-  for (final MapEntry<String, Object?> entry in contextDefinitions.entries) {
-    final String key = entry.key;
-    final value = entry.value as JsonMap;
-    if (value.containsKey('path')) {
-      resolved[key] = dataContext.getValue(DataPath(value['path'] as String));
-    } else if (value.containsKey('literalString')) {
-      resolved[key] = value['literalString'];
-    } else if (value.containsKey('literalNumber')) {
-      resolved[key] = value['literalNumber'];
-    } else if (value.containsKey('literalBoolean')) {
-      resolved[key] = value['literalBoolean'];
-    }
-  }
-  return resolved;
-}
+);
+
 
 /// Resolves a string reference against a [DataContext].
-String? resolveStringReference(DataContext dataContext, JsonMap? ref) {
+String? resolveStringReference(DataContext dataContext, Object? ref) {
   if (ref == null) return null;
-  if (ref.containsKey('path')) {
-    final Object? value = dataContext.getValue<Object?>(
-      DataPath(ref['path'] as String),
-    );
-    return value?.toString();
-  } else if (ref.containsKey('literalString')) {
-    return ref['literalString'] as String?;
+  if (ref is String) return ref;
+
+  if (ref is Map<String, Object?>) {
+    if (ref.containsKey('path')) {
+      final Object? value = dataContext.getValue<Object?>(
+        DataPath(ref['path'] as String),
+      );
+      return value?.toString();
+    } else if (ref.containsKey('literalString')) {
+      return ref['literalString'] as String?;
+    }
   }
   return null;
 }

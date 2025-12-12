@@ -116,11 +116,14 @@ final dateInputChip = CatalogItem(
       [
         {
           "id": "root",
-          "component": "DateInputChip",
-          "value": {
-            "literalString": "1871-07-22"
-          },
-          "label": "Your birth date"
+          "component": {
+            "DateInputChip": {
+              "value": {
+                "literalString": "1871-07-22"
+              },
+              "label": "Your birth date"
+            }
+          }
         }
       ]
     ''',
