@@ -236,8 +236,7 @@ class _TravelCarouselItem extends StatelessWidget {
       child: InkWell(
         onTap: () {
           final name = data.action['name'] as String;
-          final Map<String, Object?> contextDefinition =
-              (data.action['context'] as Map<String, Object?>?) ?? {};
+          final Object? contextDefinition = data.action['context'];
           final JsonMap resolvedContext = resolveContext(
             dataContext,
             contextDefinition,

@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
-import 'package:genui/src/catalog/v0_8/binding.dart';
 import 'package:genui/src/model/v0_9/messages.dart' as v0_9;
 
 void main() {

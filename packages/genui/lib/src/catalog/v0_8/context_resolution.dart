@@ -8,10 +8,20 @@ import '../../primitives/simple_items.dart';
 /// Resolves a context map definition against a [DataContext].
 JsonMap resolveContext(
   DataContext dataContext,
-  Map<String, Object?> contextDefinitions,
+  Object? contextDefinitions,
 ) {
+  final Map<String, Object?> definitions;
+  if (contextDefinitions is List) {
+    definitions = {
+      for (final item in contextDefinitions)
+        (item as Map)['key'] as String: item['value'],
+    };
+  } else {
+    definitions = (contextDefinitions as Map<String, Object?>?) ?? const {};
+  }
+
   final resolved = <String, Object?>{};
-  for (final MapEntry<String, Object?> entry in contextDefinitions.entries) {
+  for (final MapEntry<String, Object?> entry in definitions.entries) {
     final String key = entry.key;
     final value = entry.value as JsonMap;
     if (value.containsKey('path')) {
