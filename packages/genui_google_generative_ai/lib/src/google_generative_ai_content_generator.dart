@@ -2,18 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
-import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:genui/genui.dart';
 import 'package:google_cloud_ai_generativelanguage_v1beta/generativelanguage.dart'
     as google_ai;
-import 'package:google_cloud_protobuf/protobuf.dart' as protobuf;
 
-import 'google_content_converter.dart';
+import 'google_generative_ai_content_generator_v0_8.dart';
+import 'google_generative_ai_content_generator_v0_9.dart';
 import 'google_generative_service_interface.dart';
-import 'google_schema_adapter.dart';
+
+export 'google_generative_ai_content_generator_v0_8.dart';
+export 'google_generative_ai_content_generator_v0_9.dart';
 
 /// A factory for creating a [GoogleGenerativeServiceInterface].
 ///
@@ -25,112 +24,49 @@ typedef GenerativeServiceFactory =
 
 /// A [ContentGenerator] that uses the Google Cloud Generative Language API to
 /// generate content.
-class GoogleGenerativeAiContentGenerator implements ContentGenerator {
-  /// Creates a [GoogleGenerativeAiContentGenerator] instance with specified
-  /// configurations.
-  GoogleGenerativeAiContentGenerator({
-    required this.catalog,
-    this.systemInstruction,
-    this.serviceFactory = defaultGenerativeServiceFactory,
-    this.additionalTools = const [],
-    this.modelName = 'models/gemini-2.5-flash',
-    this.apiKey,
-    this.protocolVersion = A2uiProtocolVersion.v0_8,
-  }) : _protocol = A2uiProtocol.fromVersion(protocolVersion);
-
-  /// The version of the A2UI protocol to use.
-  final A2uiProtocolVersion protocolVersion;
-
-  final A2uiProtocol _protocol;
-
-  /// The catalog of UI components available to the AI.
-  final Catalog catalog;
-
-  /// The system instruction to use for the AI model.
-  final String? systemInstruction;
-
-  /// A function to use for creating the service itself.
+///
+/// This abstract class serves as a factory for creating version-specific
+/// implementations of the content generator.
+abstract class GoogleGenerativeAiContentGenerator implements ContentGenerator {
+  /// Creates a [GoogleGenerativeAiContentGenerator] instance.
   ///
-  /// This factory function is responsible for instantiating the
-  /// [GoogleGenerativeServiceInterface] used for AI interactions. It allows for
-  /// customization of the service setup, or for providing mock services during
-  /// testing. The factory receives this [GoogleGenerativeAiContentGenerator]
-  /// instance as configuration.
-  ///
-  /// Defaults to a wrapper for the regular [google_ai.GenerativeService]
-  /// constructor, [defaultGenerativeServiceFactory].
-  final GenerativeServiceFactory serviceFactory;
-
-  /// Additional tools to make available to the AI model.
-  final List<AiTool> additionalTools;
-
-  /// The model name to use (e.g., 'models/gemini-2.5-flash').
-  final String modelName;
-
-  /// The API key to use for authentication.
-  final String? apiKey;
-
-  /// The total number of input tokens used by this client.
-  int inputTokenUsage = 0;
-
-  /// The total number of output tokens used by this client
-  int outputTokenUsage = 0;
-
-  final _a2uiMessageController = StreamController<A2uiMessage>.broadcast();
-  final _textResponseController = StreamController<String>.broadcast();
-  final _errorController = StreamController<ContentGeneratorError>.broadcast();
-  final _isProcessing = ValueNotifier<bool>(false);
-
-  @override
-  Stream<A2uiMessage> get a2uiMessageStream => _a2uiMessageController.stream;
-
-  @override
-  Stream<String> get textResponseStream => _textResponseController.stream;
-
-  @override
-  Stream<ContentGeneratorError> get errorStream => _errorController.stream;
-
-  @override
-  ValueListenable<bool> get isProcessing => _isProcessing;
-
-  /// The default system instruction to use if none is provided.
-  ///
-  /// This is determined by the [protocolVersion].
-  String get _defaultSystemPreamble {
-    return _protocol.getSystemPreamble(catalog) ?? '';
-  }
-
-  @override
-  void dispose() {
-    _a2uiMessageController.close();
-    _textResponseController.close();
-    _errorController.close();
-    _isProcessing.dispose();
-  }
-
-  @override
-  Future<void> sendRequest(
-    ChatMessage message, {
-    Iterable<ChatMessage>? history,
-    A2UiClientCapabilities? clientCapabilities,
-  }) async {
-    _isProcessing.value = true;
-    try {
-      final messages = [...?history, message];
-      await _generate(messages: messages);
-    } catch (e, st) {
-      genUiLogger.severe('Error generating content', e, st);
-      _errorController.add(ContentGeneratorError(e, st));
-    } finally {
-      _isProcessing.value = false;
+  /// Depending on the [protocolVersion], this will return a
+  /// [GoogleGenerativeAiContentGeneratorV08] or
+  /// [GoogleGenerativeAiContentGeneratorV09].
+  factory GoogleGenerativeAiContentGenerator({
+    required Catalog catalog,
+    String? systemInstruction,
+    String outputToolName = 'provideFinalOutput',
+    GenerativeServiceFactory serviceFactory = defaultGenerativeServiceFactory,
+    List<AiTool> additionalTools = const [],
+    String modelName = 'models/gemini-2.5-flash',
+    String? apiKey,
+    A2uiProtocolVersion protocolVersion = A2uiProtocolVersion.v0_8,
+  }) {
+    if (protocolVersion == A2uiProtocolVersion.v0_9) {
+      return GoogleGenerativeAiContentGeneratorV09(
+        catalog: catalog,
+        systemInstruction: systemInstruction,
+        serviceFactory: serviceFactory,
+        additionalTools: additionalTools,
+        modelName: modelName,
+        apiKey: apiKey,
+        protocolVersion: protocolVersion,
+      );
+    } else {
+      return GoogleGenerativeAiContentGeneratorV08(
+        catalog: catalog,
+        systemInstruction: systemInstruction,
+        outputToolName: outputToolName,
+        serviceFactory: serviceFactory,
+        additionalTools: additionalTools,
+        modelName: modelName,
+        apiKey: apiKey,
+      );
     }
   }
 
   /// The default factory function for creating a [google_ai.GenerativeService].
-  ///
-  /// This function instantiates a standard [google_ai.GenerativeService] using
-  /// the `apiKey` from the provided [GoogleGenerativeAiContentGenerator]
-  /// `configuration`.
   static GoogleGenerativeServiceInterface defaultGenerativeServiceFactory({
     required GoogleGenerativeAiContentGenerator configuration,
   }) {
@@ -139,357 +75,30 @@ class GoogleGenerativeAiContentGenerator implements ContentGenerator {
     );
   }
 
-  ({List<google_ai.Tool>? tools, Set<String> allowedFunctionNames})
-  _setupToolsAndFunctions({
-    required List<AiTool> availableTools,
-    required GoogleSchemaAdapter adapter,
-  }) {
-    genUiLogger.fine('Setting up tools');
+  /// The catalog of UI components available to the AI.
+  Catalog get catalog;
 
-    // Combine available tools with protocol tools
-    final allTools = availableTools;
-    genUiLogger.fine(
-      'Available tools: ${allTools.map((t) => t.name).join(', ')}',
-    );
+  /// The system instruction to use for the AI model.
+  String? get systemInstruction;
 
-    final uniqueAiToolsByName = <String, AiTool>{};
-    final toolFullNames = <String>{};
-    for (final tool in allTools) {
-      if (uniqueAiToolsByName.containsKey(tool.name)) {
-        throw Exception('Duplicate tool ${tool.name} registered.');
-      }
-      uniqueAiToolsByName[tool.name] = tool;
-      if (tool.name != tool.fullName) {
-        if (toolFullNames.contains(tool.fullName)) {
-          throw Exception('Duplicate tool ${tool.fullName} registered.');
-        }
-        toolFullNames.add(tool.fullName);
-      }
-    }
+  /// Additional tools to make available to the AI model.
+  List<AiTool> get additionalTools;
 
-    final functionDeclarations = <google_ai.FunctionDeclaration>[];
-    for (final tool in uniqueAiToolsByName.values) {
-      google_ai.Schema? adaptedParameters;
-      if (tool.parameters != null) {
-        final result = adapter.adapt(tool.parameters!);
-        if (result.errors.isNotEmpty) {
-          genUiLogger.warning(
-            'Errors adapting parameters for tool ${tool.name}: '
-            '${result.errors.join('\n')}',
-          );
-        }
-        adaptedParameters = result.schema;
-      }
-      functionDeclarations.add(
-        google_ai.FunctionDeclaration(
-          name: tool.name,
-          description: tool.description,
-          parameters: adaptedParameters,
-        ),
-      );
-      if (tool.name != tool.fullName) {
-        functionDeclarations.add(
-          google_ai.FunctionDeclaration(
-            name: tool.fullName,
-            description: tool.description,
-            parameters: adaptedParameters,
-          ),
-        );
-      }
-    }
-    genUiLogger.fine(
-      'Adapted tools to function declarations: '
-      '${functionDeclarations.map((d) => d.name).join(', ')}',
-    );
+  /// The model name to use (e.g., 'models/gemini-2.5-flash').
+  String get modelName;
 
-    final tools = functionDeclarations.isNotEmpty
-        ? [google_ai.Tool(functionDeclarations: functionDeclarations)]
-        : null;
+  /// The API key to use for authentication.
+  String? get apiKey;
 
-    if (tools != null) {
-      genUiLogger.finest(
-        'Tool declarations being sent to the model: '
-        '${jsonEncode(tools)}',
-      );
-    }
+  /// The protocol version being used.
+  A2uiProtocolVersion get protocolVersion;
 
-    final allowedFunctionNames = <String>{
-      ...uniqueAiToolsByName.keys,
-      ...toolFullNames,
-    };
+  /// The factory function used to create the generative service.
+  GenerativeServiceFactory get serviceFactory;
 
-    genUiLogger.fine(
-      'Allowed function names for model: ${allowedFunctionNames.join(', ')}',
-    );
+  /// The total number of input tokens used by this client.
+  int get inputTokenUsage;
 
-    return (tools: tools, allowedFunctionNames: allowedFunctionNames);
-  }
-
-  Future<({List<google_ai.Part> functionResponseParts})> _processFunctionCalls({
-    required List<google_ai.FunctionCall> functionCalls,
-    required List<AiTool> availableTools,
-  }) async {
-    genUiLogger.fine(
-      'Processing ${functionCalls.length} function calls from model.',
-    );
-    // Note: tools here should span all available tools including protocol
-    // tools. _generate ensures this by passing allTools.
-
-    final functionResponseParts = <google_ai.Part>[];
-    for (final call in functionCalls) {
-      genUiLogger.fine(
-        'Processing function call: ${call.name} with args: ${call.args}',
-      );
-
-      final aiTool = availableTools.firstWhere(
-        (t) => t.name == call.name || t.fullName == call.name,
-        orElse: () => throw Exception('Unknown tool ${call.name} called.'),
-      );
-      Map<String, Object?> toolResult;
-      try {
-        genUiLogger.fine('Invoking tool: ${aiTool.name}');
-        // Convert Struct args to Map for tool invocation
-        final argsMap = call.args?.toJson() as Map<String, Object?>? ?? {};
-        toolResult = await aiTool.invoke(argsMap);
-        genUiLogger.info(
-          'Invoked tool ${aiTool.name} with args $argsMap. '
-          'Result: $toolResult',
-        );
-      } catch (exception, stack) {
-        genUiLogger.severe(
-          'Error invoking tool ${aiTool.name} with args ${call.args}: ',
-          exception,
-          stack,
-        );
-        toolResult = {
-          'error': 'Tool ${aiTool.name} failed to execute: $exception',
-        };
-      }
-      functionResponseParts.add(
-        google_ai.Part(
-          functionResponse: google_ai.FunctionResponse(
-            id: call.id,
-            name: call.name!,
-            response: protobuf.Struct.fromJson(toolResult),
-          ),
-        ),
-      );
-    }
-    genUiLogger.fine(
-      'Finished processing function calls. Returning '
-      '${functionResponseParts.length} responses.',
-    );
-    return (functionResponseParts: functionResponseParts);
-  }
-
-  Future<void> _generate({required Iterable<ChatMessage> messages}) async {
-    final converter = GoogleContentConverter();
-    final adapter = GoogleSchemaAdapter();
-
-    final service = serviceFactory(configuration: this);
-
-    try {
-      final content = converter.toGoogleAiContent(messages);
-
-      // Get protocol tools once
-      final protocolTools = _protocol.getTools(
-        catalog,
-        _a2uiMessageController.add,
-      );
-      final allTools = [...additionalTools, ...protocolTools];
-
-      final (:tools, :allowedFunctionNames) = _setupToolsAndFunctions(
-        availableTools: allTools,
-        adapter: adapter,
-      );
-
-      genUiLogger.info(
-        'Sending Tools: ${jsonEncode(tools?.map((t) => t.toJson()).toList())}',
-      );
-
-      var toolUsageCycle = 0;
-      const maxToolUsageCycles = 40; // Safety break for tool loops
-
-      final effectiveSystemInstruction =
-          '${systemInstruction ?? ''}\n\n$_defaultSystemPreamble';
-
-      final systemInstructionContent = [
-        google_ai.Content(
-          parts: [google_ai.Part(text: effectiveSystemInstruction)],
-        ),
-      ];
-
-      toolLoop:
-      while (toolUsageCycle < maxToolUsageCycles) {
-        genUiLogger.fine('Starting tool usage cycle ${toolUsageCycle + 1}.');
-        toolUsageCycle++;
-
-        final concatenatedContents = content
-            .map((c) => jsonEncode(c.toJson()))
-            .join('\n');
-
-        genUiLogger.info(
-          '''****** Performing Inference ******
-System Instruction:
-$effectiveSystemInstruction
-
-Content:
-$concatenatedContents
-With functions:
-  '${allowedFunctionNames.join(', ')}',
-  ''',
-        );
-        final inferenceStartTime = DateTime.now();
-
-        final request = google_ai.GenerateContentRequest(
-          model: modelName,
-          contents: [...systemInstructionContent, ...content],
-          tools: tools,
-          toolConfig: tools == null
-              ? null
-              : google_ai.ToolConfig(
-                  functionCallingConfig: google_ai.FunctionCallingConfig(
-                    mode: google_ai.FunctionCallingConfig_Mode.auto,
-                  ),
-                ),
-        );
-
-        final responseStream = service.streamGenerateContent(request);
-
-        final currentLineBuffer = StringBuffer();
-
-        await for (final google_ai.GenerateContentResponse response
-            in responseStream) {
-          if (response.candidates == null || response.candidates!.isEmpty) {
-            continue;
-          }
-
-          final candidate = response.candidates!.first;
-          genUiLogger.fine(
-            'Received candidate: content=${candidate.content}, '
-            'finishReason=${candidate.finishReason}, '
-            'safetyRatings=${candidate.safetyRatings}\n'
-            'finishMessage=${candidate.finishMessage}',
-          );
-
-          if (candidate.finishReason ==
-              google_ai.Candidate_FinishReason.malformedFunctionCall) {
-            genUiLogger.warning(
-              'Inference stopped due to MALFORMED_FUNCTION_CALL.',
-            );
-            if (candidate.content != null) {
-              genUiLogger.warning(
-                'Malformed content: ${jsonEncode(candidate.content)}',
-              );
-            } else {
-              genUiLogger.warning(
-                'No content returned with MALFORMED_FUNCTION_CALL. '
-                'This usually indicates the model attempted to call a function '
-                'with arguments that did not match the schema.',
-              );
-            }
-          }
-
-          // Handle function calls
-          final functionCalls = <google_ai.FunctionCall>[];
-          if (candidate.content?.parts != null) {
-            for (final part in candidate.content!.parts!) {
-              if (part.functionCall != null) {
-                functionCalls.add(part.functionCall!);
-              }
-            }
-          }
-
-          if (functionCalls.isNotEmpty) {
-            genUiLogger.fine(
-              'Model response contained ${functionCalls.length} '
-              'function calls.',
-            );
-            if (candidate.content != null) {
-              content.add(candidate.content!);
-            }
-
-            final result = await _processFunctionCalls(
-              functionCalls: functionCalls,
-              availableTools: allTools,
-            );
-            final functionResponseParts = result.functionResponseParts;
-
-            if (functionResponseParts.isNotEmpty) {
-              content.add(
-                google_ai.Content(role: 'user', parts: functionResponseParts),
-              );
-              genUiLogger.fine(
-                'Added tool response message with '
-                '${functionResponseParts.length} parts to conversation.',
-              );
-              continue toolLoop;
-            }
-          }
-
-          // Handle text content for JSONL parsing
-          if (candidate.content?.parts != null) {
-            for (final part in candidate.content!.parts!) {
-              final text = part.text;
-              if (text != null && text.isNotEmpty) {
-                genUiLogger.fine('Received text part: $text');
-                for (var i = 0; i < text.length; i++) {
-                  final char = text[i];
-                  if (char == '\n') {
-                    _processLine(currentLineBuffer.toString());
-                    currentLineBuffer.clear();
-                  } else {
-                    currentLineBuffer.write(char);
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        // Process any remaining content in the buffer
-        if (currentLineBuffer.isNotEmpty) {
-          _processLine(currentLineBuffer.toString());
-        }
-
-        final elapsed = DateTime.now().difference(inferenceStartTime);
-        genUiLogger.info(
-          '****** Completed Inference ******\n'
-          'Latency = ${elapsed.inMilliseconds}ms',
-        );
-
-        break;
-      }
-    } finally {
-      service.close();
-    }
-  }
-
-  void _processLine(String line) {
-    line = line.trim();
-    if (line.isEmpty) {
-      return;
-    }
-
-    genUiLogger.fine('Processing line: $line');
-
-    try {
-      final json = jsonDecode(line);
-      if (json is Map<String, dynamic>) {
-        try {
-          final message = _protocol.parseJson(json);
-          genUiLogger.fine('Parsed A2UI message: $message');
-          _a2uiMessageController.add(message);
-          return;
-        } catch (e) {
-          // Not an A2UI message, treat as text/other JSON
-          genUiLogger.fine('Failed to parse as A2UI message: $e');
-        }
-      }
-    } catch (e) {
-      // Not JSON, treat as text
-      genUiLogger.fine('Failed to parse as JSON: $e');
-    }
-    _textResponseController.add(line);
-  }
+  /// The total number of output tokens used by this client
+  int get outputTokenUsage;
 }

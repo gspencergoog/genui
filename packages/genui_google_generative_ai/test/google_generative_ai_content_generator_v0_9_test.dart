@@ -1,0 +1,295 @@
+// Copyright 2025 The Flutter Authors.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'dart:async';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:genui/genui.dart' as genui;
+import 'package:genui_google_generative_ai/genui_google_generative_ai.dart';
+import 'package:google_cloud_ai_generativelanguage_v1beta/generativelanguage.dart'
+    as google_ai;
+import 'package:google_cloud_protobuf/protobuf.dart' as protobuf;
+import 'package:json_schema_builder/json_schema_builder.dart' as dsb;
+
+void main() {
+  group('GoogleGenerativeAiContentGeneratorV09', () {
+    const version = genui.A2uiProtocolVersion.v0_9;
+    late genui.DataBinder Function(genui.DataContext) binderFactory;
+    setUp(() {
+      binderFactory = genui.V09DataBinder.new;
+    });
+
+    test('constructor creates instance with required parameters', () {
+      final catalog = genui.Catalog(
+        <genui.CatalogItem>[],
+        binderFactory: binderFactory,
+      );
+
+      final generator = GoogleGenerativeAiContentGenerator(
+        catalog: catalog,
+        apiKey: 'test-api-key',
+        protocolVersion: version,
+      );
+
+      expect(generator, isNotNull);
+      expect(generator.catalog, catalog);
+      expect(generator.modelName, 'models/gemini-2.5-flash');
+      expect(generator.protocolVersion, version);
+      expect(generator, isA<GoogleGenerativeAiContentGeneratorV09>());
+    });
+
+    test('constructor accepts system instruction', () {
+      final catalog = genui.Catalog(
+        <genui.CatalogItem>[],
+        binderFactory: binderFactory,
+      );
+
+      final generator = GoogleGenerativeAiContentGenerator(
+        catalog: catalog,
+        systemInstruction: 'You are a helpful assistant',
+        apiKey: 'test-api-key',
+        protocolVersion: version,
+      );
+
+      expect(generator.systemInstruction, 'You are a helpful assistant');
+    });
+
+    test('constructor accepts additional tools', () {
+      final catalog = genui.Catalog(
+        <genui.CatalogItem>[],
+        binderFactory: binderFactory,
+      );
+      final tool = genui.DynamicAiTool<Map<String, Object?>>(
+        name: 'testTool',
+        description: 'A test tool',
+        invokeFunction: (args) async => {},
+      );
+
+      final generator = GoogleGenerativeAiContentGenerator(
+        catalog: catalog,
+        additionalTools: [tool],
+        apiKey: 'test-api-key',
+        protocolVersion: version,
+      );
+
+      expect(generator.additionalTools, hasLength(1));
+      expect(generator.additionalTools.first.name, 'testTool');
+    });
+
+    test('streams are accessible', () {
+      final catalog = genui.Catalog(
+        <genui.CatalogItem>[],
+        binderFactory: binderFactory,
+      );
+
+      final generator = GoogleGenerativeAiContentGenerator(
+        catalog: catalog,
+        apiKey: 'test-api-key',
+        protocolVersion: version,
+      );
+
+      expect(generator.a2uiMessageStream, isNotNull);
+      expect(generator.textResponseStream, isNotNull);
+      expect(generator.errorStream, isNotNull);
+      expect(generator.isProcessing, isNotNull);
+    });
+
+    test('isProcessing starts as false', () {
+      final catalog = genui.Catalog(
+        <genui.CatalogItem>[],
+        binderFactory: binderFactory,
+      );
+
+      final generator = GoogleGenerativeAiContentGenerator(
+        catalog: catalog,
+        apiKey: 'test-api-key',
+        protocolVersion: version,
+      );
+
+      expect(generator.isProcessing.value, isFalse);
+    });
+
+    test('dispose closes all streams', () {
+      final catalog = genui.Catalog(
+        <genui.CatalogItem>[],
+        binderFactory: binderFactory,
+      );
+
+      final generator = GoogleGenerativeAiContentGenerator(
+        catalog: catalog,
+        apiKey: 'test-api-key',
+        protocolVersion: version,
+      );
+
+      // Should not throw
+      expect(generator.dispose, returnsNormally);
+    });
+
+    test('token usage starts at zero', () {
+      final catalog = genui.Catalog(
+        <genui.CatalogItem>[],
+        binderFactory: binderFactory,
+      );
+
+      final generator = GoogleGenerativeAiContentGenerator(
+        catalog: catalog,
+        apiKey: 'test-api-key',
+        protocolVersion: version,
+      );
+
+      expect(generator.inputTokenUsage, 0);
+      expect(generator.outputTokenUsage, 0);
+    });
+
+    test('isProcessing is true during request', () async {
+      final generator = GoogleGenerativeAiContentGenerator(
+        catalog: genui.Catalog(
+          <genui.CatalogItem>[],
+          binderFactory: binderFactory,
+        ),
+        protocolVersion: version,
+        serviceFactory: ({required configuration}) {
+          return FakeGoogleGenerativeService([
+            google_ai.GenerateContentResponse(
+              candidates: [
+                google_ai.Candidate(
+                  content: google_ai.Content(
+                    role: 'model',
+                    parts: [google_ai.Part(text: '{"response": "Hello"}')],
+                  ),
+                  finishReason: google_ai.Candidate_FinishReason.stop,
+                ),
+              ],
+            ),
+          ]);
+        },
+      );
+
+      expect(generator.isProcessing.value, isFalse);
+      final future = generator.sendRequest(
+        genui.UserMessage([const genui.TextPart('Hi')]),
+      );
+      expect(generator.isProcessing.value, isTrue);
+      await future;
+      expect(generator.isProcessing.value, isFalse);
+    });
+
+    test('can call a tool and return a result', () async {
+      final generator = GoogleGenerativeAiContentGenerator(
+        catalog: genui.Catalog(
+          <genui.CatalogItem>[],
+          binderFactory: binderFactory,
+        ),
+        protocolVersion: version,
+        additionalTools: [
+          genui.DynamicAiTool<Map<String, Object?>>(
+            name: 'testTool',
+            description: 'A test tool',
+            parameters: dsb.Schema.object(),
+            invokeFunction: (args) async => {'result': 'tool result'},
+          ),
+        ],
+        serviceFactory: ({required configuration}) {
+          return FakeGoogleGenerativeService([
+            google_ai.GenerateContentResponse(
+              candidates: [
+                google_ai.Candidate(
+                  content: google_ai.Content(
+                    role: 'model',
+                    parts: [
+                      google_ai.Part(
+                        functionCall: google_ai.FunctionCall(
+                          id: '1',
+                          name: 'testTool',
+                          args: protobuf.Struct.fromJson(<String, dynamic>{}),
+                        ),
+                      ),
+                    ],
+                  ),
+                  finishReason: google_ai.Candidate_FinishReason.stop,
+                ),
+              ],
+            ),
+            google_ai.GenerateContentResponse(
+              candidates: [
+                google_ai.Candidate(
+                  content: google_ai.Content(
+                    role: 'model',
+                    parts: [google_ai.Part(text: 'Tool called')],
+                  ),
+                  finishReason: google_ai.Candidate_FinishReason.stop,
+                ),
+              ],
+            ),
+          ]);
+        },
+      );
+
+      final hi = genui.UserMessage([const genui.TextPart('Hi')]);
+      final completer = Completer<String>();
+      unawaited(generator.textResponseStream.first.then(completer.complete));
+      await generator.sendRequest(hi);
+      final response = await completer.future;
+      expect(response, 'Tool called');
+    });
+
+    test('returns a simple text response', () async {
+      final generator = GoogleGenerativeAiContentGenerator(
+        catalog: genui.Catalog(
+          <genui.CatalogItem>[],
+          binderFactory: binderFactory,
+        ),
+        protocolVersion: version,
+        serviceFactory: ({required configuration}) {
+          return FakeGoogleGenerativeService([
+            google_ai.GenerateContentResponse(
+              candidates: [
+                google_ai.Candidate(
+                  content: google_ai.Content(
+                    role: 'model',
+                    parts: [google_ai.Part(text: 'Hello')],
+                  ),
+                  finishReason: google_ai.Candidate_FinishReason.stop,
+                ),
+              ],
+            ),
+          ]);
+        },
+      );
+
+      final hi = genui.UserMessage([const genui.TextPart('Hi')]);
+      final completer = Completer<String>();
+      unawaited(generator.textResponseStream.first.then(completer.complete));
+      await generator.sendRequest(hi);
+      final response = await completer.future;
+      expect(response, 'Hello');
+    });
+  });
+}
+
+class FakeGoogleGenerativeService implements GoogleGenerativeServiceInterface {
+  FakeGoogleGenerativeService(this.responses);
+
+  final List<google_ai.GenerateContentResponse> responses;
+  int callCount = 0;
+
+  @override
+  Future<google_ai.GenerateContentResponse> generateContent(
+    google_ai.GenerateContentRequest request,
+  ) {
+    return Future.delayed(Duration.zero, () => responses[callCount++]);
+  }
+
+  @override
+  Stream<google_ai.GenerateContentResponse> streamGenerateContent(
+    google_ai.GenerateContentRequest request,
+  ) async* {
+    yield responses[callCount++];
+  }
+
+  @override
+  void close() {
+    // No-op for testing
+  }
+}

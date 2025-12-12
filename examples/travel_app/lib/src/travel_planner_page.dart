@@ -84,6 +84,7 @@ class _TravelPlannerPageState extends State<TravelPlannerPage>
                 ),
               ],
               apiKey: getApiKey(),
+              protocolVersion: A2uiProtocolVersion.v0_8,
             );
           }(),
           AiBackend.firebase => FirebaseAiContentGenerator(
