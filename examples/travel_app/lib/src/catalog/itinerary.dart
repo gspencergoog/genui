@@ -43,11 +43,33 @@ final _schema = S.object(
                 'A short description of the day\'s plan. '
                 'This supports markdown.',
           ),
-          'dayNumber': S.integer(),
-          'date': S.string(),
-          'activities': S.list(
+          'imageChildId': A2uiSchemas.componentReference(
+            description:
+                'The ID of the Image widget to display. The Image fit should '
+                'typically be \'cover\'.',
+          ),
+          'entries': S.list(
+            description:
+                'A list of widget IDs for the ItineraryEntry '
+                'children for this day.',
             items: S.object(
               properties: {
+                'title': A2uiSchemas.stringReference(
+                  description: 'The title of the itinerary entry.',
+                ),
+                'subtitle': A2uiSchemas.stringReference(
+                  description: 'The subtitle of the itinerary entry.',
+                ),
+                'bodyText': A2uiSchemas.stringReference(
+                  description:
+                      'The body text for the entry. This supports markdown.',
+                ),
+                'address': A2uiSchemas.stringReference(
+                  description: 'The address for the entry.',
+                ),
+                'time': A2uiSchemas.stringReference(
+                  description: 'The time for the entry (formatted string).',
+                ),
                 'totalCost': A2uiSchemas.stringReference(
                   description: 'The total cost for the entry.',
                 ),

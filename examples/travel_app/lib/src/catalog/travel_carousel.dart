@@ -17,28 +17,36 @@ final _schema = S.object(
     'title': A2uiSchemas.stringReference(
       description: 'An optional title to display above the carousel.',
     ),
-    'selectedItemIndex': A2uiSchemas.numberReference(
-      description:
-          'The index of the currently selected item in the carousel. '
-          'This is useful for pre-selecting an item or for tracking '
-          'the user\'s selection.',
-    ),
     'items': S.list(
       description: 'A list of items to display in the carousel.',
       items: S.object(
         properties: {
-          'imageChildId': A2uiSchemas.componentReference(
-            description: 'The ID of the image to display in the carousel item.',
+          'description': A2uiSchemas.stringReference(
+            description:
+                'The short description of the carousel item. '
+                'It may include the price and location if applicable. '
+                'It should be very concise. '
+                'Example: "The Dart Inn in Sunnyvale, CA for \$150"',
           ),
-          'title': S.string(description: 'The title of the carousel item.'),
-          'subtitle': S.string(
-            description: 'The subtitle of the carousel item.',
+          'imageChildId': A2uiSchemas.componentReference(
+            description:
+                'The ID of the Image widget to display as the carousel item '
+                'image. Be sure to create Image widgets with matching IDs.',
+          ),
+          'listingSelectionId': S.string(
+            description:
+                'An optional ID of the listing that this item '
+                'represents. This is useful when the carousel is used to show '
+                'a list of hotels or other bookable items.',
           ),
           'action': A2uiSchemas.action(
-            description: 'The action to perform when the item is tapped.',
+            description:
+                'The action to perform when the item is tapped. The '
+                'context for this action will include the "description" and '
+                '"listingSelectionId" of the tapped item.',
           ),
         },
-        required: ['imageChildId', 'title', 'action'],
+        required: ['description', 'imageChildId', 'action'],
       ),
     ),
   },

@@ -8,18 +8,18 @@ import 'package:json_schema_builder/json_schema_builder.dart';
 
 final _schema = S.object(
   properties: {
-    'tabs': S.list(
+    'sections': S.list(
       description: 'A list of sections to display as tabs.',
       items: S.object(
         properties: {
-          'label': A2uiSchemas.stringReference(
-            description: 'The label of the tab.',
+          'title': A2uiSchemas.stringReference(
+            description: 'The title of the tab.',
           ),
-          'childId': A2uiSchemas.componentReference(
+          'child': A2uiSchemas.componentReference(
             description: 'The ID of the child widget for the tab content.',
           ),
         },
-        required: ['childId', 'label'],
+        required: ['child', 'title'],
       ),
     ),
   },

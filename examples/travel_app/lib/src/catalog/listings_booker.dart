@@ -177,6 +177,7 @@ class _CustomRadioState<T> extends State<_CustomRadio<T>> {
           shape: BoxShape.circle,
           border: Border.all(
             color: isSelected ? Theme.of(context).primaryColor : Colors.grey,
+            width: 2,
           ),
         ),
         child: isSelected

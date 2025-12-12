@@ -4,7 +4,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
-import 'package:genui/src/model/a2ui_protocol.dart';
 import 'package:genui/src/model/v0_8/messages.dart' as v0_8;
 
 void main() {

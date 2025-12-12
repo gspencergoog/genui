@@ -11,7 +11,8 @@ import '../utils.dart';
 final _schema = S.object(
   properties: {
     'imageChildId': A2uiSchemas.componentReference(
-      description: 'The ID of the image to display at the top of the card.',
+      description:
+          '''The ID of the image to display at the top of the card. The Image fit should typically be "cover". Be sure to create an Image widget with a matching ID.''',
     ),
     'title': A2uiSchemas.stringReference(description: 'The title of the card.'),
     'subtitle': A2uiSchemas.stringReference(
