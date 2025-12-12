@@ -124,7 +124,7 @@ class FakeA2AClient implements a2a.A2AClient {
 class FakeA2uiAgentConnector implements A2uiAgentConnector {
   FakeA2uiAgentConnector({
     required this.url,
-    this.protocolVersion = genui.A2uiProtocolVersion.v0_9,
+    this.protocolVersion = genui.A2uiProtocolVersion.v0_8,
   }) {
     client = FakeA2AClient();
   }

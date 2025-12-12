@@ -42,7 +42,7 @@ class A2uiAgentConnector {
     required this.url,
     A2AClient? client,
     String? contextId,
-    this.protocolVersion = genui.A2uiProtocolVersion.v0_9,
+    this.protocolVersion = genui.A2uiProtocolVersion.v0_8,
   }) : _contextId = contextId,
        _protocol = genui.A2uiProtocol.fromVersion(protocolVersion) {
     this.client = client ?? A2AClient(url.toString());

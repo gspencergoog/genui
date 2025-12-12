@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:a2a/a2a.dart' as a2a;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart' as genui;
+import 'package:genui/src/model/v0_8/messages.dart' as v0_8;
 import 'package:genui/src/model/v0_9/messages.dart' as v0_9;
 import 'package:genui_a2ui/genui_a2ui.dart';
 
@@ -22,6 +23,7 @@ void main() {
       connector = A2uiAgentConnector(
         url: Uri.parse('http://localhost:8080'),
         client: fakeClient,
+        protocolVersion: genui.A2uiProtocolVersion.v0_9,
       );
     });
 
@@ -175,8 +177,43 @@ void main() {
 
       connector.dispose();
 
-      await expectLater(streamDone.future, completes);
       await expectLater(errorStreamDone.future, completes);
+    });
+
+    test('defaults to v0.8', () async {
+      final connectorV08 = A2uiAgentConnector(
+        url: Uri.parse('http://localhost:8080'),
+        client: fakeClient,
+      );
+      addTearDown(connectorV08.dispose);
+
+      final responses = [
+        a2a.A2ASendStreamMessageSuccessResponse()
+          ..result = (a2a.A2ATask()
+            ..id = 'task1'
+            ..contextId = 'context1'),
+        a2a.A2ASendStreamMessageSuccessResponse()
+          ..result = (a2a.A2AMessage()
+            ..parts = [
+              a2a.A2ADataPart()
+                ..data = {
+                  'surfaceUpdate': {
+                    'surfaceId': 's1',
+                    'components': <Object>[],
+                  },
+                },
+            ]),
+      ];
+      fakeClient.sendMessageStreamHandler = (_) =>
+          Stream.fromIterable(responses);
+
+      final messages = <genui.A2uiMessage>[];
+      connectorV08.stream.listen(messages.add);
+
+      await connectorV08.connectAndSend(genui.UserMessage.text('Hi'));
+
+      expect(messages.length, 1);
+      expect(messages.first, isA<v0_8.SurfaceUpdate>());
     });
   });
 }

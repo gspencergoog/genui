@@ -13,104 +13,133 @@ import 'package:json_schema_builder/json_schema_builder.dart' as dsb;
 
 void main() {
   group('FirebaseAiContentGenerator', () {
-    test('isProcessing is true during request', () async {
-      final generator = FirebaseAiContentGenerator(
-        catalog: const genui.Catalog({}),
-        modelCreator:
-            ({required configuration, systemInstruction, tools, toolConfig}) {
-              return FakeGeminiGenerativeModel([
-                GenerateContentResponse([
-                  Candidate(
-                    Content.model([const TextPart('{"response": "Hello"}')]),
-                    [],
-                    null,
-                    FinishReason.stop,
-                    '',
-                  ),
-                ], null),
-              ]);
-            },
-      );
+    for (final genui.A2uiProtocolVersion version
+        in genui.A2uiProtocolVersion.values) {
+      group('with $version', () {
+        test('isProcessing is true during request', () async {
+          final generator = FirebaseAiContentGenerator(
+            catalog: const genui.Catalog({}),
+            protocolVersion: version,
+            modelCreator:
+                ({
+                  required configuration,
+                  systemInstruction,
+                  tools,
+                  toolConfig,
+                }) {
+                  return FakeGeminiGenerativeModel([
+                    GenerateContentResponse([
+                      Candidate(
+                        Content.model([
+                          const TextPart('{"response": "Hello"}'),
+                        ]),
+                        [],
+                        null,
+                        FinishReason.stop,
+                        '',
+                      ),
+                    ], null),
+                  ]);
+                },
+          );
 
-      expect(generator.isProcessing.value, isFalse);
-      final Future<void> future = generator.sendRequest(
-        genui.UserMessage([const genui.TextPart('Hi')]),
-      );
-      expect(generator.isProcessing.value, isTrue);
-      await future;
-      expect(generator.isProcessing.value, isFalse);
-    });
+          expect(generator.isProcessing.value, isFalse);
+          final Future<void> future = generator.sendRequest(
+            genui.UserMessage([const genui.TextPart('Hi')]),
+          );
+          expect(generator.isProcessing.value, isTrue);
+          await future;
+          expect(generator.isProcessing.value, isFalse);
+        });
 
-    test('can call a tool and return a result', () async {
-      final generator = FirebaseAiContentGenerator(
-        catalog: const genui.Catalog({}),
-        additionalTools: [
-          genui.DynamicAiTool<Map<String, Object?>>(
-            name: 'testTool',
-            description: 'A test tool',
-            parameters: dsb.Schema.object(),
-            invokeFunction: (args) async => {'result': 'tool result'},
-          ),
-        ],
-        modelCreator:
-            ({required configuration, systemInstruction, tools, toolConfig}) {
-              return FakeGeminiGenerativeModel([
-                GenerateContentResponse([
-                  Candidate(
-                    Content.model([const FunctionCall('testTool', {})]),
-                    [],
-                    null,
-                    FinishReason.stop,
-                    '',
-                  ),
-                ], null),
-                GenerateContentResponse([
-                  Candidate(
-                    Content.model([const TextPart('Tool called')]),
-                    [],
-                    null,
-                    FinishReason.stop,
-                    '',
-                  ),
-                ], null),
-              ]);
-            },
-      );
+        test('can call a tool and return a result', () async {
+          final generator = FirebaseAiContentGenerator(
+            catalog: const genui.Catalog({}),
+            protocolVersion: version,
+            additionalTools: [
+              genui.DynamicAiTool<Map<String, Object?>>(
+                name: 'testTool',
+                description: 'A test tool',
+                parameters: dsb.Schema.object(),
+                invokeFunction: (args) async => {'result': 'tool result'},
+              ),
+            ],
+            modelCreator:
+                ({
+                  required configuration,
+                  systemInstruction,
+                  tools,
+                  toolConfig,
+                }) {
+                  return FakeGeminiGenerativeModel([
+                    GenerateContentResponse([
+                      Candidate(
+                        Content.model([const FunctionCall('testTool', {})]),
+                        [],
+                        null,
+                        FinishReason.stop,
+                        '',
+                      ),
+                    ], null),
+                    GenerateContentResponse([
+                      Candidate(
+                        Content.model([const TextPart('Tool called')]),
+                        [],
+                        null,
+                        FinishReason.stop,
+                        '',
+                      ),
+                    ], null),
+                  ]);
+                },
+          );
 
-      final hi = genui.UserMessage([const genui.TextPart('Hi')]);
-      final completer = Completer<String>();
-      unawaited(generator.textResponseStream.first.then(completer.complete));
-      await generator.sendRequest(hi);
-      final String response = await completer.future;
-      expect(response, 'Tool called');
-    });
+          final hi = genui.UserMessage([const genui.TextPart('Hi')]);
+          final completer = Completer<String>();
+          unawaited(
+            generator.textResponseStream.first.then(completer.complete),
+          );
+          await generator.sendRequest(hi);
+          final String response = await completer.future;
+          expect(response, 'Tool called');
+        });
 
-    test('returns a simple text response', () async {
-      final generator = FirebaseAiContentGenerator(
-        catalog: const genui.Catalog({}),
-        modelCreator:
-            ({required configuration, systemInstruction, tools, toolConfig}) {
-              return FakeGeminiGenerativeModel([
-                GenerateContentResponse([
-                  Candidate(
-                    Content.model([const TextPart('Hello')]),
-                    [],
-                    null,
-                    FinishReason.stop,
-                    '',
-                  ),
-                ], null),
-              ]);
-            },
-      );
+        test('returns a simple text response', () async {
+          final generator = FirebaseAiContentGenerator(
+            catalog: const genui.Catalog({}),
+            protocolVersion: version,
+            modelCreator:
+                ({
+                  required configuration,
+                  systemInstruction,
+                  tools,
+                  toolConfig,
+                }) {
+                  return FakeGeminiGenerativeModel([
+                    GenerateContentResponse([
+                      Candidate(
+                        Content.model([const TextPart('Hello')]),
+                        [],
+                        null,
+                        FinishReason.stop,
+                        '',
+                      ),
+                    ], null),
+                  ]);
+                },
+          );
 
-      final hi = genui.UserMessage([const genui.TextPart('Hi')]);
-      final completer = Completer<String>();
-      unawaited(generator.textResponseStream.first.then(completer.complete));
-      await generator.sendRequest(hi);
-      final String response = await completer.future;
-      expect(response, 'Hello');
-    });
+          final hi = genui.UserMessage([const genui.TextPart('Hi')]);
+          final completer = Completer<String>();
+          unawaited(
+            generator.textResponseStream.first.then(completer.complete),
+          );
+          await generator.sendRequest(hi);
+          final String response = await completer.future;
+          expect(response, 'Hello');
+        });
+      });
+    }
   });
 }
 
