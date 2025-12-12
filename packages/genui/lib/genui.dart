@@ -9,8 +9,10 @@
 /// data handling, and communication with a generative AI service.
 library;
 
+export 'src/catalog/v0_8/binding.dart';
 export 'src/catalog/v0_8/context_resolution.dart';
 export 'src/catalog/v0_8/core_catalog.dart';
+export 'src/catalog/v0_9/binding.dart';
 export 'src/content_generator.dart';
 export 'src/core/a2ui_message_processor.dart';
 export 'src/core/genui_host.dart';

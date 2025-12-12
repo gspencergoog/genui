@@ -32,7 +32,7 @@ Widget listBuilder(CatalogItemContext itemContext) {
       : Axis.vertical;
   return ComponentChildrenBuilder(
     childrenData: listData.children,
-    dataContext: itemContext.dataContext,
+    binder: itemContext.binder,
     buildChild: itemContext.buildChild,
     getComponent: itemContext.getComponent,
     explicitListBuilder: (childIds, buildChild, getComponent, dataContext) {

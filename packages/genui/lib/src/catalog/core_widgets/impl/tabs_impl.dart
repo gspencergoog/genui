@@ -4,9 +4,9 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../core/data_binder.dart';
 import '../../../model/catalog_item.dart';
 import '../../../primitives/simple_items.dart';
-import 'widget_helpers.dart';
 
 extension type TabsData.fromMap(JsonMap _json) {
   factory TabsData({required List<JsonMap> tabItems}) =>
@@ -16,6 +16,7 @@ extension type TabsData.fromMap(JsonMap _json) {
 }
 
 Widget tabsBuilder(CatalogItemContext itemContext) {
+  final DataBinder binder = itemContext.binder;
   final tabsData = TabsData.fromMap(itemContext.data as JsonMap);
   return DefaultTabController(
     length: tabsData.tabItems.length,
@@ -23,7 +24,7 @@ Widget tabsBuilder(CatalogItemContext itemContext) {
       children: [
         TabBar(
           tabs: tabsData.tabItems.map((tabItem) {
-            final ValueNotifier<String?> titleNotifier = itemContext.dataContext
+            final ValueNotifier<String?> titleNotifier = binder
                 .subscribeToString(tabItem['title'] as JsonMap);
             return ValueListenableBuilder<String?>(
               valueListenable: titleNotifier,

@@ -4,8 +4,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../core/data_binder.dart';
 import '../../../model/catalog_item.dart';
-import '../../../model/data_model.dart';
 import '../../../primitives/simple_items.dart';
 
 extension type IconSchemaData.fromMap(JsonMap _json) {
@@ -13,9 +13,6 @@ extension type IconSchemaData.fromMap(JsonMap _json) {
       IconSchemaData.fromMap({'name': name});
 
   JsonMap get nameMap => _json['name'] as JsonMap;
-
-  String? get literalName => nameMap['literalString'] as String?;
-  String? get namePath => nameMap['path'] as String?;
 }
 
 enum AvailableIcons {
@@ -86,22 +83,11 @@ enum AvailableIcons {
 }
 
 Widget iconBuilder(CatalogItemContext itemContext) {
+  final DataBinder binder = itemContext.binder;
   final iconData = IconSchemaData.fromMap(itemContext.data as JsonMap);
-  final String? literalName = iconData.literalName;
-  final String? namePath = iconData.namePath;
-
-  if (literalName != null) {
-    final IconData icon =
-        AvailableIcons.fromName(literalName)?.iconData ?? Icons.broken_image;
-    return Icon(icon);
-  }
-
-  if (namePath == null) {
-    return const Icon(Icons.broken_image);
-  }
-
-  final ValueNotifier<String?> notifier = itemContext.dataContext
-      .subscribe<String>(DataPath(namePath));
+  final ValueNotifier<String?> notifier = binder.subscribeToString(
+    iconData.nameMap,
+  );
 
   return ValueListenableBuilder<String?>(
     valueListenable: notifier,

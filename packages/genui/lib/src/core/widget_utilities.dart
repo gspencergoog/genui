@@ -92,10 +92,9 @@ extension DataContextExtensions on DataContext {
 /// [DataContext].
 typedef ContextResolver =
     JsonMap Function(
-  DataContext dataContext,
-  Map<String, Object?> contextDefinitions,
-);
-
+      DataContext dataContext,
+      Map<String, Object?> contextDefinitions,
+    );
 
 /// Resolves a string reference against a [DataContext].
 String? resolveStringReference(DataContext dataContext, Object? ref) {

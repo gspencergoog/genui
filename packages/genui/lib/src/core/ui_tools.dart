@@ -13,8 +13,6 @@ import '../model/v0_8/messages.dart' as v0_8_messages;
 import '../model/v0_8/schemas.dart' as v0_8_schemas;
 import '../primitives/simple_items.dart';
 
-
-
 /// An [AiTool] for updating a surface with new components (V0.8).
 class SurfaceUpdateTool extends AiTool<JsonMap> {
   /// Creates a [SurfaceUpdateTool].

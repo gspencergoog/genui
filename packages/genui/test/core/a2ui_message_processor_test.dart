@@ -24,8 +24,16 @@ void main() {
     });
 
     test('can be initialized with multiple catalogs', () {
-      final catalog1 = const Catalog([], catalogId: 'cat1');
-      final catalog2 = const Catalog([], catalogId: 'cat2');
+      final catalog1 = const Catalog(
+        [],
+        catalogId: 'cat1',
+        binderFactory: V09DataBinder.new,
+      );
+      final catalog2 = const Catalog(
+        [],
+        catalogId: 'cat2',
+        binderFactory: V09DataBinder.new,
+      );
       final multiManager = A2uiMessageProcessor(catalogs: [catalog1, catalog2]);
       expect(multiManager.catalogs, contains(catalog1));
       expect(multiManager.catalogs, contains(catalog2));

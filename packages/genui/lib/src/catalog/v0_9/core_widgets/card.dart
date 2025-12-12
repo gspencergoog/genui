@@ -37,9 +37,7 @@ final card = CatalogItem(
         {
           "id": "text",
           "component": "Text",
-          "text": {
-            "literalString": "This is a card."
-          }
+          "text": "This is a card."
         }
       ]
     ''',

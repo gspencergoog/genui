@@ -6,7 +6,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../core/widget_utilities.dart';
+import '../../../core/data_binder.dart';
 import '../../../model/catalog_item.dart';
 import '../../../model/ui_models.dart';
 import '../../../primitives/logging.dart';
@@ -28,10 +28,8 @@ extension type ButtonData.fromMap(JsonMap _json) {
   bool get primary => (_json['primary'] as bool?) ?? false;
 }
 
-Widget buttonBuilder(
-  CatalogItemContext itemContext, {
-  required ContextResolver resolveContext,
-}) {
+Widget buttonBuilder(CatalogItemContext itemContext) {
+  final DataBinder binder = itemContext.binder;
   final buttonData = ButtonData.fromMap(itemContext.data as JsonMap);
   final Widget child = itemContext.buildChild(buttonData.child);
   final JsonMap actionData = buttonData.action;
@@ -58,10 +56,7 @@ Widget buttonBuilder(
       foregroundColor: primary ? colorScheme.onPrimary : colorScheme.onSurface,
     ).copyWith(textStyle: WidgetStatePropertyAll(textStyle)),
     onPressed: () {
-      final JsonMap resolvedContext = resolveContext(
-        itemContext.dataContext,
-        contextDefinition,
-      );
+      final JsonMap resolvedContext = binder.resolveContext(contextDefinition);
       itemContext.dispatchEvent(
         UserActionEvent(
           name: actionName,

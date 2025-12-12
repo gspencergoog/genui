@@ -5,6 +5,7 @@
 import '../../model/catalog.dart';
 import '../../model/catalog_item.dart';
 import '../../primitives/constants.dart';
+import 'binding.dart';
 import 'core_widgets/audio_player.dart' as audio_player_item;
 import 'core_widgets/button.dart' as button_item;
 import 'core_widgets/card.dart' as card_item;
@@ -111,25 +112,29 @@ class CoreCatalogItems {
 
   /// Creates a catalog containing all core catalog items.
   static Catalog asCatalog() {
-    return Catalog([
-      audioPlayer,
-      button,
-      card,
-      checkBox,
-      column,
-      dateTimeInput,
-      divider,
-      icon,
-      image,
-      list,
-      modal,
-      choicePicker,
-      row,
-      slider,
-      tabs,
-      text,
-      textField,
-      video,
-    ], catalogId: standardCatalogId);
+    return Catalog(
+      [
+        audioPlayer,
+        button,
+        card,
+        checkBox,
+        column,
+        dateTimeInput,
+        divider,
+        icon,
+        image,
+        list,
+        modal,
+        choicePicker,
+        row,
+        slider,
+        tabs,
+        text,
+        textField,
+        video,
+      ],
+      catalogId: standardCatalogId,
+      binderFactory: V08DataBinder.new,
+    );
   }
 }

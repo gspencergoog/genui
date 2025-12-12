@@ -46,15 +46,11 @@ final tabs = CatalogItem(
           "component": "Tabs",
           "tabItems": [
             {
-              "title": {
-                "literalString": "Overview"
-              },
+              "title": "Overview",
               "child": "text1"
             },
             {
-              "title": {
-                "literalString": "Details"
-              },
+              "title": "Details",
               "child": "text2"
             }
           ]
@@ -62,16 +58,12 @@ final tabs = CatalogItem(
         {
           "id": "text1",
           "component": "Text",
-          "text": {
-            "literalString": "This is a short summary of the item."
-          }
+          "text": "This is a short summary of the item."
         },
         {
           "id": "text2",
           "component": "Text",
-          "text": {
-            "literalString": "This is a much longer, more detailed description of the item, providing in-depth information and context. It can span multiple lines and include rich formatting if needed."
-          }
+          "text": "This is a much longer, more detailed description of the item, providing in-depth information and context. It can span multiple lines and include rich formatting if needed."
         }
       ]
     ''',

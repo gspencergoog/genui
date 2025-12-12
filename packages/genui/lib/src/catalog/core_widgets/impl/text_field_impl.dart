@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../core/widget_utilities.dart';
+import '../../../core/data_binder.dart';
 import '../../../model/catalog_item.dart';
 import '../../../model/data_model.dart';
 import '../../../model/ui_models.dart';
@@ -94,19 +94,17 @@ class _TextFieldState extends State<_TextField> {
   }
 }
 
-Widget textFieldBuilder(
-  CatalogItemContext itemContext, {
-  required ContextResolver resolveContext,
-}) {
+Widget textFieldBuilder(CatalogItemContext itemContext) {
+  final DataBinder binder = itemContext.binder;
   final textFieldData = TextFieldData.fromMap(itemContext.data as JsonMap);
   final Object? valueRef = textFieldData.text;
   final String? path = valueRef is Map<String, Object?>
       ? valueRef['path'] as String?
       : null;
-  final ValueNotifier<String?> notifier = itemContext.dataContext
-      .subscribeToString(valueRef);
-  final ValueNotifier<String?> labelNotifier = itemContext.dataContext
-      .subscribeToString(textFieldData.label);
+  final ValueNotifier<String?> notifier = binder.subscribeToString(valueRef);
+  final ValueNotifier<String?> labelNotifier = binder.subscribeToString(
+    textFieldData.label,
+  );
 
   return ValueListenableBuilder<String?>(
     valueListenable: notifier,
@@ -132,8 +130,7 @@ Widget textFieldBuilder(
               final actionName = actionData['name'] as String;
               final Map<String, Object?> contextDefinition =
                   (actionData['context'] as Map<String, Object?>?) ?? {};
-              final JsonMap resolvedContext = resolveContext(
-                itemContext.dataContext,
+              final JsonMap resolvedContext = binder.resolveContext(
                 contextDefinition,
               );
               itemContext.dispatchEvent(

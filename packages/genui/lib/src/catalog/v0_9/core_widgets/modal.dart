@@ -54,25 +54,19 @@ final modal = CatalogItem(
           "action": {
             "name": "showModal",
             "context": {
-              "modalId": {
-                "literalString": "root"
-              }
+              "modalId": "root"
             }
           }
         },
         {
           "id": "button_text",
           "component": "Text",
-          "text": {
-            "literalString": "Open Modal"
-          }
+          "text": "Open Modal"
         },
         {
           "id": "text",
           "component": "Text",
-          "text": {
-            "literalString": "This is a modal."
-          }
+          "text": "This is a modal."
         }
       ]
     ''',

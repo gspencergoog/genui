@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../../model/catalog_item.dart';
 
 Widget videoBuilder(CatalogItemContext itemContext) {
+  // final DataBinder binder = itemContext.binder; // Unused for now
   return ConstrainedBox(
     constraints: const BoxConstraints(maxWidth: 200, maxHeight: 100),
     child: const Placeholder(child: Center(child: Text('Video'))),

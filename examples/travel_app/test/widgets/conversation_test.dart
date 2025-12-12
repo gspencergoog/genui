@@ -5,7 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
-import 'package:genui/v0_9.dart' as v0_9;
+
+
 import 'package:travel_app/src/widgets/conversation.dart';
 
 void main() {
@@ -35,13 +36,14 @@ void main() {
         ),
       ];
       manager.handleMessage(
-        const v0_9.CreateSurface(
+        const BeginRendering(
           surfaceId: surfaceId,
           catalogId: standardCatalogId,
+          root: 'root',
         ),
       );
       manager.handleMessage(
-        v0_9.UpdateComponents(surfaceId: surfaceId, components: components),
+        SurfaceUpdate(surfaceId: surfaceId, components: components),
       );
 
       await tester.pumpWidget(
@@ -89,13 +91,14 @@ void main() {
         ),
       ];
       manager.handleMessage(
-        const v0_9.CreateSurface(
+        const BeginRendering(
           surfaceId: surfaceId,
           catalogId: standardCatalogId,
+          root: 'root',
         ),
       );
       manager.handleMessage(
-        v0_9.UpdateComponents(surfaceId: surfaceId, components: components),
+        SurfaceUpdate(surfaceId: surfaceId, components: components),
       );
       await tester.pumpWidget(
         MaterialApp(

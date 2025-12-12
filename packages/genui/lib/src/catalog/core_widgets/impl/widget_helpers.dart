@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../core/data_binder.dart';
 import '../../../model/catalog_item.dart';
 import '../../../model/data_model.dart';
 import '../../../model/ui_models.dart';
@@ -50,7 +51,7 @@ class ComponentChildrenBuilder extends StatelessWidget {
   /// Creates a new [ComponentChildrenBuilder].
   const ComponentChildrenBuilder({
     required this.childrenData,
-    required this.dataContext,
+    required this.binder,
     required this.buildChild,
     required this.getComponent,
     required this.explicitListBuilder,
@@ -61,8 +62,8 @@ class ComponentChildrenBuilder extends StatelessWidget {
   /// The data that defines the children to build.
   final Object? childrenData;
 
-  /// The data context for the children.
-  final DataContext dataContext;
+  /// The data binder for the children.
+  final DataBinder binder;
 
   /// The callback to build a child widget.
   final ChildBuilderCallback buildChild;
@@ -88,7 +89,7 @@ class ComponentChildrenBuilder extends StatelessWidget {
         explicitList,
         buildChild,
         getComponent,
-        dataContext,
+        binder.dataContext,
       );
     }
 
@@ -96,38 +97,39 @@ class ComponentChildrenBuilder extends StatelessWidget {
       final childrenMap = childrenData as JsonMap;
       final template = childrenMap['template'] as JsonMap?;
       if (template != null) {
-        final dataBinding = template['dataBinding'] as String;
+        final String? dataBinding = binder.getTemplatePath(template);
         final componentId = template['componentId'] as String;
-        genUiLogger.finest(
-          'Widget $componentId subscribing to ${dataContext.path}',
-        );
-        final ValueNotifier<Object?> dataNotifier = dataContext
-            .subscribe<Object?>(DataPath(dataBinding));
-        return ValueListenableBuilder<Object?>(
-          valueListenable: dataNotifier,
-          builder: (context, data, child) {
-            genUiLogger.info(
-              'ComponentChildrenBuilder: data type: ${data.runtimeType}, '
-              'value: $data',
-            );
-            if (data != null) {
-              return templateListWidgetBuilder(
-                context,
-                data,
-                componentId,
-                dataBinding,
+        if (dataBinding != null) {
+          genUiLogger.finest(
+            'Widget $componentId subscribing to ${binder.dataContext.path}',
+          );
+          final ValueNotifier<Object?> dataNotifier = binder.dataContext
+              .subscribe<Object?>(DataPath(dataBinding));
+          return ValueListenableBuilder<Object?>(
+            valueListenable: dataNotifier,
+            builder: (context, data, child) {
+              genUiLogger.info(
+                'ComponentChildrenBuilder: data type: ${data.runtimeType}, '
+                'value: $data',
               );
-            }
-            return const SizedBox.shrink();
-          },
-        );
+              if (data != null) {
+                return templateListWidgetBuilder(
+                  context,
+                  data,
+                  componentId,
+                  dataBinding,
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          );
+        }
       }
     }
     return const SizedBox.shrink();
   }
 }
 
-/// Builds a child widget, wrapping it in a [Flexible] if a weight is provided
 /// in the component.
 Widget buildWeightedChild({
   required String componentId,
@@ -141,57 +143,4 @@ Widget buildWeightedChild({
     return Flexible(flex: weight, child: childWidget);
   }
   return childWidget;
-}
-
-extension DataContextPropertyExtensions on DataContext {
-  ValueNotifier<String?> subscribeToString(JsonMap property) {
-    final literal = property['literalString'] as String?;
-    if (literal != null) {
-      return ValueNotifier<String?>(literal);
-    }
-    final path = property['path'] as String?;
-    if (path != null) {
-      return subscribe<String>(DataPath(path));
-    }
-    return ValueNotifier<String?>(null);
-  }
-
-  ValueNotifier<bool?> subscribeToBool(JsonMap property) {
-    final literal = property['literalBoolean'] as bool?;
-    if (literal != null) {
-      return ValueNotifier<bool?>(literal);
-    }
-    final path = property['path'] as String?;
-    if (path != null) {
-      return subscribe<bool>(DataPath(path));
-    }
-    return ValueNotifier<bool?>(null);
-  }
-
-  ValueNotifier<List<Object?>?> subscribeToObjectArray(JsonMap property) {
-    final literal = property['literalArray'] as List<Object?>?;
-    if (literal != null) {
-      return ValueNotifier<List<Object?>?>(literal);
-    }
-    final path = property['path'] as String?;
-    if (path != null) {
-      return subscribe<List<Object?>>(DataPath(path));
-    }
-    return ValueNotifier<List<Object?>?>(null);
-  }
-
-  ValueNotifier<num?> subscribeToNum(
-    JsonMap property, {
-    String literalKey = 'literalNumber',
-  }) {
-    final literal = property[literalKey] as num?;
-    if (literal != null) {
-      return ValueNotifier<num?>(literal);
-    }
-    final path = property['path'] as String?;
-    if (path != null) {
-      return subscribe<num>(DataPath(path));
-    }
-    return ValueNotifier<num?>(null);
-  }
 }

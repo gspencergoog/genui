@@ -54,6 +54,7 @@ void main() {
                           dispatchEvent: (event) {},
                           buildContext: context,
                           dataContext: DataContext(DataModel(), '/'),
+                          binder: V08DataBinder(DataContext(DataModel(), '/')),
                           getComponent: (String componentId) => null,
                           surfaceId: 'surface1',
                         ),

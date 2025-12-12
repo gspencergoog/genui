@@ -13,7 +13,11 @@ void main() {
   ) async {
     final manager = A2uiMessageProcessor(
       catalogs: [
-        Catalog([CoreCatalogItems.slider], catalogId: standardCatalogId),
+        Catalog(
+          [CoreCatalogItems.slider],
+          catalogId: standardCatalogId,
+          binderFactory: V09DataBinder.new,
+        ),
       ],
     );
     const surfaceId = 'testSurface';
@@ -64,7 +68,11 @@ void main() {
   ) async {
     final manager = A2uiMessageProcessor(
       catalogs: [
-        Catalog([CoreCatalogItems.slider], catalogId: standardCatalogId),
+        Catalog(
+          [CoreCatalogItems.slider],
+          catalogId: standardCatalogId,
+          binderFactory: V09DataBinder.new,
+        ),
       ],
     );
     const surfaceId = 'testSurface';

@@ -13,10 +13,11 @@ void main() {
   ) async {
     final manager = A2uiMessageProcessor(
       catalogs: [
-        Catalog([
-          CoreCatalogItems.choicePicker,
-          CoreCatalogItems.text,
-        ], catalogId: standardCatalogId),
+        Catalog(
+          [CoreCatalogItems.choicePicker, CoreCatalogItems.text],
+          catalogId: standardCatalogId,
+          binderFactory: V09DataBinder.new,
+        ),
       ],
     );
     const surfaceId = 'testSurface';
@@ -87,9 +88,11 @@ void main() {
     (WidgetTester tester) async {
       final manager = A2uiMessageProcessor(
         catalogs: [
-          Catalog([
-            CoreCatalogItems.choicePicker,
-          ], catalogId: standardCatalogId),
+          Catalog(
+            [CoreCatalogItems.choicePicker],
+            catalogId: standardCatalogId,
+            binderFactory: V09DataBinder.new,
+          ),
         ],
       );
       const surfaceId = 'testSurfaceSimple';

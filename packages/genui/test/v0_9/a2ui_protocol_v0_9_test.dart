@@ -78,13 +78,21 @@ void main() {
     });
 
     test('returns no tools', () {
-      final catalog = const Catalog([], catalogId: 'cat1');
+      final catalog = const Catalog(
+        [],
+        catalogId: 'cat1',
+        binderFactory: V09DataBinder.new,
+      );
       final List<AiTool<JsonMap>> tools = protocol.getTools(catalog, (_) {});
       expect(tools, isEmpty);
     });
 
     test('returns non-null system preamble', () {
-      final catalog = const Catalog([], catalogId: 'cat1');
+      final catalog = const Catalog(
+        [],
+        catalogId: 'cat1',
+        binderFactory: V09DataBinder.new,
+      );
       expect(protocol.getSystemPreamble(catalog), isNotEmpty);
       expect(protocol.getSystemPreamble(catalog), contains('JSONL'));
     });

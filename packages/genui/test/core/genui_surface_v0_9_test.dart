@@ -9,10 +9,11 @@ import 'package:genui/src/model/v0_9/messages.dart' as v0_9;
 
 void main() {
   late A2uiMessageProcessor manager;
-  final testCatalog = Catalog([
-    CoreCatalogItems.button,
-    CoreCatalogItems.text,
-  ], catalogId: standardCatalogId);
+  final testCatalog = Catalog(
+    [CoreCatalogItems.button, CoreCatalogItems.text],
+    catalogId: standardCatalogId,
+    binderFactory: V09DataBinder.new,
+  );
 
   setUp(() {
     manager = A2uiMessageProcessor(catalogs: [testCatalog]);
@@ -33,10 +34,7 @@ void main() {
       ),
       const Component(
         id: 'text',
-        props: {
-          'component': 'Text',
-          'text': {'literalString': 'Hello'},
-        },
+        props: {'component': 'Text', 'text': 'Hello'},
       ),
     ];
     manager.handleMessage(
@@ -72,10 +70,7 @@ void main() {
       ),
       const Component(
         id: 'text',
-        props: {
-          'component': 'Text',
-          'text': {'literalString': 'Hello'},
-        },
+        props: {'component': 'Text', 'text': 'Hello'},
       ),
     ];
     manager.handleMessage(

@@ -4,10 +4,10 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../core/data_binder.dart';
 import '../../../model/catalog_item.dart';
 import '../../../model/data_model.dart';
 import '../../../primitives/simple_items.dart';
-import 'widget_helpers.dart';
 
 extension type CheckBoxData.fromMap(JsonMap _json) {
   factory CheckBoxData({required JsonMap label, required JsonMap value}) =>
@@ -18,11 +18,14 @@ extension type CheckBoxData.fromMap(JsonMap _json) {
 }
 
 Widget checkBoxBuilder(CatalogItemContext itemContext) {
+  final DataBinder binder = itemContext.binder;
   final checkBoxData = CheckBoxData.fromMap(itemContext.data as JsonMap);
-  final ValueNotifier<String?> labelNotifier = itemContext.dataContext
-      .subscribeToString(checkBoxData.label);
-  final ValueNotifier<bool?> valueNotifier = itemContext.dataContext
-      .subscribeToBool(checkBoxData.value);
+  final ValueNotifier<String?> labelNotifier = binder.subscribeToString(
+    checkBoxData.label,
+  );
+  final ValueNotifier<bool?> valueNotifier = binder.subscribeToBool(
+    checkBoxData.value,
+  );
   return ValueListenableBuilder<String?>(
     valueListenable: labelNotifier,
     builder: (context, label, child) {
@@ -39,7 +42,7 @@ Widget checkBoxBuilder(CatalogItemContext itemContext) {
             onChanged: (newValue) {
               final path = checkBoxData.value['path'] as String?;
               if (path != null) {
-                itemContext.dataContext.update(DataPath(path), newValue);
+                binder.dataContext.update(DataPath(path), newValue);
               }
             },
           );

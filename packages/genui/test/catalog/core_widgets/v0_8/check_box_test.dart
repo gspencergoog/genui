@@ -13,7 +13,11 @@ void main() {
   ) async {
     final manager = A2uiMessageProcessor(
       catalogs: [
-        Catalog([CoreCatalogItems.checkBox], catalogId: standardCatalogId),
+        Catalog(
+          [CoreCatalogItems.checkBox],
+          catalogId: standardCatalogId,
+          binderFactory: V09DataBinder.new,
+        ),
       ],
     );
     const surfaceId = 'testSurface';

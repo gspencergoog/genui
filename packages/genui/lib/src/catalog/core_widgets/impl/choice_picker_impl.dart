@@ -4,10 +4,10 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../core/data_binder.dart';
 import '../../../model/catalog_item.dart';
 import '../../../model/data_model.dart';
 import '../../../primitives/simple_items.dart';
-import 'widget_helpers.dart';
 
 extension type ChoicePickerData.fromMap(JsonMap _json) {
   factory ChoicePickerData({
@@ -26,13 +26,13 @@ extension type ChoicePickerData.fromMap(JsonMap _json) {
 }
 
 Widget choicePickerBuilder(CatalogItemContext itemContext) {
+  final DataBinder binder = itemContext.binder;
   final choicePickerData = ChoicePickerData.fromMap(
     itemContext.data as JsonMap,
   );
-  final ValueNotifier<List<Object?>?> selectionsNotifier = itemContext
-      .dataContext
+  final ValueNotifier<List<Object?>?> selectionsNotifier = binder
       .subscribeToObjectArray(choicePickerData.value);
-  final ValueNotifier<List<Object?>?> optionsNotifier = itemContext.dataContext
+  final ValueNotifier<List<Object?>?> optionsNotifier = binder
       .subscribeToObjectArray(choicePickerData.options);
 
   return ValueListenableBuilder<List<Object?>?>(
@@ -52,9 +52,7 @@ Widget choicePickerBuilder(CatalogItemContext itemContext) {
               if (labelObj is String) {
                 labelNotifier = ValueNotifier<String?>(labelObj);
               } else if (labelObj is JsonMap) {
-                labelNotifier = itemContext.dataContext.subscribeToString(
-                  labelObj,
-                );
+                labelNotifier = binder.subscribeToString(labelObj);
               } else {
                 labelNotifier = ValueNotifier<String?>(null);
               }
@@ -82,9 +80,7 @@ Widget choicePickerBuilder(CatalogItemContext itemContext) {
                         if (path == null || newValue == null) {
                           return;
                         }
-                        itemContext.dataContext.update(DataPath(path), [
-                          newValue,
-                        ]);
+                        binder.dataContext.update(DataPath(path), [newValue]);
                       },
                     );
                   } else {
@@ -108,7 +104,7 @@ Widget choicePickerBuilder(CatalogItemContext itemContext) {
                         } else {
                           newSelections.remove(value);
                         }
-                        itemContext.dataContext.update(
+                        binder.dataContext.update(
                           DataPath(path),
                           newSelections,
                         );

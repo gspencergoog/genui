@@ -6,6 +6,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
+import '../catalog/v0_8/binding.dart';
+import '../core/data_binder.dart';
 import '../primitives/logging.dart';
 import '../primitives/simple_items.dart';
 import 'catalog_item.dart';
@@ -23,10 +25,17 @@ import 'data_model.dart';
 @immutable
 class Catalog {
   /// Creates a new catalog with the given list of items.
-  const Catalog(this.items, {this.catalogId});
+  const Catalog(
+    this.items, {
+    this.binderFactory = V08DataBinder.new,
+    this.catalogId,
+  });
 
   /// The list of [CatalogItem]s available in this catalog.
   final Iterable<CatalogItem> items;
+
+  /// A factory that creates a [DataBinder] for a given [DataContext].
+  final DataBinder Function(DataContext) binderFactory;
 
   /// A string that uniquely identifies this catalog. It is recommended to use
   /// a reverse-domain name notation, e.g. 'com.example.my_catalog'.
@@ -37,12 +46,21 @@ class Catalog {
   ///
   /// If an item with the same name already exists in the catalog, it will be
   /// replaced with the new item.
+  /// Returns a new [Catalog] containing the items from both this catalog and
+  /// the provided [items].
+  ///
+  /// If an item with the same name already exists in the catalog, it will be
+  /// replaced with the new item.
   Catalog copyWith(List<CatalogItem> newItems, {String? catalogId}) {
     final Map<String, CatalogItem> itemsByName = {
       for (final item in items) item.name: item,
     };
     itemsByName.addAll({for (final item in newItems) item.name: item});
-    return Catalog(itemsByName.values, catalogId: catalogId ?? this.catalogId);
+    return Catalog(
+      itemsByName.values,
+      binderFactory: binderFactory,
+      catalogId: catalogId ?? this.catalogId,
+    );
   }
 
   /// Returns a new [Catalog] instance containing the items from this catalog
@@ -54,7 +72,11 @@ class Catalog {
     final List<CatalogItem> updatedItems = items
         .where((item) => !namesToRemove.contains(item.name))
         .toList();
-    return Catalog(updatedItems, catalogId: catalogId ?? this.catalogId);
+    return Catalog(
+      updatedItems,
+      binderFactory: binderFactory,
+      catalogId: catalogId ?? this.catalogId,
+    );
   }
 
   /// Builds a Flutter widget from a JSON-like data structure.
@@ -82,6 +104,7 @@ class Catalog {
         dispatchEvent: itemContext.dispatchEvent,
         buildContext: itemContext.buildContext,
         dataContext: itemContext.dataContext,
+        binder: itemContext.binder,
         getComponent: itemContext.getComponent,
         surfaceId: itemContext.surfaceId,
       ),

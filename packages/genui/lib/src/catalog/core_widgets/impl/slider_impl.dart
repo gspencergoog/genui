@@ -4,10 +4,10 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../core/data_binder.dart';
 import '../../../model/catalog_item.dart';
 import '../../../model/data_model.dart';
 import '../../../primitives/simple_items.dart';
-import 'widget_helpers.dart';
 
 extension type SliderData.fromMap(JsonMap _json) {
   factory SliderData({required JsonMap value, JsonMap? min, JsonMap? max}) =>
@@ -19,13 +19,17 @@ extension type SliderData.fromMap(JsonMap _json) {
 }
 
 Widget sliderBuilder(CatalogItemContext itemContext) {
+  final DataBinder binder = itemContext.binder;
   final sliderData = SliderData.fromMap(itemContext.data as JsonMap);
-  final ValueNotifier<num?> valueNotifier = itemContext.dataContext
-      .subscribeToNum(sliderData.value);
-  final ValueNotifier<num?> minNotifier = itemContext.dataContext
-      .subscribeToNum(sliderData.min ?? {'literalNumber': 0.0});
-  final ValueNotifier<num?> maxNotifier = itemContext.dataContext
-      .subscribeToNum(sliderData.max ?? {'literalNumber': 1.0});
+  final ValueNotifier<num?> valueNotifier = binder.subscribeToNum(
+    sliderData.value,
+  );
+  final ValueNotifier<num?> minNotifier = binder.subscribeToNum(
+    sliderData.min ?? 0.0,
+  );
+  final ValueNotifier<num?> maxNotifier = binder.subscribeToNum(
+    sliderData.max ?? 1.0,
+  );
 
   return ListenableBuilder(
     listenable: Listenable.merge([valueNotifier, minNotifier, maxNotifier]),
@@ -55,7 +59,7 @@ Widget sliderBuilder(CatalogItemContext itemContext) {
                 onChanged: (newValue) {
                   final path = sliderData.value['path'] as String?;
                   if (path != null) {
-                    itemContext.dataContext.update(DataPath(path), newValue);
+                    binder.dataContext.update(DataPath(path), newValue);
                   }
                 },
               ),

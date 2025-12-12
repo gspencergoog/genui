@@ -58,9 +58,7 @@ final choicePicker = CatalogItem(
         {
           "id": "heading1",
           "component": "Text",
-          "text": {
-            "literalString": "Single Selection (mutuallyExclusive)"
-          }
+          "text": "Single Selection (mutuallyExclusive)"
         },
         {
           "id": "singleChoice",
@@ -69,29 +67,21 @@ final choicePicker = CatalogItem(
             "path": "/singleSelection"
           },
           "usageHint": "mutuallyExclusive",
-          "options": {
-            "literalArray": [
+          "options": [
               {
-                "label": {
-                  "literalString": "Option A"
-                },
+                "label": "Option A",
                 "value": "A"
               },
               {
-                "label": {
-                  "literalString": "Option B"
-                },
+                "label": "Option B",
                 "value": "B"
               }
             ]
-          }
         },
         {
           "id": "heading2",
           "component": "Text",
-          "text": {
-            "literalString": "Multiple Selections"
-          }
+          "text": "Multiple Selections"
         },
         {
           "id": "multiChoice",
@@ -99,28 +89,20 @@ final choicePicker = CatalogItem(
           "value": {
             "path": "/multiSelection"
           },
-          "options": {
-            "literalArray": [
+          "options": [
               {
-                "label": {
-                  "literalString": "Option X"
-                },
+                "label": "Option X",
                 "value": "X"
               },
               {
-                "label": {
-                  "literalString": "Option Y"
-                },
+                "label": "Option Y",
                 "value": "Y"
               },
               {
-                "label": {
-                  "literalString": "Option Z"
-                },
+                "label": "Option Z",
                 "value": "Z"
               }
             ]
-          }
         }
       ]
     ''',

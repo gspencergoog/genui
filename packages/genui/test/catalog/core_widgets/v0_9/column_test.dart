@@ -11,10 +11,11 @@ void main() {
   testWidgets('Column widget renders children', (WidgetTester tester) async {
     final manager = A2uiMessageProcessor(
       catalogs: [
-        Catalog([
-          CoreCatalogItems.column,
-          CoreCatalogItems.text,
-        ], catalogId: standardCatalogId),
+        Catalog(
+          [CoreCatalogItems.column, CoreCatalogItems.text],
+          catalogId: standardCatalogId,
+          binderFactory: V09DataBinder.new,
+        ),
       ],
     );
     const surfaceId = 'testSurface';
@@ -70,10 +71,11 @@ void main() {
   ) async {
     final manager = A2uiMessageProcessor(
       catalogs: [
-        Catalog([
-          CoreCatalogItems.column,
-          CoreCatalogItems.text,
-        ], catalogId: standardCatalogId),
+        Catalog(
+          [CoreCatalogItems.column, CoreCatalogItems.text],
+          catalogId: standardCatalogId,
+          binderFactory: V09DataBinder.new,
+        ),
       ],
     );
     const surfaceId = 'testSurface';

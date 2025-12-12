@@ -11,10 +11,11 @@ void main() {
   testWidgets('List widget renders children', (WidgetTester tester) async {
     final manager = A2uiMessageProcessor(
       catalogs: [
-        Catalog([
-          CoreCatalogItems.list,
-          CoreCatalogItems.text,
-        ], catalogId: standardCatalogId),
+        Catalog(
+          [CoreCatalogItems.list, CoreCatalogItems.text],
+          catalogId: standardCatalogId,
+          binderFactory: V09DataBinder.new,
+        ),
       ],
     );
     const surfaceId = 'testSurface';

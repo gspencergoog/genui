@@ -8,40 +8,19 @@ import '../../../model/catalog_item.dart';
 import '../../../model/v0_9/schemas.dart';
 import '../../core_widgets/impl/button_impl.dart';
 
-import '../context_resolution.dart' as v0_9;
-
 final _schema = S.object(
   properties: {
-    'child': A2uiSchemas.componentReference(
-      description:
-          'The ID of a child widget. This should always be set, e.g. to the ID '
-          'of a `Text` widget.',
-    ),
+    'child': A2uiSchemas.componentReference(),
+    'primary': S.boolean(),
     'action': A2uiSchemas.action(),
-    'primary': S.boolean(
-      description: 'Whether the button invokes a primary action.',
-    ),
   },
-  required: ['child', 'action'],
+  required: ['child'],
 );
 
-/// A catalog item representing a Material Design elevated button.
-///
-/// This widget displays an interactive button. When pressed, it dispatches
-/// the specified `action` event. The button's appearance can be styled as
-/// a primary action.
-///
-/// ## Parameters:
-///
-/// - `child`: The ID of a child widget to display inside the button.
-/// - `action`: The action to perform when the button is pressed.
-/// - `primary`: Whether the button invokes a primary action (defaults to
-///   false).
 final button = CatalogItem(
   name: 'Button',
   dataSchema: _schema,
-  widgetBuilder: (context) =>
-      buttonBuilder(context, resolveContext: v0_9.resolveContext),
+  widgetBuilder: buttonBuilder,
   exampleData: [
     () => '''
       [
@@ -56,9 +35,7 @@ final button = CatalogItem(
         {
           "id": "text",
           "component": "Text",
-          "text": {
-            "literalString": "Hello World"
-          }
+          "text": "Hello World"
         }
       ]
     ''',
@@ -91,15 +68,12 @@ final button = CatalogItem(
         {
           "id": "primaryText",
           "component": "Text",
-          "text": {
-            "literalString": "Primary Button"
-          }
+          "text": "Primary Button"
         },
         {
           "id": "secondaryText",
           "component": "Text",
-          "text": {
-            "literalString": "Secondary Button"
+          "text": "Secondary Button"
           }
         }
       ]

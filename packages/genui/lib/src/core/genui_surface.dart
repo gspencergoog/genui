@@ -108,6 +108,7 @@ class _GenUiSurfaceState extends State<GenUiSurface> {
         dispatchEvent: _dispatchEvent,
         buildContext: context,
         dataContext: dataContext,
+        binder: catalog.binderFactory(dataContext),
         getComponent: (String componentId) =>
             definition.components[componentId],
         surfaceId: widget.surfaceId,

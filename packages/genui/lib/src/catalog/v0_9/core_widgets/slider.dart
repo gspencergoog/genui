@@ -39,11 +39,10 @@ final slider = CatalogItem(
         {
           "id": "root",
           "component": "Slider",
-          "min": {"literalNumber": 0},
-          "max": {"literalNumber": 10},
+          "min": 0,
+          "max": 10,
           "value": {
-            "path": "/myValue",
-            "literalNumber": 5
+            "path": "/myValue"
           }
         }
       ]

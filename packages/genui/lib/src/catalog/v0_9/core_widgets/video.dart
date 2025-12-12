@@ -35,9 +35,7 @@ final video = CatalogItem(
         {
           "id": "root",
           "component": "Video",
-          "url": {
-            "literalString": "https://example.com/video.mp4"
-          }
+          "url": "https://example.com/video.mp4"
         }
       ]
     ''',

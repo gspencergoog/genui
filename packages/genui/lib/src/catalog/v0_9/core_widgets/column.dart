@@ -72,16 +72,12 @@ final column = CatalogItem(
         {
           "id": "advice_text",
           "component": "Text",
-          "text": {
-            "literalString": "What kind of advice are you looking for?"
-          }
+          "text": "What kind of advice are you looking for?"
         },
         {
           "id": "advice_options",
           "component": "Text",
-          "text": {
-            "literalString": "Some advice options."
-          }
+          "text": "Some advice options."
         },
         {
           "id": "submit_button",
@@ -94,9 +90,7 @@ final column = CatalogItem(
         {
           "id": "submit_button_text",
           "component": "Text",
-          "text": {
-            "literalString": "Submit"
-          }
+          "text": "Submit"
         }
       ]
     ''',

@@ -13,11 +13,15 @@ void main() {
   ) async {
     final manager = A2uiMessageProcessor(
       catalogs: [
-        Catalog([
-          CoreCatalogItems.modal,
-          CoreCatalogItems.button,
-          CoreCatalogItems.text,
-        ], catalogId: standardCatalogId),
+        Catalog(
+          [
+            CoreCatalogItems.modal,
+            CoreCatalogItems.button,
+            CoreCatalogItems.text,
+          ],
+          catalogId: standardCatalogId,
+          binderFactory: V09DataBinder.new,
+        ),
       ],
     );
     const surfaceId = 'testSurface';

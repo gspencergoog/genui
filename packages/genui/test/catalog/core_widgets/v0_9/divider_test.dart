@@ -11,7 +11,11 @@ void main() {
   testWidgets('Divider widget renders', (WidgetTester tester) async {
     final manager = A2uiMessageProcessor(
       catalogs: [
-        Catalog([CoreCatalogItems.divider], catalogId: standardCatalogId),
+        Catalog(
+          [CoreCatalogItems.divider],
+          catalogId: standardCatalogId,
+          binderFactory: V09DataBinder.new,
+        ),
       ],
     );
     const surfaceId = 'testSurface';

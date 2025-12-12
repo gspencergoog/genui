@@ -65,7 +65,7 @@ Widget rowBuilder(CatalogItemContext itemContext) {
   final rowData = RowData.fromMap(itemContext.data as JsonMap);
   return ComponentChildrenBuilder(
     childrenData: rowData.children,
-    dataContext: itemContext.dataContext,
+    binder: itemContext.binder,
     buildChild: itemContext.buildChild,
     getComponent: itemContext.getComponent,
     explicitListBuilder: (childIds, buildChild, getComponent, dataContext) {

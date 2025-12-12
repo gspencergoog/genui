@@ -34,9 +34,7 @@ final icon = CatalogItem(
         {
           "id": "root",
           "component": "Icon",
-          "name": {
-            "literalString": "add"
-          }
+          "name": "add"
         }
       ]
     ''',

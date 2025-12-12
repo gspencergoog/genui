@@ -11,16 +11,21 @@ import 'package:logging/logging.dart';
 void main() {
   group('Catalog', () {
     test('has a catalogId', () {
-      final catalog = Catalog([
-        CoreCatalogItems.text,
-      ], catalogId: 'test_catalog');
+      final catalog = Catalog(
+        [CoreCatalogItems.text],
+        catalogId: 'test_catalog',
+        binderFactory: V09DataBinder.new,
+      );
       expect(catalog.catalogId, 'test_catalog');
     });
 
     testWidgets('buildWidget finds and builds the correct widget', (
       WidgetTester tester,
     ) async {
-      final catalog = Catalog([CoreCatalogItems.column, CoreCatalogItems.text]);
+      final catalog = Catalog([
+        CoreCatalogItems.column,
+        CoreCatalogItems.text,
+      ], binderFactory: V09DataBinder.new);
       final Map<String, Object> widgetData = {
         'component': 'Column',
         'children': {
@@ -42,6 +47,7 @@ void main() {
                     dispatchEvent: (UiEvent event) {},
                     buildContext: context,
                     dataContext: DataContext(DataModel(), '/'),
+                    binder: V09DataBinder(DataContext(DataModel(), '/')),
                     getComponent: (String componentId) => const Component(
                       id: 'child1',
                       props: {
@@ -65,7 +71,7 @@ void main() {
     testWidgets('buildWidget returns empty container for unknown widget type', (
       WidgetTester tester,
     ) async {
-      final catalog = const Catalog([]);
+      final catalog = const Catalog([], binderFactory: V09DataBinder.new);
       final Map<String, Object> data = {
         'id': 'text1',
         'widget': {'component': 'unknown_widget', 'text': 'hello'},
@@ -94,6 +100,7 @@ void main() {
                     dispatchEvent: (UiEvent event) {},
                     buildContext: context,
                     dataContext: DataContext(DataModel(), '/'),
+                    binder: V09DataBinder(DataContext(DataModel(), '/')),
                     getComponent: (String componentId) => null,
                     surfaceId: 'surfaceId',
                   ),
@@ -109,7 +116,10 @@ void main() {
     });
 
     test('schema generation is correct', () {
-      final catalog = Catalog([CoreCatalogItems.text, CoreCatalogItems.button]);
+      final catalog = Catalog([
+        CoreCatalogItems.text,
+        CoreCatalogItems.button,
+      ], binderFactory: V09DataBinder.new);
       final schema = catalog.definition as ObjectSchema;
 
       expect(schema.properties?.containsKey('components'), isTrue);

@@ -4,10 +4,10 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../core/data_binder.dart';
 import '../../../model/catalog_item.dart';
 import '../../../model/data_model.dart';
 import '../../../primitives/simple_items.dart';
-import 'widget_helpers.dart';
 
 extension type DateTimeInputData.fromMap(JsonMap _json) {
   factory DateTimeInputData({
@@ -29,11 +29,13 @@ extension type DateTimeInputData.fromMap(JsonMap _json) {
 }
 
 Widget dateTimeInputBuilder(CatalogItemContext itemContext) {
+  final DataBinder binder = itemContext.binder;
   final dateTimeInputData = DateTimeInputData.fromMap(
     itemContext.data as JsonMap,
   );
-  final ValueNotifier<String?> valueNotifier = itemContext.dataContext
-      .subscribeToString(dateTimeInputData.value);
+  final ValueNotifier<String?> valueNotifier = binder.subscribeToString(
+    dateTimeInputData.value,
+  );
 
   return ValueListenableBuilder<String?>(
     valueListenable: valueNotifier,
@@ -53,10 +55,7 @@ Widget dateTimeInputBuilder(CatalogItemContext itemContext) {
               lastDate: DateTime(2100),
             );
             if (date != null) {
-              itemContext.dataContext.update(
-                DataPath(path),
-                date.toIso8601String(),
-              );
+              binder.dataContext.update(DataPath(path), date.toIso8601String());
             }
           }
           if (dateTimeInputData.enableTime) {
@@ -65,7 +64,7 @@ Widget dateTimeInputBuilder(CatalogItemContext itemContext) {
               initialTime: TimeOfDay.now(),
             );
             if (time != null) {
-              itemContext.dataContext.update(
+              binder.dataContext.update(
                 DataPath(path),
                 time.format(itemContext.buildContext),
               );

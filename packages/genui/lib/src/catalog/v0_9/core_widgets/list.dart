@@ -52,16 +52,12 @@ final list = CatalogItem(
         {
           "id": "text1",
           "component": "Text",
-          "text": {
-            "literalString": "First"
-          }
+          "text": "First"
         },
         {
           "id": "text2",
           "component": "Text",
-          "text": {
-            "literalString": "Second"
-          }
+          "text": "Second"
         }
       ]
     ''',

@@ -7,7 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 
-import '../../../core/widget_utilities.dart';
+import '../../../core/data_binder.dart';
 import '../../../model/catalog_item.dart';
 import '../../../primitives/simple_items.dart';
 
@@ -23,9 +23,9 @@ extension type TextData.fromMap(JsonMap _json) {
 }
 
 Widget textBuilder(CatalogItemContext itemContext) {
+  final DataBinder binder = itemContext.binder;
   final textData = TextData.fromMap(itemContext.data as JsonMap);
-  final String textContent =
-      resolveStringReference(itemContext.dataContext, textData.text) ?? '';
+  final String textContent = binder.resolveString(textData.text) ?? '';
   final String? usageHint = textData.usageHint;
 
   final ThemeData theme = Theme.of(itemContext.buildContext);

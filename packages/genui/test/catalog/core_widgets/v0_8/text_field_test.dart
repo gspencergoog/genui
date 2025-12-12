@@ -14,7 +14,11 @@ void main() {
     ChatMessage? message;
     final manager = A2uiMessageProcessor(
       catalogs: [
-        Catalog([CoreCatalogItems.textField], catalogId: standardCatalogId),
+        Catalog(
+          [CoreCatalogItems.textField],
+          catalogId: standardCatalogId,
+          binderFactory: V09DataBinder.new,
+        ),
       ],
     );
     manager.onSubmit.listen((event) => message = event);

@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:genui/src/catalog/v0_8/binding.dart';
 import 'package:genui/src/catalog/v0_8/core_widgets/text.dart';
 import 'package:genui/src/model/catalog_item.dart';
 import 'package:genui/src/model/data_model.dart';
@@ -29,6 +30,7 @@ void main() {
                 dispatchEvent: (UiEvent event) {},
                 buildContext: context,
                 dataContext: DataContext(DataModel(), '/'),
+                binder: V08DataBinder(DataContext(DataModel(), '/')),
                 getComponent: (String componentId) => null,
                 surfaceId: 'surface1',
               ),
@@ -60,6 +62,7 @@ void main() {
                 dispatchEvent: (UiEvent event) {},
                 buildContext: context,
                 dataContext: DataContext(DataModel(), '/'),
+                binder: V08DataBinder(DataContext(DataModel(), '/')),
                 getComponent: (String componentId) => null,
                 surfaceId: 'surface1',
               ),
@@ -113,6 +116,7 @@ void main() {
                 dispatchEvent: (UiEvent event) {},
                 buildContext: context,
                 dataContext: DataContext(DataModel(), '/'),
+                binder: V08DataBinder(DataContext(DataModel(), '/')),
                 getComponent: (String componentId) => null,
                 surfaceId: 'surface1',
               ),

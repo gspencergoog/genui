@@ -94,7 +94,11 @@ void main() {
     });
 
     test('returns correct tools', () {
-      final catalog = const Catalog([], catalogId: 'cat1');
+      final catalog = const Catalog(
+        [],
+        catalogId: 'cat1',
+        binderFactory: V09DataBinder.new,
+      );
       final List<AiTool<JsonMap>> tools = protocol.getTools(catalog, (_) {});
       expect(
         tools.map((t) => t.name),
@@ -108,7 +112,11 @@ void main() {
     });
 
     test('returns null system preamble', () {
-      final catalog = const Catalog([], catalogId: 'cat1');
+      final catalog = const Catalog(
+        [],
+        catalogId: 'cat1',
+        binderFactory: V09DataBinder.new,
+      );
       expect(protocol.getSystemPreamble(catalog), isNull);
     });
   });

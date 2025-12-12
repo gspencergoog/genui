@@ -4,10 +4,10 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../core/data_binder.dart';
 import '../../../model/catalog_item.dart';
 import '../../../primitives/logging.dart';
 import '../../../primitives/simple_items.dart';
-import 'widget_helpers.dart';
 
 extension type ImageData.fromMap(JsonMap _json) {
   factory ImageData({required JsonMap url, String? fit, String? usageHint}) =>
@@ -21,9 +21,11 @@ extension type ImageData.fromMap(JsonMap _json) {
 }
 
 Widget imageBuilder(CatalogItemContext itemContext) {
+  final DataBinder binder = itemContext.binder;
   final imageData = ImageData.fromMap(itemContext.data as JsonMap);
-  final ValueNotifier<String?> notifier = itemContext.dataContext
-      .subscribeToString(imageData.url);
+  final ValueNotifier<String?> notifier = binder.subscribeToString(
+    imageData.url,
+  );
 
   return ValueListenableBuilder<String?>(
     valueListenable: notifier,

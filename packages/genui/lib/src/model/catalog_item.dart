@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
+import '../core/data_binder.dart';
 import 'data_model.dart';
 import 'ui_models.dart';
 
@@ -33,6 +34,7 @@ class CatalogItemContext {
     required this.dispatchEvent,
     required this.buildContext,
     required this.dataContext,
+    required this.binder,
     required this.getComponent,
     required this.surfaceId,
   });
@@ -43,6 +45,7 @@ class CatalogItemContext {
   final DispatchEventCallback dispatchEvent;
   final BuildContext buildContext;
   final DataContext dataContext;
+  final DataBinder binder;
   final GetComponentCallback getComponent;
   final String surfaceId;
 }
