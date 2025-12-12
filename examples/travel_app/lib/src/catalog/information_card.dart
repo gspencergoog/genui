@@ -10,14 +10,14 @@ import '../utils.dart';
 
 final _schema = S.object(
   properties: {
-    'imageChildId': Schemas.componentReference(
+    'imageChildId': A2uiSchemas.componentReference(
       description: 'The ID of the image to display at the top of the card.',
     ),
-    'title': Schemas.stringReference(description: 'The title of the card.'),
-    'subtitle': Schemas.stringReference(
+    'title': A2uiSchemas.stringReference(description: 'The title of the card.'),
+    'subtitle': A2uiSchemas.stringReference(
       description: 'The subtitle of the card.',
     ),
-    'body': Schemas.stringReference(
+    'body': A2uiSchemas.stringReference(
       description: 'The body text of the card. This supports markdown.',
     ),
   },

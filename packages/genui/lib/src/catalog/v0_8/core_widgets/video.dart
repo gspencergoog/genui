@@ -10,7 +10,7 @@ import '../../core_widgets/impl/video_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'url': Schemas.stringReference(
+    'url': A2uiSchemas.stringReference(
       description: 'The URL of the video to play.',
     ),
   },

@@ -13,8 +13,8 @@ import '../../core_widgets/impl/check_box_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'label': Schemas.stringReference(),
-    'value': Schemas.booleanReference(),
+    'label': A2uiSchemas.stringReference(),
+    'value': A2uiSchemas.booleanReference(),
   },
   required: ['label', 'value'],
 );

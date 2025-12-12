@@ -14,10 +14,10 @@ import '../tools/booking/model.dart';
 
 final _schema = S.object(
   properties: {
-    'title': Schemas.stringReference(
+    'title': A2uiSchemas.stringReference(
       description: 'An optional title to display above the carousel.',
     ),
-    'selectedItemIndex': Schemas.numberReference(
+    'selectedItemIndex': A2uiSchemas.numberReference(
       description:
           'The index of the currently selected item in the carousel. '
           'This is useful for pre-selecting an item or for tracking '
@@ -27,14 +27,14 @@ final _schema = S.object(
       description: 'A list of items to display in the carousel.',
       items: S.object(
         properties: {
-          'imageChildId': Schemas.componentReference(
+          'imageChildId': A2uiSchemas.componentReference(
             description: 'The ID of the image to display in the carousel item.',
           ),
           'title': S.string(description: 'The title of the carousel item.'),
           'subtitle': S.string(
             description: 'The subtitle of the carousel item.',
           ),
-          'action': Schemas.action(
+          'action': A2uiSchemas.action(
             description: 'The action to perform when the item is tapped.',
           ),
         },

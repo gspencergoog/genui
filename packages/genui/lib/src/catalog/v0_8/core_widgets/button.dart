@@ -10,12 +10,12 @@ import '../../core_widgets/impl/button_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'child': Schemas.componentReference(
+    'child': A2uiSchemas.componentReference(
       description:
           'The ID of a child widget. This should always be set, e.g. to the ID '
           'of a `Text` widget.',
     ),
-    'action': Schemas.action(),
+    'action': A2uiSchemas.action(),
     'primary': S.boolean(
       description: 'Whether the button invokes a primary action.',
     ),

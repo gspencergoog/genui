@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 
 import '../primitives/simple_items.dart';
+import 'a2ui_protocol.dart';
 
 /// A callback that is called when events are sent.
 typedef SendEventsCallback =
@@ -141,21 +142,52 @@ class UiDefinition {
 /// A component in the UI.
 final class Component {
   /// Creates a [Component].
-  const Component({required this.id, required this.props, this.weight});
+  const Component({
+    required this.id,
+    required this.props,
+    this.weight,
+    this.version = A2uiProtocolVersion.v0_8,
+  });
 
   /// Creates a [Component] from a JSON map.
-  factory Component.fromJson(JsonMap json) {
+  factory Component.fromJson(
+    JsonMap json, {
+    A2uiProtocolVersion version = A2uiProtocolVersion.v0_8,
+  }) {
+    switch (version) {
+      case A2uiProtocolVersion.v0_8:
+        return Component._fromV08Json(json);
+      case A2uiProtocolVersion.v0_9:
+        return Component._fromV09Json(json);
+    }
+  }
+
+  factory Component._fromV08Json(JsonMap json) {
     final id = json['id'] as String;
     final weight = json['weight'] as int?;
-    final Map<String, dynamic> props;
-    if (json.containsKey('props') && json['props'] is Map) {
-      props = Map.of(json['props'] as Map<String, dynamic>);
-    } else {
-      props = Map.of(json);
-      props.remove('id');
-      props.remove('weight');
-    }
-    return Component(id: id, props: props, weight: weight);
+    final Map<String, Object?> props = Map.of(json);
+    props.remove('id');
+    props.remove('weight');
+    return Component(
+      id: id,
+      props: props,
+      weight: weight,
+      version: A2uiProtocolVersion.v0_8,
+    );
+  }
+
+  factory Component._fromV09Json(JsonMap json) {
+    final id = json['id'] as String;
+    final weight = json['weight'] as int?;
+    final Map<String, dynamic> props = json.containsKey('props')
+        ? Map.of(json['props'] as Map<String, dynamic>)
+        : <String, dynamic>{};
+    return Component(
+      id: id,
+      props: props,
+      weight: weight,
+      version: A2uiProtocolVersion.v0_9,
+    );
   }
 
   /// The unique ID of the component.
@@ -167,9 +199,17 @@ final class Component {
   /// The weight of the component, used for layout in Row/Column.
   final int? weight;
 
+  /// The protocol version used by this component.
+  final A2uiProtocolVersion version;
+
   /// Converts this object to a JSON map.
   JsonMap toJson() {
-    return {'id': id, if (weight != null) 'weight': weight, ...props};
+    switch (version) {
+      case A2uiProtocolVersion.v0_8:
+        return {'id': id, if (weight != null) 'weight': weight, ...props};
+      case A2uiProtocolVersion.v0_9:
+        return {'id': id, if (weight != null) 'weight': weight, 'props': props};
+    }
   }
 
   /// The type of the component.
@@ -180,9 +220,14 @@ final class Component {
       other is Component &&
       id == other.id &&
       weight == other.weight &&
+      version == other.version &&
       const DeepCollectionEquality().equals(props, other.props);
 
   @override
-  int get hashCode =>
-      Object.hash(id, weight, const DeepCollectionEquality().hash(props));
+  int get hashCode => Object.hash(
+    id,
+    weight,
+    version,
+    const DeepCollectionEquality().hash(props),
+  );
 }

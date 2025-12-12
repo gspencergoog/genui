@@ -13,7 +13,7 @@ import '../../core_widgets/impl/row_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'children': Schemas.componentArrayReference(
+    'children': A2uiSchemas.componentArrayReference(
       description:
           'Either an explicit list of widget IDs for the children, or a '
           'template with a data binding to the list of children.',

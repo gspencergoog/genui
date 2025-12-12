@@ -14,8 +14,8 @@ final _schema = S.object(
     'tabItems': S.list(
       items: S.object(
         properties: {
-          'title': Schemas.stringReference(),
-          'child': Schemas.componentReference(),
+          'title': A2uiSchemas.stringReference(),
+          'child': A2uiSchemas.componentReference(),
         },
         required: ['title', 'child'],
       ),

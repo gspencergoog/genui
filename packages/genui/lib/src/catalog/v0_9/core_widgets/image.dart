@@ -11,7 +11,7 @@ import '../../core_widgets/impl/image_impl.dart';
 
 Schema _schema({required bool enableUsageHint}) {
   final Map<String, Schema> properties = {
-    'url': Schemas.stringReference(
+    'url': A2uiSchemas.stringReference(
       description:
           'Asset path (e.g. assets/...) or network URL (e.g. https://...)',
     ),

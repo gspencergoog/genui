@@ -12,10 +12,10 @@ final _schema = S.object(
       description: 'A list of sections to display as tabs.',
       items: S.object(
         properties: {
-          'label': Schemas.stringReference(
+          'label': A2uiSchemas.stringReference(
             description: 'The label of the tab.',
           ),
-          'childId': Schemas.componentReference(
+          'childId': A2uiSchemas.componentReference(
             description: 'The ID of the child widget for the tab content.',
           ),
         },

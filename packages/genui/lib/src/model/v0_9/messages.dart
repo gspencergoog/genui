@@ -4,19 +4,26 @@
 
 import '../../primitives/simple_items.dart';
 import '../a2ui_message.dart';
+import '../a2ui_protocol.dart';
 import '../ui_models.dart';
 
 /// An A2UI message that updates a surface with new components (V0.9).
-final class UpdateComponents implements A2uiMessage {
+final class UpdateComponents extends A2uiMessage {
   /// Creates a [UpdateComponents] message.
-  const UpdateComponents({required this.surfaceId, required this.components});
+  const UpdateComponents({required this.surfaceId, required this.components})
+    : super(A2uiProtocolVersion.v0_9);
 
   /// Creates a [UpdateComponents] message from a JSON map.
   factory UpdateComponents.fromJson(JsonMap json) {
     return UpdateComponents(
       surfaceId: json[surfaceIdKey] as String,
       components: (json['components'] as List<Object?>)
-          .map((e) => Component.fromJson(e as JsonMap))
+          .map(
+            (e) => Component.fromJson(
+              e as JsonMap,
+              version: A2uiProtocolVersion.v0_9,
+            ),
+          )
           .toList(),
     );
   }
@@ -37,14 +44,14 @@ final class UpdateComponents implements A2uiMessage {
 }
 
 /// An A2UI message that updates the data model (V0.9).
-final class UpdateDataModel implements A2uiMessage {
+final class UpdateDataModel extends A2uiMessage {
   /// Creates a [UpdateDataModel] message.
   const UpdateDataModel({
     required this.surfaceId,
     this.path,
     this.op = 'replace',
     required this.value,
-  });
+  }) : super(A2uiProtocolVersion.v0_9);
 
   /// Creates a [UpdateDataModel] message from a JSON map.
   factory UpdateDataModel.fromJson(JsonMap json) {
@@ -70,9 +77,10 @@ final class UpdateDataModel implements A2uiMessage {
 }
 
 /// An A2UI message that signals the client to begin rendering (V0.9).
-final class CreateSurface implements A2uiMessage {
+final class CreateSurface extends A2uiMessage {
   /// Creates a [CreateSurface] message.
-  const CreateSurface({required this.surfaceId, required this.catalogId});
+  const CreateSurface({required this.surfaceId, required this.catalogId})
+    : super(A2uiProtocolVersion.v0_9);
 
   /// Creates a [CreateSurface] message from a JSON map.
   factory CreateSurface.fromJson(JsonMap json) {
@@ -90,9 +98,10 @@ final class CreateSurface implements A2uiMessage {
 }
 
 /// An A2UI message that deletes a surface (V0.9).
-final class DeleteSurface implements A2uiMessage {
+final class DeleteSurface extends A2uiMessage {
   /// Creates a [DeleteSurface] message.
-  const DeleteSurface({required this.surfaceId});
+  const DeleteSurface({required this.surfaceId})
+    : super(A2uiProtocolVersion.v0_9);
 
   /// Creates a [DeleteSurface] message from a JSON map.
   factory DeleteSurface.fromJson(JsonMap json) {
@@ -104,14 +113,14 @@ final class DeleteSurface implements A2uiMessage {
 }
 
 /// An A2UI message that reports an error (V0.9).
-final class ErrorMessage implements A2uiMessage {
+final class ErrorMessage extends A2uiMessage {
   /// Creates a [ErrorMessage] message.
   const ErrorMessage({
     required this.code,
     required this.message,
     this.surfaceId,
     this.path,
-  });
+  }) : super(A2uiProtocolVersion.v0_9);
 
   /// Creates a [ErrorMessage] message from a JSON map.
   factory ErrorMessage.fromJson(JsonMap json) {

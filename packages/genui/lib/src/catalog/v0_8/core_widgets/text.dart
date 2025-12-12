@@ -10,7 +10,7 @@ import '../../core_widgets/impl/text_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'text': Schemas.stringReference(description: 'The text to display.'),
+    'text': A2uiSchemas.stringReference(description: 'The text to display.'),
     'usageHint': S.string(
       description:
           'A hint for how the text should be styled (e.g., h1, h2, p).',

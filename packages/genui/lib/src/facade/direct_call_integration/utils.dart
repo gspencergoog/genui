@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../core/prompt_fragments.dart';
 import '../../model/a2ui_message.dart';
+import '../../model/a2ui_protocol.dart';
 import '../../model/catalog.dart';
 import '../../model/ui_models.dart';
 import '../../model/v0_9/messages.dart';
@@ -49,7 +50,9 @@ ParsedToolCall parseToolCall(ToolCall toolCall, String toolName) {
           surfaceId: surfaceId,
           components: components
               .cast<JsonMap>()
-              .map(Component.fromJson)
+              .map(
+                (e) => Component.fromJson(e, version: A2uiProtocolVersion.v0_9),
+              )
               .toList(),
         ),
       );
@@ -59,7 +62,9 @@ ParsedToolCall parseToolCall(ToolCall toolCall, String toolName) {
           surfaceId: surfaceId,
           components: components.values
               .cast<JsonMap>()
-              .map(Component.fromJson)
+              .map(
+                (e) => Component.fromJson(e, version: A2uiProtocolVersion.v0_9),
+              )
               .toList(),
         ),
       );

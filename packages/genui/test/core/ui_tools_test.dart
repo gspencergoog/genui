@@ -4,7 +4,8 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
-import 'package:genui/src/model/v0_9/messages.dart' as v0_9;
+import 'package:genui/src/model/a2ui_protocol.dart';
+import 'package:genui/src/model/v0_8/messages.dart' as v0_8;
 
 void main() {
   group('UI Tools', () {
@@ -16,8 +17,8 @@ void main() {
       genUiManager = A2uiMessageProcessor(catalogs: [catalog]);
     });
 
-    test('UpdateComponentsTool sends UpdateComponents message', () async {
-      final tool = UpdateComponentsTool(
+    test('SurfaceUpdateTool sends SurfaceUpdate message', () async {
+      final tool = SurfaceUpdateTool(
         handleMessage: genUiManager.handleMessage,
         catalog: catalog,
       );
@@ -48,9 +49,11 @@ void main() {
       );
 
       await tool.invoke(args);
+      // Trigger a render by setting root
       genUiManager.handleMessage(
-        const v0_9.CreateSurface(
+        const v0_8.BeginRendering(
           surfaceId: 'testSurface',
+          root: 'root',
           catalogId: standardCatalogId,
         ),
       );
@@ -58,22 +61,26 @@ void main() {
       await future;
     });
 
-    test('CreateSurfaceTool sends CreateSurface message', () async {
-      final tool = CreateSurfaceTool(handleMessage: genUiManager.handleMessage);
+    test('BeginRenderingTool sends BeginRendering message', () async {
+      final tool = BeginRenderingTool(
+        handleMessage: genUiManager.handleMessage,
+        catalogId: standardCatalogId,
+      );
 
       final Map<String, String> args = {
         surfaceIdKey: 'testSurface',
-        'catalogId': standardCatalogId,
+        'root': 'root',
       };
 
       // First, add a component to the surface so that the root can be set.
       genUiManager.handleMessage(
-        const v0_9.UpdateComponents(
+        const v0_8.SurfaceUpdate(
           surfaceId: 'testSurface',
           components: [
             Component(
               id: 'root',
               props: {'component': 'Text', 'text': 'Hello'},
+              version: A2uiProtocolVersion.v0_8,
             ),
           ],
         ),

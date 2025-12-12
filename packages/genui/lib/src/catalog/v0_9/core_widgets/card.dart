@@ -9,7 +9,7 @@ import '../../../model/v0_9/schemas.dart';
 import '../../core_widgets/impl/card_impl.dart';
 
 final _schema = S.object(
-  properties: {'child': Schemas.componentReference()},
+  properties: {'child': A2uiSchemas.componentReference()},
   required: ['child'],
 );
 

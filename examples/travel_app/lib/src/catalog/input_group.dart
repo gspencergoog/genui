@@ -8,15 +8,15 @@ import 'package:json_schema_builder/json_schema_builder.dart';
 
 final _schema = S.object(
   properties: {
-    'submitLabel': Schemas.stringReference(
+    'submitLabel': A2uiSchemas.stringReference(
       description: 'The label for the submit button.',
     ),
-    'children': Schemas.componentArrayReference(
+    'children': A2uiSchemas.componentArrayReference(
       description:
           'A list of widget IDs for the input children, which must '
           'be input types such as OptionsFilterChipInput.',
     ),
-    'action': Schemas.action(
+    'action': A2uiSchemas.action(
       description:
           'The action to perform when the submit button is pressed. '
           'The context for this action should include references to the values '

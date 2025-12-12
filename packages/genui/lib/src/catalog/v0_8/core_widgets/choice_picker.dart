@@ -10,8 +10,8 @@ import '../../core_widgets/impl/choice_picker_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'value': Schemas.stringArrayReference(),
-    'options': Schemas.objectArrayReference(),
+    'value': A2uiSchemas.stringArrayReference(),
+    'options': A2uiSchemas.objectArrayReference(),
     'usageHint': S.string(
       description: 'Hint for how the choice picker should be displayed.',
       enumValues: ['multipleSelection', 'mutuallyExclusive'],

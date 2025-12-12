@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import '../core/a2ui_message_processor.dart';
 import '../core/genui_surface.dart';
+import '../model/a2ui_protocol.dart';
 import '../model/catalog.dart';
 import '../model/catalog_item.dart';
 import '../model/chat_message.dart';
@@ -71,7 +72,12 @@ class _DebugCatalogViewState extends State<DebugCatalogView> {
         final exampleData = jsonDecode(exampleJsonString) as List<Object?>;
 
         final List<Component> components = exampleData
-            .map((e) => Component.fromJson(e as JsonMap))
+            .map(
+              (e) => Component.fromJson(
+                e as JsonMap,
+                version: A2uiProtocolVersion.v0_9,
+              ),
+            )
             .toList();
 
         Component? rootComponent;

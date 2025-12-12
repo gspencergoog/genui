@@ -77,13 +77,10 @@ void main() {
       expect(message, isA<v0_9.UpdateComponents>());
     });
 
-    test('returns correct tools', () {
+    test('returns no tools', () {
       final catalog = const Catalog([], catalogId: 'cat1');
       final List<AiTool<JsonMap>> tools = protocol.getTools(catalog, (_) {});
-      expect(
-        tools.map((t) => t.name),
-        containsAll(['updateComponents', 'createSurface', 'deleteSurface']),
-      );
+      expect(tools, isEmpty);
     });
 
     test('returns non-null system preamble', () {

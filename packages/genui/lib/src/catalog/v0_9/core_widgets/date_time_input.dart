@@ -10,7 +10,7 @@ import '../../core_widgets/impl/date_time_input_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'value': Schemas.stringReference(
+    'value': A2uiSchemas.stringReference(
       description: 'The selected date and/or time.',
     ),
     'enableDate': S.boolean(),

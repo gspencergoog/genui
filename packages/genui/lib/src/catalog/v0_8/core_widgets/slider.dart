@@ -11,9 +11,9 @@ import '../../core_widgets/impl/slider_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'value': Schemas.numberReference(),
-    'min': Schemas.numberReference(),
-    'max': Schemas.numberReference(),
+    'value': A2uiSchemas.numberReference(),
+    'min': A2uiSchemas.numberReference(),
+    'max': A2uiSchemas.numberReference(),
   },
   required: ['value'],
 );

@@ -16,13 +16,13 @@ enum ItineraryEntryStatus { noBookingRequired, choiceRequired, chosen }
 final _schema = S.object(
   description: 'Widget to show an itinerary or a plan for travel.',
   properties: {
-    'title': Schemas.stringReference(
+    'title': A2uiSchemas.stringReference(
       description: 'The title of the itinerary.',
     ),
-    'subheading': Schemas.stringReference(
+    'subheading': A2uiSchemas.stringReference(
       description: 'The subheading of the itinerary.',
     ),
-    'imageChildId': Schemas.componentReference(
+    'imageChildId': A2uiSchemas.componentReference(
       description:
           'The ID of the Image widget to display. The Image fit '
           "should typically be 'cover'. Be sure to create an Image widget "
@@ -32,13 +32,13 @@ final _schema = S.object(
       description: 'A list of days in the itinerary.',
       items: S.object(
         properties: {
-          'title': Schemas.stringReference(
+          'title': A2uiSchemas.stringReference(
             description: 'The title for the day, e.g., "Day 1".',
           ),
-          'subtitle': Schemas.stringReference(
+          'subtitle': A2uiSchemas.stringReference(
             description: 'The subtitle for the day, e.g., "Arrival in Tokyo".',
           ),
-          'description': Schemas.stringReference(
+          'description': A2uiSchemas.stringReference(
             description:
                 'A short description of the day\'s plan. '
                 'This supports markdown.',
@@ -48,7 +48,7 @@ final _schema = S.object(
           'activities': S.list(
             items: S.object(
               properties: {
-                'totalCost': Schemas.stringReference(
+                'totalCost': A2uiSchemas.stringReference(
                   description: 'The total cost for the entry.',
                 ),
                 'type': S.string(
@@ -70,7 +70,7 @@ final _schema = S.object(
                       .map((e) => e.name)
                       .toList(),
                 ),
-                'choiceRequiredAction': Schemas.action(
+                'choiceRequiredAction': A2uiSchemas.action(
                   description:
                       'The action to perform when the user needs to '
                       'make a choice. This is only used when the status is '

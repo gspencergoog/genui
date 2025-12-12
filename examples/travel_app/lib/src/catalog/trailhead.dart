@@ -10,9 +10,9 @@ final _schema = S.object(
   properties: {
     'topics': S.list(
       description: 'A list of topics to display as chips.',
-      items: Schemas.stringReference(description: 'A topic to explore.'),
+      items: A2uiSchemas.stringReference(description: 'A topic to explore.'),
     ),
-    'action': Schemas.action(
+    'action': A2uiSchemas.action(
       description:
           'The action to perform when a topic is selected. The selected topic '
           'will be added to the context with the key "topic".',

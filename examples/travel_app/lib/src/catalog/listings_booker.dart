@@ -19,10 +19,10 @@ final _schema = S.object(
       description: 'Listings to select among.',
       items: S.string(),
     ),
-    'itineraryName': Schemas.stringReference(
+    'itineraryName': A2uiSchemas.stringReference(
       description: 'The name of the itinerary.',
     ),
-    'modifyAction': Schemas.action(
+    'modifyAction': A2uiSchemas.action(
       description:
           'The action to perform when the user wants to modify a listing '
           'selection. The listingSelectionId will be added to the context with '

@@ -8,7 +8,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import '../../core/genui_host.dart';
-import '../../core/ui_tools.dart';
 import '../../model/data_model.dart';
 import '../../model/ui_models.dart';
 import '../../primitives/logging.dart';
@@ -71,14 +70,7 @@ class A2uiProtocolV09 implements A2uiProtocol {
 
   @override
   List<AiTool> getTools(Catalog catalog, void Function(A2uiMessage) onMessage) {
-    return [
-      UpdateComponentsTool(handleMessage: onMessage, catalog: catalog),
-      CreateSurfaceTool(handleMessage: onMessage),
-      DeleteSurfaceTool(
-        handleMessage: onMessage,
-        messageFactory: (id) => DeleteSurface(surfaceId: id),
-      ),
-    ];
+    return const [];
   }
 
   @override

@@ -11,15 +11,15 @@ import '../../core_widgets/impl/text_field_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'text': Schemas.stringReference(
+    'text': A2uiSchemas.stringReference(
       description: 'The initial value of the text field.',
     ),
-    'label': Schemas.stringReference(),
+    'label': A2uiSchemas.stringReference(),
     'usageHint': S.string(
       enumValues: ['shortText', 'longText', 'number', 'date', 'obscured'],
     ),
     'validationRegexp': S.string(),
-    'onSubmittedAction': Schemas.action(),
+    'onSubmittedAction': A2uiSchemas.action(),
   },
 );
 
