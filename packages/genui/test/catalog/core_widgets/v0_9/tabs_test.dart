@@ -27,30 +27,18 @@ void main() {
         props: {
           'component': 'Tabs',
           'tabItems': [
-            {
-              'title': {'literalString': 'Tab 1'},
-              'child': 'text1',
-            },
-            {
-              'title': {'literalString': 'Tab 2'},
-              'child': 'text2',
-            },
+            {'title': 'Tab 1', 'child': 'text1'},
+            {'title': 'Tab 2', 'child': 'text2'},
           ],
         },
       ),
       const Component(
         id: 'text1',
-        props: {
-          'component': 'Text',
-          'text': {'literalString': 'This is the first tab.'},
-        },
+        props: {'component': 'Text', 'text': 'This is the first tab.'},
       ),
       const Component(
         id: 'text2',
-        props: {
-          'component': 'Text',
-          'text': {'literalString': 'This is the second tab.'},
-        },
+        props: {'component': 'Text', 'text': 'This is the second tab.'},
       ),
     ];
     manager.handleMessage(

@@ -25,7 +25,7 @@ Widget tabsBuilder(CatalogItemContext itemContext) {
         TabBar(
           tabs: tabsData.tabItems.map((tabItem) {
             final ValueNotifier<String?> titleNotifier = binder
-                .subscribeToString(tabItem['title'] as JsonMap);
+                .subscribeToString(tabItem['title']);
             return ValueListenableBuilder<String?>(
               valueListenable: titleNotifier,
               builder: (context, title, child) {

@@ -148,10 +148,8 @@ final inputGroup = CatalogItem(
               builder: (builderContext, submitLabel, child) {
                 return ElevatedButton(
                   onPressed: () {
-                    final JsonMap resolvedContext = resolveContext(
-                      itemContext.dataContext,
-                      contextDefinition,
-                    );
+                    final JsonMap resolvedContext = itemContext.binder
+                        .resolveContext(contextDefinition);
                     itemContext.dispatchEvent(
                       UserActionEvent(
                         name: name,

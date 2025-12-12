@@ -16,7 +16,7 @@ void main() {
         Catalog(
           [CoreCatalogItems.checkBox],
           catalogId: standardCatalogId,
-          binderFactory: V09DataBinder.new,
+          binderFactory: V08DataBinder.new,
         ),
       ],
     );

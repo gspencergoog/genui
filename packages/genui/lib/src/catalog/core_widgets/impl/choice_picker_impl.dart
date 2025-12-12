@@ -11,8 +11,8 @@ import '../../../primitives/simple_items.dart';
 
 extension type ChoicePickerData.fromMap(JsonMap _json) {
   factory ChoicePickerData({
-    required JsonMap value,
-    required JsonMap options,
+    required Object? value,
+    required Object? options,
     String? usageHint,
   }) => ChoicePickerData.fromMap({
     'value': value,
@@ -20,8 +20,8 @@ extension type ChoicePickerData.fromMap(JsonMap _json) {
     'usageHint': usageHint,
   });
 
-  JsonMap get value => _json['value'] as JsonMap;
-  JsonMap get options => _json['options'] as JsonMap;
+  Object? get value => _json['value'];
+  Object? get options => _json['options'];
   String? get usageHint => _json['usageHint'] as String?;
 }
 
@@ -76,7 +76,11 @@ Widget choicePickerBuilder(CatalogItemContext itemContext) {
                       groupValue: groupValue is String ? groupValue : null,
                       // ignore: deprecated_member_use
                       onChanged: (newValue) {
-                        final path = choicePickerData.value['path'] as String?;
+                        final Object? val = choicePickerData.value;
+                        final String? path =
+                            val is Map && val.containsKey('path')
+                            ? val['path'] as String?
+                            : null;
                         if (path == null || newValue == null) {
                           return;
                         }
@@ -90,7 +94,11 @@ Widget choicePickerBuilder(CatalogItemContext itemContext) {
                       controlAffinity: ListTileControlAffinity.leading,
                       value: selections?.contains(value) ?? false,
                       onChanged: (newValue) {
-                        final path = choicePickerData.value['path'] as String?;
+                        final Object? val = choicePickerData.value;
+                        final String? path =
+                            val is Map && val.containsKey('path')
+                            ? val['path'] as String?
+                            : null;
                         if (path == null) {
                           return;
                         }

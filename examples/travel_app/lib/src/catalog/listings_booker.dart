@@ -69,7 +69,7 @@ final listingsBooker = CatalogItem(
           dispatchEvent: context.dispatchEvent,
           widgetId: context.id,
           modifyAction: listingsBookerData.modifyAction,
-          dataContext: context.dataContext,
+          binder: context.binder,
         );
       },
     );
@@ -130,7 +130,7 @@ class _ListingsBooker extends StatefulWidget {
   final DispatchEventCallback dispatchEvent;
   final String widgetId;
   final JsonMap? modifyAction;
-  final DataContext dataContext;
+  final DataBinder binder;
 
   const _ListingsBooker({
     required this.listingSelectionIds,
@@ -138,7 +138,7 @@ class _ListingsBooker extends StatefulWidget {
     required this.dispatchEvent,
     required this.widgetId,
     this.modifyAction,
-    required this.dataContext,
+    required this.binder,
   });
 
   @override
@@ -332,10 +332,8 @@ class _ListingsBookerState extends State<_ListingsBooker> {
                                 final actionName = actionData['name'] as String;
                                 final Object? contextDefinition =
                                     actionData['context'];
-                                final JsonMap resolvedContext = resolveContext(
-                                  widget.dataContext,
-                                  contextDefinition,
-                                );
+                                final JsonMap resolvedContext = widget.binder
+                                    .resolveContext(contextDefinition);
                                 resolvedContext['listingSelectionId'] =
                                     listing.listingSelectionId;
                                 widget.dispatchEvent(

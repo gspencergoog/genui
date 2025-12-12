@@ -23,10 +23,8 @@ void main() {
               body: image.widgetBuilder(
                 CatalogItemContext(
                   data: {
-                    'url': {
-                      'literalString':
-                          'https://storage.googleapis.com/cms-storage-bucket/lockup_flutter_horizontal.c823e53b3a1a7b0d36a9.png',
-                    },
+                    'url':
+                        'https://storage.googleapis.com/cms-storage-bucket/lockup_flutter_horizontal.c823e53b3a1a7b0d36a9.png',
                   },
                   id: 'test_image',
                   buildChild: (_, [_]) => const SizedBox(),
@@ -64,7 +62,7 @@ void main() {
               body: image.widgetBuilder(
                 CatalogItemContext(
                   data: {
-                    'url': {'literalString': 'https://example.com/avatar.png'},
+                    'url': 'https://example.com/avatar.png',
                     'usageHint': 'avatar',
                   },
                   id: 'test_image_avatar',
@@ -105,7 +103,7 @@ void main() {
               body: image.widgetBuilder(
                 CatalogItemContext(
                   data: {
-                    'url': {'literalString': 'https://example.com/header.png'},
+                    'url': 'https://example.com/header.png',
                     'usageHint': 'header',
                   },
                   id: 'test_image_header',

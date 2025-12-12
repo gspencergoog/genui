@@ -36,7 +36,7 @@ abstract interface class DataBinder {
   String? resolveString(Object? ref);
 
   /// Resolves a context map for actions.
-  JsonMap resolveContext(Map<String, Object?> contextDefinitions);
+  JsonMap resolveContext(Object? contextDefinitions);
 
   /// Gets the data path from a template object.
   ///

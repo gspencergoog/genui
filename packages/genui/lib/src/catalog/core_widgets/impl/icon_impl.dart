@@ -9,10 +9,10 @@ import '../../../model/catalog_item.dart';
 import '../../../primitives/simple_items.dart';
 
 extension type IconSchemaData.fromMap(JsonMap _json) {
-  factory IconSchemaData({required JsonMap name}) =>
+  factory IconSchemaData({required Object? name}) =>
       IconSchemaData.fromMap({'name': name});
 
-  JsonMap get nameMap => _json['name'] as JsonMap;
+  Object? get nameMap => _json['name'];
 }
 
 enum AvailableIcons {

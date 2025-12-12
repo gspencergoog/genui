@@ -22,13 +22,7 @@ void main() {
     );
     const surfaceId = 'testSurface';
     final components = [
-      const Component(
-        id: 'root',
-        props: {
-          'component': 'Icon',
-          'name': {'literalString': 'add'},
-        },
-      ),
+      const Component(id: 'root', props: {'component': 'Icon', 'name': 'add'}),
     ];
     manager.handleMessage(
       v0_9.UpdateComponents(surfaceId: surfaceId, components: components),

@@ -14,7 +14,7 @@ void main() {
         Catalog(
           [CoreCatalogItems.row, CoreCatalogItems.text],
           catalogId: standardCatalogId,
-          binderFactory: V09DataBinder.new,
+          binderFactory: V08DataBinder.new,
         ),
       ],
     );
@@ -75,7 +75,7 @@ void main() {
         Catalog(
           [CoreCatalogItems.row, CoreCatalogItems.text],
           catalogId: standardCatalogId,
-          binderFactory: V09DataBinder.new,
+          binderFactory: V08DataBinder.new,
         ),
       ],
     );

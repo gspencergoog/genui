@@ -93,7 +93,7 @@ final travelCarousel = CatalogItem(
           items: items,
           widgetId: itemContext.id,
           dispatchEvent: itemContext.dispatchEvent,
-          dataContext: itemContext.dataContext,
+          binder: itemContext.binder,
         );
       },
     );
@@ -153,14 +153,14 @@ class _TravelCarousel extends StatelessWidget {
     required this.items,
     required this.widgetId,
     required this.dispatchEvent,
-    required this.dataContext,
+    required this.binder,
   });
 
   final String? title;
   final List<_TravelCarouselItemData> items;
   final String widgetId;
   final DispatchEventCallback dispatchEvent;
-  final DataContext dataContext;
+  final DataBinder binder;
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +190,7 @@ class _TravelCarousel extends StatelessWidget {
                   data: items[index],
                   widgetId: widgetId,
                   dispatchEvent: dispatchEvent,
-                  dataContext: dataContext,
+                  binder: binder,
                 );
               },
               separatorBuilder: (context, index) => const SizedBox(width: 16),
@@ -221,13 +221,13 @@ class _TravelCarouselItem extends StatelessWidget {
     required this.data,
     required this.widgetId,
     required this.dispatchEvent,
-    required this.dataContext,
+    required this.binder,
   });
 
   final _TravelCarouselItemData data;
   final String widgetId;
   final DispatchEventCallback dispatchEvent;
-  final DataContext dataContext;
+  final DataBinder binder;
 
   @override
   Widget build(BuildContext context) {
@@ -237,8 +237,7 @@ class _TravelCarouselItem extends StatelessWidget {
         onTap: () {
           final name = data.action['name'] as String;
           final Object? contextDefinition = data.action['context'];
-          final JsonMap resolvedContext = resolveContext(
-            dataContext,
+          final JsonMap resolvedContext = binder.resolveContext(
             contextDefinition,
           );
           resolvedContext['description'] = data.descriptionNotifier.value;

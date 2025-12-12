@@ -10,11 +10,11 @@ import '../../../model/data_model.dart';
 import '../../../primitives/simple_items.dart';
 
 extension type CheckBoxData.fromMap(JsonMap _json) {
-  factory CheckBoxData({required JsonMap label, required JsonMap value}) =>
+  factory CheckBoxData({required Object? label, required Object? value}) =>
       CheckBoxData.fromMap({'label': label, 'value': value});
 
-  JsonMap get label => _json['label'] as JsonMap;
-  JsonMap get value => _json['value'] as JsonMap;
+  Object? get label => _json['label'];
+  Object? get value => _json['value'];
 }
 
 Widget checkBoxBuilder(CatalogItemContext itemContext) {
@@ -40,7 +40,10 @@ Widget checkBoxBuilder(CatalogItemContext itemContext) {
             ),
             value: value ?? false,
             onChanged: (newValue) {
-              final path = checkBoxData.value['path'] as String?;
+              final Object? val = checkBoxData.value;
+              final String? path = val is Map && val.containsKey('path')
+                  ? val['path'] as String?
+                  : null;
               if (path != null) {
                 binder.dataContext.update(DataPath(path), newValue);
               }

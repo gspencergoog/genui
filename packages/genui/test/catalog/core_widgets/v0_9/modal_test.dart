@@ -41,25 +41,17 @@ void main() {
           'child': 'button_text',
           'action': {
             'name': 'showModal',
-            'context': {
-              'modalId': {'literalString': 'root'},
-            },
+            'context': {'modalId': 'root'},
           },
         },
       ),
       const Component(
         id: 'button_text',
-        props: {
-          'component': 'Text',
-          'text': {'literalString': 'Open Modal'},
-        },
+        props: {'component': 'Text', 'text': 'Open Modal'},
       ),
       const Component(
         id: 'text',
-        props: {
-          'component': 'Text',
-          'text': {'literalString': 'This is a modal.'},
-        },
+        props: {'component': 'Text', 'text': 'This is a modal.'},
       ),
     ];
     manager.handleMessage(

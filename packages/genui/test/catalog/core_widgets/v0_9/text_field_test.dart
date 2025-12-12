@@ -29,7 +29,7 @@ void main() {
         props: {
           'component': 'TextField',
           'text': {'path': '/myValue'},
-          'label': {'literalString': 'My Label'},
+          'label': 'My Label',
           'onSubmittedAction': {'name': 'submit'},
         },
       ),

@@ -16,7 +16,7 @@ void main() {
         Catalog(
           [CoreCatalogItems.slider],
           catalogId: standardCatalogId,
-          binderFactory: V09DataBinder.new,
+          binderFactory: V08DataBinder.new,
         ),
       ],
     );
@@ -72,7 +72,7 @@ void main() {
         Catalog(
           [CoreCatalogItems.slider],
           catalogId: standardCatalogId,
-          binderFactory: V09DataBinder.new,
+          binderFactory: V08DataBinder.new,
         ),
       ],
     );

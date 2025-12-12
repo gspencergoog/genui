@@ -16,7 +16,7 @@ void main() {
         Catalog(
           [CoreCatalogItems.choicePicker, CoreCatalogItems.text],
           catalogId: standardCatalogId,
-          binderFactory: V09DataBinder.new,
+          binderFactory: V08DataBinder.new,
         ),
       ],
     );
@@ -92,7 +92,7 @@ void main() {
           Catalog(
             [CoreCatalogItems.choicePicker],
             catalogId: standardCatalogId,
-            binderFactory: V09DataBinder.new,
+            binderFactory: V08DataBinder.new,
           ),
         ],
       );

@@ -11,7 +11,7 @@ import '../../../primitives/simple_items.dart';
 
 extension type DateTimeInputData.fromMap(JsonMap _json) {
   factory DateTimeInputData({
-    required JsonMap value,
+    required Object? value,
     bool? enableDate,
     bool? enableTime,
     String? outputFormat,
@@ -22,7 +22,7 @@ extension type DateTimeInputData.fromMap(JsonMap _json) {
     'outputFormat': outputFormat,
   });
 
-  JsonMap get value => _json['value'] as JsonMap;
+  Object? get value => _json['value'];
   bool get enableDate => (_json['enableDate'] as bool?) ?? true;
   bool get enableTime => (_json['enableTime'] as bool?) ?? true;
   String? get outputFormat => _json['outputFormat'] as String?;
@@ -43,7 +43,10 @@ Widget dateTimeInputBuilder(CatalogItemContext itemContext) {
       return ListTile(
         title: Text(value ?? 'Select a date/time'),
         onTap: () async {
-          final path = dateTimeInputData.value['path'] as String?;
+          final Object? val = dateTimeInputData.value;
+          final String? path = val is Map && val.containsKey('path')
+              ? val['path'] as String?
+              : null;
           if (path == null) {
             return;
           }

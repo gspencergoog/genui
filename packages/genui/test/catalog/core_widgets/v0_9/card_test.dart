@@ -26,10 +26,7 @@ void main() {
       ),
       const Component(
         id: 'text',
-        props: {
-          'component': 'Text',
-          'text': {'literalString': 'This is a card.'},
-        },
+        props: {'component': 'Text', 'text': 'This is a card.'},
       ),
     ];
     manager.handleMessage(

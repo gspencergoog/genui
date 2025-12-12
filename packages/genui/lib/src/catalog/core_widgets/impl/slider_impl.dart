@@ -10,12 +10,12 @@ import '../../../model/data_model.dart';
 import '../../../primitives/simple_items.dart';
 
 extension type SliderData.fromMap(JsonMap _json) {
-  factory SliderData({required JsonMap value, JsonMap? min, JsonMap? max}) =>
+  factory SliderData({required Object? value, Object? min, Object? max}) =>
       SliderData.fromMap({'value': value, 'min': min, 'max': max});
 
-  JsonMap get value => _json['value'] as JsonMap;
-  JsonMap? get min => _json['min'] as JsonMap?;
-  JsonMap? get max => _json['max'] as JsonMap?;
+  Object? get value => _json['value'];
+  Object? get min => _json['min'];
+  Object? get max => _json['max'];
 }
 
 Widget sliderBuilder(CatalogItemContext itemContext) {
@@ -57,7 +57,10 @@ Widget sliderBuilder(CatalogItemContext itemContext) {
                     ? (effectiveMax - effectiveMin).toInt()
                     : 1,
                 onChanged: (newValue) {
-                  final path = sliderData.value['path'] as String?;
+                  final Object? val = sliderData.value;
+                  final String? path = val is Map && val.containsKey('path')
+                      ? val['path'] as String?
+                      : null;
                   if (path != null) {
                     binder.dataContext.update(DataPath(path), newValue);
                   }

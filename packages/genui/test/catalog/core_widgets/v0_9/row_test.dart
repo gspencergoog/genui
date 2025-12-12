@@ -31,17 +31,11 @@ void main() {
       ),
       const Component(
         id: 'text1',
-        props: {
-          'component': 'Text',
-          'text': {'literalString': 'First'},
-        },
+        props: {'component': 'Text', 'text': 'First'},
       ),
       const Component(
         id: 'text2',
-        props: {
-          'component': 'Text',
-          'text': {'literalString': 'Second'},
-        },
+        props: {'component': 'Text', 'text': 'Second'},
       ),
     ];
     manager.handleMessage(
@@ -91,26 +85,17 @@ void main() {
       ),
       const Component(
         id: 'text1',
-        props: {
-          'component': 'Text',
-          'text': {'literalString': 'First'},
-        },
+        props: {'component': 'Text', 'text': 'First'},
         weight: 1,
       ),
       const Component(
         id: 'text2',
-        props: {
-          'component': 'Text',
-          'text': {'literalString': 'Second'},
-        },
+        props: {'component': 'Text', 'text': 'Second'},
         weight: 2,
       ),
       const Component(
         id: 'text3',
-        props: {
-          'component': 'Text',
-          'text': {'literalString': 'Third'},
-        },
+        props: {'component': 'Text', 'text': 'Third'},
       ),
     ];
     manager.handleMessage(

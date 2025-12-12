@@ -76,7 +76,7 @@ final trailhead = CatalogItem(
       action: trailheadData.action,
       widgetId: itemContext.id,
       dispatchEvent: itemContext.dispatchEvent,
-      dataContext: itemContext.dataContext,
+      binder: itemContext.binder,
     );
   },
 );
@@ -87,14 +87,14 @@ class _Trailhead extends StatelessWidget {
     required this.action,
     required this.widgetId,
     required this.dispatchEvent,
-    required this.dataContext,
+    required this.binder,
   });
 
   final List<JsonMap> topics;
   final JsonMap action;
   final String widgetId;
   final DispatchEventCallback dispatchEvent;
-  final DataContext dataContext;
+  final DataBinder binder;
 
   @override
   Widget build(BuildContext context) {
@@ -104,9 +104,8 @@ class _Trailhead extends StatelessWidget {
         spacing: 8.0,
         runSpacing: 8.0,
         children: topics.map((topicRef) {
-          final ValueNotifier<String?> notifier = dataContext.subscribeToString(
-            topicRef,
-          );
+          final ValueNotifier<String?> notifier = binder.dataContext
+              .subscribeToString(topicRef);
 
           return ValueListenableBuilder<String?>(
             valueListenable: notifier,
@@ -119,8 +118,7 @@ class _Trailhead extends StatelessWidget {
                 onPressed: () {
                   final name = action['name'] as String;
                   final Object? contextDefinition = action['context'];
-                  final JsonMap resolvedContext = resolveContext(
-                    dataContext,
+                  final JsonMap resolvedContext = binder.resolveContext(
                     contextDefinition,
                   );
                   resolvedContext['topic'] = topic;

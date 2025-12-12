@@ -34,10 +34,7 @@ void main() {
       ),
       const Component(
         id: 'button_text',
-        props: {
-          'component': 'Text',
-          'text': {'literalString': 'Click Me'},
-        },
+        props: {'component': 'Text', 'text': 'Click Me'},
       ),
     ];
     manager.handleMessage(

@@ -14,7 +14,7 @@ void main() {
         Catalog(
           [CoreCatalogItems.list, CoreCatalogItems.text],
           catalogId: standardCatalogId,
-          binderFactory: V09DataBinder.new,
+          binderFactory: V08DataBinder.new,
         ),
       ],
     );

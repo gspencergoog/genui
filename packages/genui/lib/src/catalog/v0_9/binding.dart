@@ -54,9 +54,11 @@ class V09DataBinder implements DataBinder {
   }
 
   @override
-  JsonMap resolveContext(Map<String, Object?> contextDefinitions) {
+  JsonMap resolveContext(Object? contextDefinitions) {
+    final Map<String, Object?> contextMap =
+        (contextDefinitions as Map<String, Object?>?) ?? const {};
     final resolved = <String, Object?>{};
-    for (final MapEntry<String, Object?> entry in contextDefinitions.entries) {
+    for (final MapEntry<String, Object?> entry in contextMap.entries) {
       final String key = entry.key;
       final Object? value = entry.value;
       if (value is Map && value.containsKey('path')) {

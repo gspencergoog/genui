@@ -10,10 +10,10 @@ import '../../../primitives/logging.dart';
 import '../../../primitives/simple_items.dart';
 
 extension type ImageData.fromMap(JsonMap _json) {
-  factory ImageData({required JsonMap url, String? fit, String? usageHint}) =>
+  factory ImageData({required Object? url, String? fit, String? usageHint}) =>
       ImageData.fromMap({'url': url, 'fit': fit, 'usageHint': usageHint});
 
-  JsonMap get url => _json['url'] as JsonMap;
+  Object? get url => _json['url'];
   BoxFit? get fit => _json['fit'] != null
       ? BoxFit.values.firstWhere((e) => e.name == _json['fit'] as String)
       : null;

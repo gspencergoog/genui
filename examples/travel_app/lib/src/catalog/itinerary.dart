@@ -238,7 +238,7 @@ final itinerary = CatalogItem(
       widgetId: context.id,
       buildChild: context.buildChild,
       dispatchEvent: context.dispatchEvent,
-      dataContext: context.dataContext,
+      binder: context.binder,
     );
   },
 );
@@ -251,7 +251,7 @@ class _Itinerary extends StatelessWidget {
   final String widgetId;
   final ChildBuilderCallback buildChild;
   final DispatchEventCallback dispatchEvent;
-  final DataContext dataContext;
+  final DataBinder binder;
 
   const _Itinerary({
     required this.titleNotifier,
@@ -261,7 +261,7 @@ class _Itinerary extends StatelessWidget {
     required this.widgetId,
     required this.buildChild,
     required this.dispatchEvent,
-    required this.dataContext,
+    required this.binder,
   });
 
   @override
@@ -318,7 +318,7 @@ class _Itinerary extends StatelessWidget {
                                 widgetId: widgetId,
                                 buildChild: buildChild,
                                 dispatchEvent: dispatchEvent,
-                                dataContext: dataContext,
+                                binder: binder,
                               ),
                           ],
                         ),
@@ -386,24 +386,23 @@ class _ItineraryDay extends StatelessWidget {
     required this.widgetId,
     required this.buildChild,
     required this.dispatchEvent,
-    required this.dataContext,
+    required this.binder,
   });
 
   final _ItineraryDayData data;
   final String widgetId;
   final ChildBuilderCallback buildChild;
   final DispatchEventCallback dispatchEvent;
-  final DataContext dataContext;
+  final DataBinder binder;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ValueNotifier<String?> titleNotifier = dataContext.subscribeToString(
-      data.title,
-    );
-    final ValueNotifier<String?> subtitleNotifier = dataContext
+    final ValueNotifier<String?> titleNotifier = binder.dataContext
+        .subscribeToString(data.title);
+    final ValueNotifier<String?> subtitleNotifier = binder.dataContext
         .subscribeToString(data.subtitle);
-    final ValueNotifier<String?> descriptionNotifier = dataContext
+    final ValueNotifier<String?> descriptionNotifier = binder.dataContext
         .subscribeToString(data.description);
     final Widget imageChild = buildChild(data.imageChildId);
 
@@ -463,7 +462,7 @@ class _ItineraryDay extends StatelessWidget {
                 data: _ItineraryEntryData.fromMap(entryData),
                 widgetId: widgetId,
                 dispatchEvent: dispatchEvent,
-                dataContext: dataContext,
+                binder: binder,
               ),
           ],
         ),
@@ -476,13 +475,13 @@ class _ItineraryEntry extends StatelessWidget {
   final _ItineraryEntryData data;
   final String widgetId;
   final DispatchEventCallback dispatchEvent;
-  final DataContext dataContext;
+  final DataBinder binder;
 
   const _ItineraryEntry({
     required this.data,
     required this.widgetId,
     required this.dispatchEvent,
-    required this.dataContext,
+    required this.binder,
   });
 
   IconData _getIconForType(ItineraryEntryType type) {
@@ -499,19 +498,17 @@ class _ItineraryEntry extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ValueNotifier<String?> titleNotifier = dataContext.subscribeToString(
-      data.title,
-    );
-    final ValueNotifier<String?> subtitleNotifier = dataContext
+    final ValueNotifier<String?> titleNotifier = binder.dataContext
+        .subscribeToString(data.title);
+    final ValueNotifier<String?> subtitleNotifier = binder.dataContext
         .subscribeToString(data.subtitle);
-    final ValueNotifier<String?> bodyTextNotifier = dataContext
+    final ValueNotifier<String?> bodyTextNotifier = binder.dataContext
         .subscribeToString(data.bodyText);
-    final ValueNotifier<String?> addressNotifier = dataContext
+    final ValueNotifier<String?> addressNotifier = binder.dataContext
         .subscribeToString(data.address);
-    final ValueNotifier<String?> timeNotifier = dataContext.subscribeToString(
-      data.time,
-    );
-    final ValueNotifier<String?> totalCostNotifier = dataContext
+    final ValueNotifier<String?> timeNotifier = binder.dataContext
+        .subscribeToString(data.time);
+    final ValueNotifier<String?> totalCostNotifier = binder.dataContext
         .subscribeToString(data.totalCost);
 
     return Padding(
@@ -550,10 +547,8 @@ class _ItineraryEntry extends StatelessWidget {
                               return;
                             }
                             final actionName = actionData['name'] as String;
-                            final JsonMap resolvedContext = resolveContext(
-                              dataContext,
-                              actionData['context'],
-                            );
+                            final JsonMap resolvedContext = binder
+                                .resolveContext(actionData['context']);
                             dispatchEvent(
                               UserActionEvent(
                                 name: actionName,

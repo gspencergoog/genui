@@ -21,10 +21,7 @@ void main() {
           builder: (context) => Scaffold(
             body: text.widgetBuilder(
               CatalogItemContext(
-                data: {
-                  'component': 'Text',
-                  'text': {'literalString': 'Hello World'},
-                },
+                data: {'component': 'Text', 'text': 'Hello World'},
                 id: 'root',
                 buildChild: (_, [_]) => const SizedBox(),
                 dispatchEvent: (UiEvent event) {},
@@ -54,7 +51,7 @@ void main() {
               CatalogItemContext(
                 data: {
                   'component': 'Text',
-                  'text': {'literalString': 'Heading 1'},
+                  'text': 'Heading 1',
                   'usageHint': 'h1',
                 },
                 id: 'root',
@@ -108,9 +105,7 @@ void main() {
           builder: (context) => Scaffold(
             body: text.widgetBuilder(
               CatalogItemContext(
-                data: {
-                  'text': {'literalString': 'Hello **Bold**'},
-                },
+                data: {'text': 'Hello **Bold**'},
                 id: 'root',
                 buildChild: (_, [_]) => const SizedBox(),
                 dispatchEvent: (UiEvent event) {},

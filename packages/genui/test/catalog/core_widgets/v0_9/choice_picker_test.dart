@@ -27,18 +27,10 @@ void main() {
         props: {
           'component': 'ChoicePicker',
           'value': {'path': '/mySelections'},
-          'options': {
-            'literalArray': [
-              {
-                'label': {'literalString': 'Option 1'},
-                'value': '1',
-              },
-              {
-                'label': {'literalString': 'Option 2'},
-                'value': '2',
-              },
-            ],
-          },
+          'options': [
+            {'label': 'Option 1', 'value': '1'},
+            {'label': 'Option 2', 'value': '2'},
+          ],
         },
       ),
     ];

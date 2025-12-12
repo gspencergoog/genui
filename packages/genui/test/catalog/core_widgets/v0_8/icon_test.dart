@@ -16,7 +16,7 @@ void main() {
         Catalog(
           [CoreCatalogItems.icon],
           catalogId: standardCatalogId,
-          binderFactory: V09DataBinder.new,
+          binderFactory: V08DataBinder.new,
         ),
       ],
     );
@@ -60,7 +60,7 @@ void main() {
         Catalog(
           [CoreCatalogItems.icon],
           catalogId: standardCatalogId,
-          binderFactory: V09DataBinder.new,
+          binderFactory: V08DataBinder.new,
         ),
       ],
     );

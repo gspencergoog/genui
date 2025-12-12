@@ -26,7 +26,7 @@ void main() {
         id: 'root',
         props: {
           'component': 'CheckBox',
-          'label': {'literalString': 'Check me'},
+          'label': 'Check me',
           'value': {'path': '/myValue'},
         },
       ),
