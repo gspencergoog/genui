@@ -59,26 +59,35 @@ final row = CatalogItem(
       [
         {
           "id": "root",
-          "component": "Row",
-          "children": {
-            "explicitList": [
-              "text1",
-              "text2"
-            ]
+          "component": {
+            "Row": {
+              "children": {
+                "explicitList": [
+                  "text1",
+                  "text2"
+                ]
+              }
+            }
           }
         },
         {
           "id": "text1",
-          "component": "Text",
-          "text": {
-            "literalString": "First"
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "First"
+              }
+            }
           }
         },
         {
           "id": "text2",
-          "component": "Text",
-          "text": {
-            "literalString": "Second"
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "Second"
+              }
+            }
           }
         }
       ]

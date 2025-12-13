@@ -11,10 +11,11 @@ final _schema = S.object(
     'submitLabel': A2uiSchemas.stringReference(
       description: 'The label for the submit button.',
     ),
-    'children': A2uiSchemas.componentArrayReference(
+    'children': S.list(
       description:
           'A list of widget IDs for the input children, which must '
           'be input types such as OptionsFilterChipInput.',
+      items: S.string(),
     ),
     'action': A2uiSchemas.action(
       description:

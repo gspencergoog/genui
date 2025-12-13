@@ -6,8 +6,8 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
+import 'package:genui/src/model/v0_9/a2ui_protocol.dart';
 import 'package:genui/src/model/v0_9/messages.dart' as v0_9;
-import 'package:genui/src/model/v0_9/protocol.dart';
 
 void main() {
   group('A2uiProtocolV09', () {

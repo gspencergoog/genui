@@ -63,7 +63,8 @@ class GoogleGenerativeAiContentGeneratorV08
   /// instance as configuration.
   ///
   /// Defaults to a wrapper for the regular [google_ai.GenerativeService]
-  /// constructor, [defaultGenerativeServiceFactory].
+  /// constructor,
+  /// [GoogleGenerativeAiContentGenerator.defaultGenerativeServiceFactory].
   @override
   final GenerativeServiceFactory serviceFactory;
 
@@ -300,7 +301,7 @@ class GoogleGenerativeAiContentGeneratorV08
           stack,
         );
         toolResult = {
-          'error': 'Tool ${aiTool.name} failed to execute: $exception',
+          'error': 'Tool ${aiTool.name} failed to execute: $exception\n$stack',
         };
       }
       functionResponseParts.add(
@@ -387,12 +388,14 @@ class GoogleGenerativeAiContentGeneratorV08
             .map((c) => jsonEncode(c.toJson()))
             .join('\n');
 
-        genUiLogger.info(
-          '''****** Performing Inference ******\n$concatenatedContents
+        genUiLogger.finest('System Instruction: $systemInstruction');
+        genUiLogger.info('''****** Performing Inference ******
+Content:
+$concatenatedContents
 With functions:
   '${allowedFunctionNames.join(', ')}',
-  ''',
-        );
+  ''');
+
         final inferenceStartTime = DateTime.now();
         google_ai.GenerateContentResponse response;
         try {

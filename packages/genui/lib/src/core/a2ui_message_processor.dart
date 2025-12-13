@@ -13,10 +13,10 @@ import '../model/catalog.dart';
 import '../model/chat_message.dart';
 import '../model/data_model.dart';
 import '../model/ui_models.dart';
+import '../model/v0_8/a2ui_protocol.dart' as v0_8_proto;
 import '../model/v0_8/messages.dart' as v0_8;
-import '../model/v0_8/protocol.dart' as v0_8_proto;
+import '../model/v0_9/a2ui_protocol.dart' as v0_9_proto;
 import '../model/v0_9/messages.dart' as v0_9;
-import '../model/v0_9/protocol.dart' as v0_9_proto;
 import '../primitives/logging.dart';
 import 'genui_host.dart';
 

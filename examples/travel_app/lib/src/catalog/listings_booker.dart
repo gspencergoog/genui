@@ -99,9 +99,12 @@ final listingsBooker = CatalogItem(
       return jsonEncode([
         {
           'id': 'root',
-          'component': 'ListingsBooker',
-          'listingSelectionIds': [listingSelectionId1, listingSelectionId2],
-          'itineraryName': {'literalString': 'Dart and Flutter deep dive'},
+          'component': {
+            'ListingsBooker': {
+              'listingSelectionIds': [listingSelectionId1, listingSelectionId2],
+              'itineraryName': {'literalString': 'Dart and Flutter deep dive'},
+            },
+          },
         },
       ]);
     },

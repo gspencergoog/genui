@@ -11,7 +11,9 @@ import '../core/data_binder.dart';
 import '../primitives/logging.dart';
 import '../primitives/simple_items.dart';
 import 'catalog_item.dart';
+import 'component_parser.dart';
 import 'data_model.dart';
+import 'v0_8/component_parser.dart';
 
 /// Represents a collection of UI components that a generative AI model can use
 /// to construct a user interface.
@@ -29,6 +31,7 @@ class Catalog {
     this.items, {
     this.binderFactory = V08DataBinder.new,
     this.catalogId,
+    this.componentParser = const V08ComponentParser(),
   });
 
   /// The list of [CatalogItem]s available in this catalog.
@@ -41,6 +44,9 @@ class Catalog {
   /// a reverse-domain name notation, e.g. 'com.example.my_catalog'.
   final String? catalogId;
 
+  /// The strategy used to parse component data from the JSON map.
+  final ComponentParser componentParser;
+
   /// Returns a new [Catalog] containing the items from both this catalog and
   /// the provided [items].
   ///
@@ -51,7 +57,11 @@ class Catalog {
   ///
   /// If an item with the same name already exists in the catalog, it will be
   /// replaced with the new item.
-  Catalog copyWith(List<CatalogItem> newItems, {String? catalogId}) {
+  Catalog copyWith(
+    List<CatalogItem> newItems, {
+    String? catalogId,
+    ComponentParser? componentParser,
+  }) {
     final Map<String, CatalogItem> itemsByName = {
       for (final item in items) item.name: item,
     };
@@ -60,12 +70,17 @@ class Catalog {
       itemsByName.values,
       binderFactory: binderFactory,
       catalogId: catalogId ?? this.catalogId,
+      componentParser: componentParser ?? this.componentParser,
     );
   }
 
   /// Returns a new [Catalog] instance containing the items from this catalog
   /// with the specified items removed.
-  Catalog copyWithout(Iterable<CatalogItem> itemNames, {String? catalogId}) {
+  Catalog copyWithout(
+    Iterable<CatalogItem> itemNames, {
+    String? catalogId,
+    ComponentParser? componentParser,
+  }) {
     final Set<String> namesToRemove = itemNames
         .map<String>((item) => item.name)
         .toSet();
@@ -76,13 +91,17 @@ class Catalog {
       updatedItems,
       binderFactory: binderFactory,
       catalogId: catalogId ?? this.catalogId,
+      componentParser: componentParser ?? this.componentParser,
     );
   }
 
   /// Builds a Flutter widget from a JSON-like data structure.
   Widget buildWidget(CatalogItemContext itemContext) {
-    final widgetData = itemContext.data as JsonMap;
-    final widgetType = widgetData['component'] as String?;
+    final ({String? widgetType, JsonMap widgetData}) parsed = componentParser
+        .parse(itemContext.data as JsonMap);
+    final String? widgetType = parsed.widgetType;
+    final JsonMap widgetData = parsed.widgetData;
+
     final CatalogItem? item = items.firstWhereOrNull(
       (item) => item.name == widgetType,
     );

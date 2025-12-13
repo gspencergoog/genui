@@ -56,7 +56,8 @@ class GoogleGenerativeAiContentGeneratorV09
   /// instance as configuration.
   ///
   /// Defaults to a wrapper for the regular [google_ai.GenerativeService]
-  /// constructor, [defaultGenerativeServiceFactory].
+  /// constructor,
+  /// [GoogleGenerativeAiContentGenerator.defaultGenerativeServiceFactory].
   @override
   final GenerativeServiceFactory serviceFactory;
 
@@ -319,10 +320,8 @@ class GoogleGenerativeAiContentGeneratorV09
             .map((c) => jsonEncode(c.toJson()))
             .join('\n');
 
+        genUiLogger.finest('System Instruction: $effectiveSystemInstruction');
         genUiLogger.info('''****** Performing Inference ******
-System Instruction:
-$effectiveSystemInstruction
-
 Content:
 $concatenatedContents
 With functions:

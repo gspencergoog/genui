@@ -33,9 +33,12 @@ final text = CatalogItem(
       [
         {
           "id": "text",
-          "component": "Text",
-          "text": {
-            "literalString": "Hello World"
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "Hello World"
+              }
+            }
           }
         }
       ]
@@ -44,11 +47,14 @@ final text = CatalogItem(
       [
         {
           "id": "heading",
-          "component": "Text",
-          "text": {
-            "literalString": "Welcome"
-          },
-          "usageHint": "h1"
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "Welcome"
+              },
+              "usageHint": "h1"
+            }
+          }
         }
       ]
     ''',

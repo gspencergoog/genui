@@ -9,11 +9,9 @@ import 'catalog/date_input_chip.dart';
 import 'catalog/information_card.dart';
 import 'catalog/input_group.dart';
 import 'catalog/itinerary.dart';
-import 'catalog/listings_booker.dart';
 import 'catalog/options_filter_chip_input.dart';
 import 'catalog/tabbed_sections.dart';
 import 'catalog/text_input_chip.dart';
-import 'catalog/trailhead.dart';
 import 'catalog/travel_carousel.dart';
 
 /// Defines the collection of UI components that the generative AI model can use
@@ -34,10 +32,10 @@ final Catalog travelAppCatalog = Catalog([
   informationCard,
   inputGroup,
   itinerary,
-  listingsBooker,
+  //listingsBooker,
   optionsFilterChipInput,
   tabbedSections,
   textInputChip,
-  trailhead,
+  // trailhead,
   travelCarousel,
 ], catalogId: standardCatalogId);

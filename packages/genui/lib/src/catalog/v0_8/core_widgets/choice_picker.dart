@@ -45,81 +45,96 @@ final choicePicker = CatalogItem(
       [
         {
           "id": "root",
-          "component": "Column",
-          "children": {
-            "explicitList": [
-              "heading1",
-              "singleChoice",
-              "heading2",
-              "multiChoice"
-            ]
+          "component": {
+            "Column": {
+              "children": {
+                "explicitList": [
+                  "heading1",
+                  "singleChoice",
+                  "heading2",
+                  "multiChoice"
+                ]
+              }
+            }
           }
         },
         {
           "id": "heading1",
-          "component": "Text",
-          "text": {
-            "literalString": "Single Selection (mutuallyExclusive)"
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "Single Selection (mutuallyExclusive)"
+              }
+            }
           }
         },
         {
           "id": "singleChoice",
-          "component": "ChoicePicker",
-          "value": {
-            "path": "/singleSelection"
-          },
-          "usageHint": "mutuallyExclusive",
-          "options": {
-            "literalArray": [
-              {
-                "label": {
-                  "literalString": "Option A"
-                },
-                "value": "A"
+          "component": {
+            "ChoicePicker": {
+              "value": {
+                "path": "/singleSelection"
               },
-              {
-                "label": {
-                  "literalString": "Option B"
-                },
-                "value": "B"
+              "usageHint": "mutuallyExclusive",
+              "options": {
+                "literalArray": [
+                  {
+                    "label": {
+                      "literalString": "Option A"
+                    },
+                    "value": "A"
+                  },
+                  {
+                    "label": {
+                      "literalString": "Option B"
+                    },
+                    "value": "B"
+                  }
+                ]
               }
-            ]
+            }
           }
         },
         {
           "id": "heading2",
-          "component": "Text",
-          "text": {
-            "literalString": "Multiple Selections"
+          "component": {
+            "Text": {
+              "text": {
+                "literalString": "Multiple Selections"
+              }
+            }
           }
         },
         {
           "id": "multiChoice",
-          "component": "ChoicePicker",
-          "value": {
-            "path": "/multiSelection"
-          },
-          "options": {
-            "literalArray": [
-              {
-                "label": {
-                  "literalString": "Option X"
-                },
-                "value": "X"
+          "component": {
+            "ChoicePicker": {
+              "value": {
+                "path": "/multiSelection"
               },
-              {
-                "label": {
-                  "literalString": "Option Y"
-                },
-                "value": "Y"
-              },
-              {
-                "label": {
-                  "literalString": "Option Z"
-                },
-                "value": "Z"
+              "options": {
+                "literalArray": [
+                  {
+                    "label": {
+                      "literalString": "Option X"
+                    },
+                    "value": "X"
+                  },
+                  {
+                    "label": {
+                      "literalString": "Option Y"
+                    },
+                    "value": "Y"
+                  },
+                  {
+                    "label": {
+                      "literalString": "Option Z"
+                    },
+                    "value": "Z"
+                  }
+                ]
               }
-            ]
+            }
           }
         }
       ]

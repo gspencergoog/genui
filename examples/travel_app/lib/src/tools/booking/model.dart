@@ -101,7 +101,7 @@ class HotelSearch {
       query: json['query'] as String,
       checkIn: DateTime.parse(json['checkIn'] as String),
       checkOut: DateTime.parse(json['checkOut'] as String),
-      guests: json['guests'] as int,
+      guests: (json['guests'] as num).toInt(),
     );
   }
 

@@ -46,11 +46,14 @@ final textInputChip = CatalogItem(
       [
         {
           "id": "root",
-          "component": "TextInputChip",
-          "value": {
-            "literalString": "John Doe"
-          },
-          "label": "Enter your name"
+          "component": {
+            "TextInputChip": {
+              "value": {
+                "literalString": "John Doe"
+              },
+              "label": "Enter your name"
+            }
+          }
         }
       ]
     ''',
@@ -58,9 +61,12 @@ final textInputChip = CatalogItem(
       [
         {
           "id": "root",
-          "component": "TextInputChip",
-          "label": "Enter your password",
-          "obscured": true
+          "component": {
+            "TextInputChip": {
+              "label": "Enter your password",
+              "obscured": true
+            }
+          }
         }
       ]
     ''',

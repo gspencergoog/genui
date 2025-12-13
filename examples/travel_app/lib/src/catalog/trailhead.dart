@@ -48,20 +48,23 @@ final trailhead = CatalogItem(
       [
         {
           "id": "root",
-          "component": "Trailhead",
-          "topics": [
-            {
-              "literalString": "Topic 1"
-            },
-            {
-              "literalString": "Topic 2"
-            },
-            {
-              "literalString": "Topic 3"
+          "component": {
+            "Trailhead": {
+              "topics": [
+                {
+                  "literalString": "Topic 1"
+                },
+                {
+                  "literalString": "Topic 2"
+                },
+                {
+                  "literalString": "Topic 3"
+                }
+              ],
+              "action": {
+                "name": "select_topic"
+              }
             }
-          ],
-          "action": {
-            "name": "select_topic"
           }
         }
       ]

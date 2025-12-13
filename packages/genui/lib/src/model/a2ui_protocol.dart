@@ -9,8 +9,8 @@ import '../primitives/simple_items.dart';
 import 'a2ui_message.dart';
 import 'catalog.dart';
 import 'tools.dart';
-import 'v0_8/protocol.dart';
-import 'v0_9/protocol.dart';
+import 'v0_8/a2ui_protocol.dart';
+import 'v0_9/a2ui_protocol.dart';
 
 /// The versions of the A2UI protocol.
 enum A2uiProtocolVersion {

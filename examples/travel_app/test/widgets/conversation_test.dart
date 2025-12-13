@@ -29,8 +29,11 @@ void main() {
         const Component(
           id: 'root',
           props: {
-            'component': 'Text',
-            'text': {'literalString': 'Hi there!'},
+            'component': {
+              'Text': {
+                'text': {'literalString': 'Hi there!'},
+              },
+            },
           },
         ),
       ];
@@ -84,8 +87,11 @@ void main() {
         const Component(
           id: 'root',
           props: {
-            'component': 'Text',
-            'text': {'literalString': 'UI Content'},
+            'component': {
+              'Text': {
+                'text': {'literalString': 'UI Content'},
+              },
+            },
           },
         ),
       ];
