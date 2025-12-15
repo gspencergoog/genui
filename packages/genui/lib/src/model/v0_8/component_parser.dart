@@ -13,6 +13,8 @@ class V08ComponentParser extends ComponentParser {
   @override
   ({String? widgetType, JsonMap widgetData}) parse(JsonMap data) {
     if (data['component'] is! Map) {
+      // Log the invalid data for debugging purposes
+      print('Invalid component data: $data');
       throw ArgumentError(
         'Component must be a map. Instead got: ${data['component']} '
         '(${data['component']?.runtimeType})',

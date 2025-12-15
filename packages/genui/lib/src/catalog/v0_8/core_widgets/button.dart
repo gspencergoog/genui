@@ -10,9 +10,17 @@ import '../../core_widgets/impl/button_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'child': A2uiSchemas.componentReference(),
-    'primary': S.boolean(),
-    'action': A2uiSchemas.action(),
+    'child': A2uiSchemas.componentReference(
+      description:
+          'The ID of the child component (usually a Text component) to display '
+          'inside the button.',
+    ),
+    'primary': S.boolean(
+      description: 'Whether the button should be styled as a primary button.',
+    ),
+    'action': A2uiSchemas.action(
+      description: 'The action to perform when the button is pressed.',
+    ),
   },
   required: ['child'],
 );

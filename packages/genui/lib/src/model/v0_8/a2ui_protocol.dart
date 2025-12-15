@@ -166,9 +166,13 @@ class A2uiProtocolV08 implements A2uiProtocol {
     final ValueNotifier<UiDefinition?> notifier = host.getSurfaceNotifier(
       surfaceId,
     );
-    final isNew = notifier.value == null;
+    final UiDefinition? previousDefinition = notifier.value;
+    final bool wasAnnounced =
+        previousDefinition != null &&
+        previousDefinition.rootComponentId != null;
+
     UiDefinition uiDefinition =
-        notifier.value ?? UiDefinition(surfaceId: surfaceId);
+        previousDefinition ?? UiDefinition(surfaceId: surfaceId);
 
     uiDefinition = uiDefinition.copyWith(
       rootComponentId: root,
@@ -179,7 +183,7 @@ class A2uiProtocolV08 implements A2uiProtocol {
 
     genUiLogger.info('Begin rendering surface $surfaceId with root $root');
 
-    if (isNew) {
+    if (!wasAnnounced) {
       host.emitUpdate(SurfaceAdded(surfaceId, uiDefinition));
     } else {
       host.emitUpdate(SurfaceUpdated(surfaceId, uiDefinition));

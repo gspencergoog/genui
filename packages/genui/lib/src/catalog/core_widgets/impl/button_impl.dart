@@ -34,8 +34,7 @@ Widget buttonBuilder(CatalogItemContext itemContext) {
   final Widget child = itemContext.buildChild(buttonData.child);
   final JsonMap actionData = buttonData.action;
   final actionName = actionData['name'] as String;
-  final Map<String, Object?> contextDefinition =
-      (actionData['context'] as Map<String, Object?>?) ?? {};
+  final Object? contextDefinition = actionData['context'];
 
   genUiLogger.info('Building Button with child: ${buttonData.child}');
   final ColorScheme colorScheme = Theme.of(
