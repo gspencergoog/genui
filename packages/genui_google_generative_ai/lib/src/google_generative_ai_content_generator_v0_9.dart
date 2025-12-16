@@ -328,11 +328,10 @@ With functions:
   '${allowedFunctionNames.join(', ')}',
   ''');
         final inferenceStartTime = DateTime.now();
-
         final request = google_ai.GenerateContentRequest(
           model: modelName,
           contents: [...systemInstructionContent, ...content],
-          tools: tools,
+          tools: tools ?? [],
           toolConfig: tools == null
               ? null
               : google_ai.ToolConfig(
@@ -341,18 +340,17 @@ With functions:
                   ),
                 ),
         );
-
         final responseStream = service.streamGenerateContent(request);
 
         final currentLineBuffer = StringBuffer();
 
         await for (final google_ai.GenerateContentResponse response
             in responseStream) {
-          if (response.candidates == null || response.candidates!.isEmpty) {
+          if (response.candidates.isEmpty) {
             continue;
           }
 
-          final candidate = response.candidates!.first;
+          final candidate = response.candidates.first;
           genUiLogger.fine(
             'Received candidate: content=${candidate.content}, '
             'finishReason=${candidate.finishReason}, '
@@ -381,7 +379,7 @@ With functions:
           // Handle function calls
           final functionCalls = <google_ai.FunctionCall>[];
           if (candidate.content?.parts != null) {
-            for (final part in candidate.content!.parts!) {
+            for (final part in candidate.content!.parts) {
               if (part.functionCall != null) {
                 functionCalls.add(part.functionCall!);
               }
@@ -417,7 +415,7 @@ With functions:
 
           // Handle text content for JSONL parsing
           if (candidate.content?.parts != null) {
-            for (final part in candidate.content!.parts!) {
+            for (final part in candidate.content!.parts) {
               final text = part.text;
               if (text != null && text.isNotEmpty) {
                 genUiLogger.fine('Received text part: $text');
