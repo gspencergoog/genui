@@ -4,6 +4,7 @@
 
 import '../../model/catalog.dart';
 import '../../model/catalog_item.dart';
+import '../../model/v0_9/component_parser.dart';
 
 import 'binding.dart';
 import 'core_widgets/audio_player.dart' as audio_player_item;
@@ -136,6 +137,7 @@ class CoreCatalogItems {
       catalogId:
           'https://a2ui.dev/specification/0.9/standard_catalog_definition.json',
       binderFactory: V09DataBinder.new,
+      componentParser: const V09ComponentParser(),
     );
   }
 }

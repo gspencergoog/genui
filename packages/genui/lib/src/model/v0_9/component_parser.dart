@@ -12,26 +12,16 @@ class V09ComponentParser extends ComponentParser {
 
   @override
   ({String? widgetType, JsonMap widgetData}) parse(JsonMap data) {
-    String? widgetType;
-    var widgetData = data;
     final Object? componentEntry = data['component'];
 
-    // In V0.9, the component property is a map where the key is the component
-    // name and the value is an object containing the component's properties.
-    if (componentEntry is Map && componentEntry.isNotEmpty) {
-      widgetType = componentEntry.keys.first as String;
-      final Map<String, Object?> innerData =
-          componentEntry[widgetType] as Map<String, Object?>? ?? {};
-      // We merge the inner properties to the top level for the widget builder,
-      // preserving the ID from the outer object if it exists (though usually
-      // the ID is not in the component map itself in V0.9 schemas, but the
-      // wrapping object has it).
-      widgetData = {...innerData, if (data.containsKey('id')) 'id': data['id']};
-    } else if (componentEntry is String) {
-      // Fallback or potentially mixed usage, though strictly V0.9 uses Map.
-      widgetType = componentEntry;
+    if (componentEntry is String) {
+      return (widgetType: componentEntry, widgetData: data);
+    } else {
+      throw ArgumentError(
+        'Invalid component format in v0.9: "component" property must be a '
+        'String. Got: $componentEntry (${componentEntry?.runtimeType}) in '
+        'data: $data',
+      );
     }
-
-    return (widgetType: widgetType, widgetData: widgetData);
   }
 }
