@@ -25,19 +25,22 @@ void main() {
       const Component(
         id: 'root',
         props: {
-          'component': 'ChoicePicker',
-          'value': {'path': '/mySelections'},
-          'options': {
-            'literalArray': [
-              {
-                'label': {'literalString': 'Option 1'},
-                'value': '1',
+          'component': {
+            'ChoicePicker': {
+              'value': {'path': '/mySelections'},
+              'options': {
+                'literalArray': [
+                  {
+                    'label': {'literalString': 'Option 1'},
+                    'value': '1',
+                  },
+                  {
+                    'label': {'literalString': 'Option 2'},
+                    'value': '2',
+                  },
+                ],
               },
-              {
-                'label': {'literalString': 'Option 2'},
-                'value': '2',
-              },
-            ],
+            },
           },
         },
       ),
@@ -101,9 +104,12 @@ void main() {
         const Component(
           id: 'root',
           props: {
-            'component': 'ChoicePicker',
-            'value': {'path': '/mySelections'},
-            'options': {'path': '/myOptions'},
+            'component': {
+              'ChoicePicker': {
+                'value': {'path': '/mySelections'},
+                'options': {'path': '/myOptions'},
+              },
+            },
           },
         ),
       ];

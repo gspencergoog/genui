@@ -18,6 +18,7 @@ void main() {
           [CoreCatalogItems.button, CoreCatalogItems.text],
           catalogId: standardCatalogId,
           binderFactory: V09DataBinder.new,
+          componentParser: const V09ComponentParser(),
         ),
       ],
     );

@@ -89,7 +89,7 @@ void main() {
       final Future<void> future = expectLater(
         genUiManager.surfaceUpdates,
         emits(
-          isA<SurfaceUpdated>().having(
+          isA<SurfaceAdded>().having(
             (e) => e.surfaceId,
             surfaceIdKey,
             'testSurface',

@@ -203,7 +203,11 @@ class A2uiProtocolV08 implements A2uiProtocol {
       '${const JsonEncoder.withIndent('  ').convert(value)}',
     );
     final DataModel dataModel = host.dataModelForSurface(surfaceId);
-    dataModel.update(DataPath(actualPath), value);
+    if (value is List) {
+      dataModel.updateFromAdjacencyList(DataPath(actualPath), value);
+    } else {
+      dataModel.update(DataPath(actualPath), value);
+    }
 
     final ValueNotifier<UiDefinition?> notifier = host.getSurfaceNotifier(
       surfaceId,

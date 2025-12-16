@@ -25,8 +25,11 @@ void main() {
       const Component(
         id: 'root',
         props: {
-          'component': 'Icon',
-          'name': {'literalString': 'add'},
+          'component': {
+            'Icon': {
+              'name': {'literalString': 'add'},
+            },
+          },
         },
       ),
     ];
@@ -69,8 +72,11 @@ void main() {
       const Component(
         id: 'root',
         props: {
-          'component': 'Icon',
-          'name': {'path': '/iconName'},
+          'component': {
+            'Icon': {
+              'name': {'path': '/iconName'},
+            },
+          },
         },
       ),
     ];

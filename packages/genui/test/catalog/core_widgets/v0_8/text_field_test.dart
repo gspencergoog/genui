@@ -27,10 +27,13 @@ void main() {
       const Component(
         id: 'root',
         props: {
-          'component': 'TextField',
-          'text': {'path': '/myValue'},
-          'label': {'literalString': 'My Label'},
-          'onSubmittedAction': {'name': 'submit'},
+          'component': {
+            'TextField': {
+              'text': {'path': '/myValue'},
+              'label': {'literalString': 'My Label'},
+              'onSubmittedAction': {'name': 'submit'},
+            },
+          },
         },
       ),
     ];

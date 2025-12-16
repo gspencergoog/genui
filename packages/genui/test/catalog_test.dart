@@ -25,7 +25,10 @@ void main() {
       final catalog = Catalog([
         CoreCatalogItems.column,
         CoreCatalogItems.text,
-      ], binderFactory: V09DataBinder.new);
+      ],
+        binderFactory: V09DataBinder.new,
+        componentParser: const V09ComponentParser(),
+      );
       final Map<String, Object> widgetData = {
         'component': 'Column',
         'children': {
@@ -71,7 +74,11 @@ void main() {
     testWidgets('buildWidget returns empty container for unknown widget type', (
       WidgetTester tester,
     ) async {
-      final catalog = const Catalog([], binderFactory: V09DataBinder.new);
+      final catalog = const Catalog(
+        [],
+        binderFactory: V09DataBinder.new,
+        componentParser: V09ComponentParser(),
+      );
       final Map<String, Object> data = {
         'id': 'text1',
         'widget': {'component': 'unknown_widget', 'text': 'hello'},

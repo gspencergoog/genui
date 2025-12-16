@@ -23,24 +23,33 @@ void main() {
       const Component(
         id: 'root',
         props: {
-          'component': 'List',
-          'children': {
-            'explicitList': ['text1', 'text2'],
+          'component': {
+            'List': {
+              'children': {
+                'explicitList': ['text1', 'text2'],
+              },
+            },
           },
         },
       ),
       const Component(
         id: 'text1',
         props: {
-          'component': 'Text',
-          'text': {'literalString': 'First'},
+          'component': {
+            'Text': {
+              'text': {'literalString': 'First'},
+            },
+          },
         },
       ),
       const Component(
         id: 'text2',
         props: {
-          'component': 'Text',
-          'text': {'literalString': 'Second'},
+          'component': {
+            'Text': {
+              'text': {'literalString': 'Second'},
+            },
+          },
         },
       ),
     ];

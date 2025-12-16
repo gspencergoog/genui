@@ -155,6 +155,21 @@ class DataModel {
     _notifySubscribers(absolutePath);
   }
 
+  /// Updates the data model from a V0.8 adjacency list.
+  void updateFromAdjacencyList(DataPath? absolutePath, List<Object?> contents) {
+    final JsonMap parsedData = _parseDataModelContents(contents);
+    if (absolutePath == null || absolutePath.segments.isEmpty) {
+      // Merge with root
+      for (final entry in parsedData.entries) {
+        _data[entry.key] = entry.value;
+      }
+      _notifySubscribers(DataPath.root);
+    } else {
+      // Update at path
+      update(absolutePath, parsedData);
+    }
+  }
+
   /// Subscribes to a specific absolute path in the data model.
   ValueNotifier<T?> subscribe<T>(DataPath absolutePath) {
     genUiLogger.info('DataModel.subscribe: path=$absolutePath');

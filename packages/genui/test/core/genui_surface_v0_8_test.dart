@@ -27,16 +27,22 @@ void main() {
       const Component(
         id: 'root',
         props: {
-          'component': 'Button',
-          'child': 'text',
-          'action': {'name': 'testAction'},
+          'component': {
+            'Button': {
+              'child': 'text',
+              'action': {'name': 'testAction'},
+            },
+          },
         },
       ),
       const Component(
         id: 'text',
         props: {
-          'component': 'Text',
-          'text': {'literalString': 'Hello'},
+          'component': {
+            'Text': {
+              'text': {'literalString': 'Hello'},
+            },
+          },
         },
       ),
     ];
@@ -68,16 +74,22 @@ void main() {
       const Component(
         id: 'root',
         props: {
-          'component': 'Button',
-          'child': 'text',
-          'action': {'name': 'testAction'},
+          'component': {
+            'Button': {
+              'child': 'text',
+              'action': {'name': 'testAction'},
+            },
+          },
         },
       ),
       const Component(
         id: 'text',
         props: {
-          'component': 'Text',
-          'text': {'literalString': 'Hello'},
+          'component': {
+            'Text': {
+              'text': {'literalString': 'Hello'},
+            },
+          },
         },
       ),
     ];

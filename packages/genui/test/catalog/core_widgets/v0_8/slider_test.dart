@@ -25,10 +25,13 @@ void main() {
       const Component(
         id: 'root',
         props: {
-          'component': 'Slider',
-          'value': {'path': '/myValue'},
-          'min': {'literalNumber': 0.0},
-          'max': {'literalNumber': 1.0},
+          'component': {
+            'Slider': {
+              'value': {'path': '/myValue'},
+              'min': {'literalNumber': 0.0},
+              'max': {'literalNumber': 1.0},
+            },
+          },
         },
       ),
     ];
@@ -81,10 +84,13 @@ void main() {
       const Component(
         id: 'root',
         props: {
-          'component': 'Slider',
-          'value': {'path': '/myValue'},
-          'min': {'path': '/myMin'},
-          'max': {'path': '/myMax'},
+          'component': {
+            'Slider': {
+              'value': {'path': '/myValue'},
+              'min': {'path': '/myMin'},
+              'max': {'path': '/myMax'},
+            },
+          },
         },
       ),
     ];

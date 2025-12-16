@@ -15,6 +15,7 @@ void main() {
           [CoreCatalogItems.card, CoreCatalogItems.text],
           catalogId: standardCatalogId,
           binderFactory: V09DataBinder.new,
+          componentParser: const V09ComponentParser(),
         ),
       ],
     );

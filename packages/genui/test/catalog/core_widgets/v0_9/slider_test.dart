@@ -17,12 +17,14 @@ void main() {
           [CoreCatalogItems.slider],
           catalogId: standardCatalogId,
           binderFactory: V09DataBinder.new,
+          componentParser: const V09ComponentParser(),
         ),
       ],
     );
     const surfaceId = 'testSurface';
     final components = [
       const Component(
+        version: A2uiProtocolVersion.v0_9,
         id: 'root',
         props: {
           'component': 'Slider',
@@ -72,12 +74,14 @@ void main() {
           [CoreCatalogItems.slider],
           catalogId: standardCatalogId,
           binderFactory: V09DataBinder.new,
+          componentParser: const V09ComponentParser(),
         ),
       ],
     );
     const surfaceId = 'testSurface';
     final components = [
       const Component(
+        version: A2uiProtocolVersion.v0_9,
         id: 'root',
         props: {
           'component': 'Slider',

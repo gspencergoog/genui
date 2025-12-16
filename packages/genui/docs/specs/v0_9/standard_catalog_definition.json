@@ -87,7 +87,7 @@
             },
             "usageHint": {
               "type": "string",
-              "description": "A hint for the image size and style.",
+              "description": "A hint for the image size and style. One of:\n      - icon: Small square icon.\n      - avatar: Circular avatar image.\n      - smallFeature: Small feature image.\n      - mediumFeature: Medium feature image.\n      - largeFeature: Large feature image.\n      - header: Full-width, full bleed, header image.",
               "enum": [
                 "icon",
                 "avatar",

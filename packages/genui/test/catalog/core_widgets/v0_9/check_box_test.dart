@@ -17,6 +17,7 @@ void main() {
           [CoreCatalogItems.checkBox],
           catalogId: standardCatalogId,
           binderFactory: V09DataBinder.new,
+          componentParser: const V09ComponentParser(),
         ),
       ],
     );

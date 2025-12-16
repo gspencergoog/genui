@@ -179,9 +179,12 @@ final class Component {
   factory Component._fromV09Json(JsonMap json) {
     final id = json['id'] as String;
     final int? weight = (json['weight'] as num?)?.toInt();
-    final Map<String, Object?> props = Map.of(json);
-    props.remove('id');
-    props.remove('weight');
+    final Map<String, Object?> props;
+    if (json.containsKey('props')) {
+      props = Map.of(json['props'] as JsonMap);
+    } else {
+      props = {};
+    }
     return Component(
       id: id,
       props: props,

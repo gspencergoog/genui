@@ -25,8 +25,11 @@ void main() {
       const Component(
         id: 'root',
         props: {
-          'component': 'DateTimeInput',
-          'value': {'path': '/myDateTime'},
+          'component': {
+            'DateTimeInput': {
+              'value': {'path': '/myDateTime'},
+            },
+          },
         },
       ),
     ];

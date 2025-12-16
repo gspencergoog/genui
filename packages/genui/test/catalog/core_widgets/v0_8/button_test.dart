@@ -27,16 +27,22 @@ void main() {
       const Component(
         id: 'root',
         props: {
-          'component': 'Button',
-          'child': 'button_text',
-          'action': {'name': 'testAction'},
+          'component': {
+            'Button': {
+              'child': 'button_text',
+              'action': {'name': 'testAction'},
+            },
+          },
         },
       ),
       const Component(
         id: 'button_text',
         props: {
-          'component': 'Text',
-          'text': {'literalString': 'Click Me'},
+          'component': {
+            'Text': {
+              'text': {'literalString': 'Click Me'},
+            },
+          },
         },
       ),
     ];

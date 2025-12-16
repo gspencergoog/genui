@@ -23,24 +23,33 @@ void main() {
       const Component(
         id: 'root',
         props: {
-          'component': 'Row',
-          'children': {
-            'explicitList': ['text1', 'text2'],
+          'component': {
+            'Row': {
+              'children': {
+                'explicitList': ['text1', 'text2'],
+              },
+            },
           },
         },
       ),
       const Component(
         id: 'text1',
         props: {
-          'component': 'Text',
-          'text': {'literalString': 'First'},
+          'component': {
+            'Text': {
+              'text': {'literalString': 'First'},
+            },
+          },
         },
       ),
       const Component(
         id: 'text2',
         props: {
-          'component': 'Text',
-          'text': {'literalString': 'Second'},
+          'component': {
+            'Text': {
+              'text': {'literalString': 'Second'},
+            },
+          },
         },
       ),
     ];
@@ -84,33 +93,45 @@ void main() {
       const Component(
         id: 'root',
         props: {
-          'component': 'Row',
-          'children': {
-            'explicitList': ['text1', 'text2', 'text3'],
+          'component': {
+            'Row': {
+              'children': {
+                'explicitList': ['text1', 'text2', 'text3'],
+              },
+            },
           },
         },
       ),
       const Component(
         id: 'text1',
         props: {
-          'component': 'Text',
-          'text': {'literalString': 'First'},
+          'component': {
+            'Text': {
+              'text': {'literalString': 'First'},
+            },
+          },
         },
         weight: 1,
       ),
       const Component(
         id: 'text2',
         props: {
-          'component': 'Text',
-          'text': {'literalString': 'Second'},
+          'component': {
+            'Text': {
+              'text': {'literalString': 'Second'},
+            },
+          },
         },
         weight: 2,
       ),
       const Component(
         id: 'text3',
         props: {
-          'component': 'Text',
-          'text': {'literalString': 'Third'},
+          'component': {
+            'Text': {
+              'text': {'literalString': 'Third'},
+            },
+          },
         },
       ),
     ];

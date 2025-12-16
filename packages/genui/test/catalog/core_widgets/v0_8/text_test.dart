@@ -149,19 +149,21 @@ void main() {
           builder: (context) => Scaffold(
             body: DefaultTextStyle(
               style: const TextStyle(color: requiredColor),
-              child: text.widgetBuilder(
-                CatalogItemContext(
-                  data: {
-                    'text': {'literalString': 'Contrast Text'},
-                  },
-                  id: 'test_contrast',
-                  buildChild: (_, [_]) => const SizedBox(),
-                  dispatchEvent: (UiEvent event) {},
-                  buildContext: context,
-                  dataContext: DataContext(DataModel(), '/'),
-                  binder: V08DataBinder(DataContext(DataModel(), '/')),
-                  getComponent: (String componentId) => null,
-                  surfaceId: 'surface1',
+              child: Builder(
+                builder: (innerContext) => text.widgetBuilder(
+                  CatalogItemContext(
+                    data: {
+                      'text': {'literalString': 'Contrast Text'},
+                    },
+                    id: 'test_contrast',
+                    buildChild: (_, [_]) => const SizedBox(),
+                    dispatchEvent: (UiEvent event) {},
+                    buildContext: innerContext,
+                    dataContext: DataContext(DataModel(), '/'),
+                    binder: V08DataBinder(DataContext(DataModel(), '/')),
+                    getComponent: (String componentId) => null,
+                    surfaceId: 'surface1',
+                  ),
                 ),
               ),
             ),

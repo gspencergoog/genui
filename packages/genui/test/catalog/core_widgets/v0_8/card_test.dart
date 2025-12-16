@@ -22,13 +22,20 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {'component': 'Card', 'child': 'text'},
+        props: {
+          'component': {
+            'Card': {'child': 'text'},
+          },
+        },
       ),
       const Component(
         id: 'text',
         props: {
-          'component': 'Text',
-          'text': {'literalString': 'This is a card.'},
+          'component': {
+            'Text': {
+              'text': {'literalString': 'This is a card.'},
+            },
+          },
         },
       ),
     ];
