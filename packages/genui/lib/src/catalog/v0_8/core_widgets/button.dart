@@ -39,7 +39,15 @@ final button = CatalogItem(
             "Button": {
               "child": "text",
               "action": {
-                "name": "button_pressed"
+                "name": "button_pressed",
+                "context": [
+                  {
+                    "key": "filename",
+                    "value": {
+                      "path": "/project/filename"
+                    }
+                  }
+                ]
               }
             }
           }
@@ -49,7 +57,7 @@ final button = CatalogItem(
           "component": {
             "Text": {
               "text": {
-                "literalString": "Hello World"
+                "literalString": "Save"
               }
             }
           }

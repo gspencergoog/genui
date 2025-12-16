@@ -131,7 +131,15 @@ class DataModel {
     );
     if (absolutePath == null || absolutePath.segments.isEmpty) {
       if (contents is List) {
-        _data = _parseDataModelContents(contents);
+        final Object parsed = _parseDataModelContents(contents);
+        if (parsed is Map<String, Object?>) {
+          _data = parsed;
+        } else {
+          genUiLogger.warning(
+            'DataModel.update: contents for root parsed to a List, but root '
+            'must be a Map.',
+          );
+        }
       } else if (contents is Map) {
         // Permissive: Allow a map to be sent for the root, even though the
         // schema expects a list.
@@ -157,13 +165,19 @@ class DataModel {
 
   /// Updates the data model from a V0.8 adjacency list.
   void updateFromAdjacencyList(DataPath? absolutePath, List<Object?> contents) {
-    final JsonMap parsedData = _parseDataModelContents(contents);
+    final Object parsedData = _parseDataModelContents(contents);
     if (absolutePath == null || absolutePath.segments.isEmpty) {
-      // Merge with root
-      for (final entry in parsedData.entries) {
-        _data[entry.key] = entry.value;
+      if (parsedData is Map<String, Object?>) {
+        // Merge with root
+        for (final MapEntry<String, Object?> entry in parsedData.entries) {
+          _data[entry.key] = entry.value;
+        }
+        _notifySubscribers(DataPath.root);
+      } else {
+        genUiLogger.warning(
+          'Root update from adjacency list must be a Map, got: $parsedData',
+        );
       }
-      _notifySubscribers(DataPath.root);
     } else {
       // Update at path
       update(absolutePath, parsedData);
@@ -205,13 +219,18 @@ class DataModel {
     return _getValue(_data, absolutePath.segments) as T?;
   }
 
-  /// Parses a list of content objects into a [JsonMap].
+  /// Parses a list of content objects into a [JsonMap] or [List].
   ///
   /// Each item in [contents] is expected to be a `Map<String, Object?>`
   /// with a 'key' and a single 'valueString', 'valueNumber', 'valueBoolean',
   /// or 'valueMap' entry.
-  JsonMap _parseDataModelContents(List<Object?> contents) {
+  ///
+  /// If all keys are sequential integers starting at 0, returns a [List].
+  /// Otherwise, returns a [JsonMap].
+  Object _parseDataModelContents(List<Object?> contents) {
     final newData = <String, Object?>{};
+    var possibleArray = true;
+
     for (final item in contents) {
       if (item is! Map<String, Object?> || !item.containsKey('key')) {
         genUiLogger.warning('Invalid item in dataModelUpdate contents: $item');
@@ -219,6 +238,12 @@ class DataModel {
       }
 
       final key = item['key'] as String;
+
+      if (possibleArray) {
+        final int? index = int.tryParse(key);
+        if (index == null) possibleArray = false;
+      }
+
       Object? value;
       var valueCount = 0;
 
@@ -227,6 +252,7 @@ class DataModel {
         'valueNumber',
         'valueBoolean',
         'valueMap',
+        'valueList',
       ];
       for (final valueKey in valueKeys) {
         if (item.containsKey(valueKey)) {
@@ -261,6 +287,19 @@ class DataModel {
       }
       newData[key] = value;
     }
+
+    if (possibleArray && newData.isNotEmpty) {
+      final List<int> keys = newData.keys.map(int.parse).toList()..sort();
+      if (keys.first == 0 &&
+          keys.last == keys.length - 1 &&
+          keys.length == newData.length) {
+        return List<Object?>.generate(
+          keys.length,
+          (i) => newData[i.toString()],
+        );
+      }
+    }
+
     return newData;
   }
 

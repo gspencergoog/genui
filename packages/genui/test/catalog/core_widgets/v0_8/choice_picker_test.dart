@@ -126,13 +126,16 @@ void main() {
       manager.handleMessage(
         const v0_8.DataModelUpdate(
           surfaceId: surfaceId,
-          contents: {
-            'mySelections': <String>[],
-            'myOptions': [
-              {'label': 'Simple Option 1', 'value': 's1'},
-              {'label': 'Simple Option 2', 'value': 's2'},
-            ],
-          },
+          contents: [
+            {'key': 'mySelections', 'valueList': <String>[]},
+            {
+              'key': 'myOptions',
+              'valueList': [
+                {'label': 'Simple Option 1', 'value': 's1'},
+                {'label': 'Simple Option 2', 'value': 's2'},
+              ],
+            },
+          ],
         ),
       );
 

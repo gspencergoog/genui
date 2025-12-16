@@ -86,8 +86,9 @@ void main() {
     manager.handleMessage(
       const v0_8.DataModelUpdate(
         surfaceId: 'testSurface',
-        path: '/iconName',
-        contents: 'close',
+        contents: [
+          {'key': 'iconName', 'valueString': 'close'},
+        ],
       ),
     );
     manager.handleMessage(

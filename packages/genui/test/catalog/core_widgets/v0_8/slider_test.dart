@@ -107,7 +107,11 @@ void main() {
     manager.handleMessage(
       const v0_8.DataModelUpdate(
         surfaceId: surfaceId,
-        contents: {'myValue': 5.0, 'myMin': 0.0, 'myMax': 10.0},
+        contents: [
+          {'key': 'myValue', 'valueNumber': 5.0},
+          {'key': 'myMin', 'valueNumber': 0.0},
+          {'key': 'myMax', 'valueNumber': 10.0},
+        ],
       ),
     );
 
@@ -128,7 +132,10 @@ void main() {
     manager.handleMessage(
       const v0_8.DataModelUpdate(
         surfaceId: surfaceId,
-        contents: {'myMin': 2.0, 'myMax': 8.0},
+        contents: [
+          {'key': 'myMin', 'valueNumber': 2.0},
+          {'key': 'myMax', 'valueNumber': 8.0},
+        ],
       ),
     );
     await tester.pumpAndSettle();
