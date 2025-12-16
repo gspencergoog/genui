@@ -17,6 +17,7 @@ import '../a2ui_protocol.dart';
 import '../catalog.dart';
 import '../tools.dart';
 import 'messages.dart';
+import 'schemas.dart';
 
 /// Implementation of the A2UI protocol for version 0.9.
 class A2uiProtocolV09 implements A2uiProtocol {
@@ -75,16 +76,37 @@ class A2uiProtocolV09 implements A2uiProtocol {
 
   @override
   String? getSystemPreamble(Catalog catalog) {
-    final String definition = const JsonEncoder.withIndent(
+    final Map<String, dynamic> catalogSchema = A2uiSchemas.buildCatalogSchema(
+      catalog,
+    );
+    final String catalogJson = const JsonEncoder.withIndent(
       '  ',
-    ).convert(catalog.definition.toJson());
-    return 'You have access to the following UI components:\n'
-        '$definition\n\n'
-        'You must output your response as a stream of JSON objects, one per '
-        'line (JSONL). Each line can be either a plain text response or a '
-        'structured A2UI message (e.g., createSurface, updateComponents). '
-        'Do not wrap the JSON objects in a list or any other structure. '
-        'Just output one JSON object per line.';
+    ).convert(catalogSchema);
+
+    return '''You are an AI assistant. Based on the following request, generate a stream of JSON messages that conform to the provided JSON Schemas.
+
+    The output MUST be a series of JSON objects, each enclosed in a markdown code block (or a single block with multiple objects).
+
+    Standard Instructions:
+    1. Generate a 'createSurface' message with surfaceId 'main' and catalogId '${catalog.catalogId ?? 'https://a2ui.dev/specification/0.9/standard_catalog_definition.json'}'.
+    2. Generate a 'updateComponents' message with surfaceId 'main' containing the requested UI.
+    3. Ensure all component children are referenced by ID (using the 'children' or 'child' property with IDs), NOT nested inline as objects.
+    4. If the request involves data binding, you may also generate 'updateDataModel' messages.
+    5. Among the 'updateComponents' messages in the output, there MUST be one root component with id: 'root'.
+    6. Components need to be nested within a root layout container (Column, Row). No need to add an extra container if the root is already a layout container.
+    7. There shouldn't be any orphaned components: no components should be generated which don't have a parent, except for the root component.
+    8. Do NOT output a list of lists (e.g. [[...]]). Output individual JSON objects separated by newlines.
+    9. STRICTLY follow the JSON Schemas. Do NOT add any properties that are not defined in the schema. Ensure ALL required properties are present.
+    10. Do NOT invent data bindings or action contexts. Only use them if the prompt explicitly asks for them.
+    11. Read the 'description' field of each component in the schema carefully. It contains critical usage instructions (e.g. regarding labels, single child limits, and layout behavior) that you MUST follow.
+    12. Do NOT define components inline inside 'child' or 'children'. Always use a string ID referencing a separate component definition.
+    13. Do NOT use a 'style' property. Use standard properties like 'alignment', 'distribution', 'usageHint', etc.
+    14. Do NOT invent properties that are not in the schema. Check the 'properties' list for each component type.
+
+    Schemas:
+    ${A2uiSchemas.serverToClientJson}
+    ${A2uiSchemas.commonTypesJson}
+    $catalogJson''';
   }
 
   @override

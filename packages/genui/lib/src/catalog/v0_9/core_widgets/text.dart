@@ -10,11 +10,13 @@ import '../../core_widgets/impl/text_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'text': A2uiSchemas.stringReference(description: 'The text to display.'),
-    'usageHint': S.string(
+    'text': A2uiSchemas.stringReference(
       description:
-          'A hint for how the text should be styled (e.g., h1, h2, p).',
-      enumValues: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'caption'],
+          '''The text content to display. While simple Markdown formatting is supported (i.e. without HTML, images, or links), utilizing dedicated UI components is generally preferred for a richer and more structured presentation.''',
+    ),
+    'usageHint': S.string(
+      description: 'A hint for the base text style.',
+      enumValues: ['h1', 'h2', 'h3', 'h4', 'h5', 'caption', 'body'],
     ),
   },
   required: ['text'],

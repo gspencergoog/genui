@@ -10,11 +10,22 @@ import '../../core_widgets/impl/text_field_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'text': A2uiSchemas.stringReference(),
-    'label': A2uiSchemas.stringReference(),
-    'usageHint': S.string(),
+    'label': A2uiSchemas.stringReference(
+      description: 'The text label for the input field.',
+    ),
+    'text': A2uiSchemas.stringReference(
+      description: 'The value of the text field.',
+    ),
+    'usageHint': S.string(
+      description: 'The type of input field to display.',
+      enumValues: ['date', 'longText', 'number', 'shortText', 'obscured'],
+    ),
+    'validationRegexp': S.string(
+      description:
+          'A regular expression used for client-side validation of the input.',
+    ),
   },
-  required: ['text'],
+  required: ['label'],
 );
 
 final textField = CatalogItem(

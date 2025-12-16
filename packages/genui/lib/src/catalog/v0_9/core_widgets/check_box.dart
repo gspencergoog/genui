@@ -13,8 +13,13 @@ import '../../core_widgets/impl/check_box_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'label': A2uiSchemas.stringReference(),
-    'value': A2uiSchemas.booleanReference(),
+    'label': A2uiSchemas.stringReference(
+      description: 'The text to display next to the checkbox.',
+    ),
+    'value': A2uiSchemas.booleanReference(
+      description:
+          '''The current state of the checkbox (true for checked, false for unchecked).''',
+    ),
   },
   required: ['label', 'value'],
 );

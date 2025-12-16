@@ -11,7 +11,10 @@ import '../../core_widgets/impl/audio_player_impl.dart';
 final _schema = S.object(
   properties: {
     'url': A2uiSchemas.stringReference(
-      description: 'The URL of the audio to play.',
+      description: 'The URL of the audio to be played.',
+    ),
+    'description': A2uiSchemas.stringReference(
+      description: 'A description of the audio, such as a title or summary.',
     ),
   },
   required: ['url'],

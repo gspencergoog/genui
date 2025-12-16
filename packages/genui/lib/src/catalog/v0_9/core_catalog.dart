@@ -4,7 +4,7 @@
 
 import '../../model/catalog.dart';
 import '../../model/catalog_item.dart';
-import '../../primitives/constants.dart';
+
 import 'binding.dart';
 import 'core_widgets/audio_player.dart' as audio_player_item;
 import 'core_widgets/button.dart' as button_item;
@@ -133,7 +133,8 @@ class CoreCatalogItems {
         textField,
         video,
       ],
-      catalogId: standardCatalogId,
+      catalogId:
+          'https://a2ui.dev/specification/0.9/standard_catalog_definition.json',
       binderFactory: V09DataBinder.new,
     );
   }

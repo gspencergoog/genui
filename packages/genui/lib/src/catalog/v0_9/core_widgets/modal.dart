@@ -14,10 +14,12 @@ import '../../core_widgets/impl/modal_impl.dart';
 final _schema = S.object(
   properties: {
     'entryPointChild': A2uiSchemas.componentReference(
-      description: 'The widget that opens the modal.',
+      description:
+          '''The ID of the component that opens the modal when interacted with (e.g., a button). Do NOT define the component inline.''',
     ),
     'contentChild': A2uiSchemas.componentReference(
-      description: 'The widget to display in the modal.',
+      description:
+          '''The ID of the component to be displayed inside the modal. Do NOT define the component inline.''',
     ),
   },
   required: ['entryPointChild', 'contentChild'],

@@ -9,7 +9,10 @@ import '../../core_widgets/impl/divider_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'axis': S.string(enumValues: ['horizontal', 'vertical']),
+    'axis': S.string(
+      description: 'The orientation of the divider.',
+      enumValues: ['horizontal', 'vertical'],
+    ),
   },
 );
 

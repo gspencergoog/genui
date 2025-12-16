@@ -12,9 +12,16 @@ import '../../../model/v0_9/schemas.dart';
 import '../../core_widgets/impl/column_impl.dart';
 
 final _schema = S.object(
+  description:
+      '''A layout component that arranges its children vertically. To create a grid layout, nest Rows within this Column.''',
   properties: {
+    'children': A2uiSchemas.childrenProperty(
+      description:
+          '''Defines the children. Use an array of strings for a fixed set of children, or a template object to generate children from a data list. Children cannot be defined inline, they must be referred to by ID.''',
+    ),
     'distribution': S.string(
-      description: 'How children are aligned on the main axis. ',
+      description:
+          '''Defines the arrangement of children along the main axis (vertically). Use 'spaceBetween' to push items to the edges (e.g. header at top, footer at bottom), or 'start'/'end'/'center' to pack them together.''',
       enumValues: [
         'start',
         'center',
@@ -22,18 +29,16 @@ final _schema = S.object(
         'spaceBetween',
         'spaceAround',
         'spaceEvenly',
+        'stretch',
       ],
     ),
     'alignment': S.string(
-      description: 'How children are aligned on the cross axis. ',
-      enumValues: ['start', 'center', 'end', 'stretch', 'baseline'],
-    ),
-    'children': A2uiSchemas.childrenProperty(
       description:
-          'Either an explicit list of widget IDs for the children, or a '
-          'template with a data binding to the list of children.',
+          '''Defines the alignment of children along the cross axis (horizontally). This is similar to the CSS 'align-items' property.''',
+      enumValues: ['center', 'end', 'start', 'stretch'],
     ),
   },
+  required: ['children'],
 );
 
 /// A catalog item representing a layout widget that displays its children in a

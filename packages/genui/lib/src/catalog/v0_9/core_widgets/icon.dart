@@ -11,8 +11,7 @@ import '../../core_widgets/impl/icon_impl.dart';
 final _schema = S.object(
   properties: {
     'name': A2uiSchemas.stringReference(
-      description:
-          '''The name of the icon to display. This can be a literal string ('literalString') or a reference to a value in the data model ('path', e.g. '/icon/name').''',
+      description: 'The name of the icon to display.',
       enumValues: AvailableIcons.allAvailable,
     ),
   },

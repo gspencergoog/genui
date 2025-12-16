@@ -9,7 +9,12 @@ import '../../../model/v0_9/schemas.dart';
 import '../../core_widgets/impl/card_impl.dart';
 
 final _schema = S.object(
-  properties: {'child': A2uiSchemas.componentReference()},
+  properties: {
+    'child': A2uiSchemas.componentReference(
+      description:
+          '''The ID of the single child component to be rendered inside the card. To display multiple elements, you MUST wrap them in a layout component (like Column or Row) and pass that container's ID here. Do NOT pass multiple IDs or a non-existent ID. Do NOT define the child component inline.''',
+    ),
+  },
   required: ['child'],
 );
 

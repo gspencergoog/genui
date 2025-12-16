@@ -12,12 +12,12 @@ import '../../core_widgets/impl/image_impl.dart';
 Schema _schema({required bool enableUsageHint}) {
   final Map<String, Schema> properties = {
     'url': A2uiSchemas.stringReference(
-      description:
-          'Asset path (e.g. assets/...) or network URL (e.g. https://...)',
+      description: 'The URL of the image to display.',
     ),
     'fit': S.string(
-      description: 'How the image should be inscribed into the box.',
-      enumValues: BoxFit.values.map((e) => e.name).toList(),
+      description:
+          '''Specifies how the image should be resized to fit its container. This corresponds to the CSS 'object-fit' property.''',
+      enumValues: ['contain', 'cover', 'fill', 'none', 'scale-down'],
     ),
   };
   if (enableUsageHint) {
@@ -39,7 +39,7 @@ Schema _schema({required bool enableUsageHint}) {
       ],
     );
   }
-  return S.object(properties: properties);
+  return S.object(properties: properties, required: ['url']);
 }
 
 /// Returns a catalog item representing a widget that displays an image.

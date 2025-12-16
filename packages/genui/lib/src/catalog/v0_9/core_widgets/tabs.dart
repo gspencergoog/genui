@@ -12,12 +12,18 @@ import '../../core_widgets/impl/tabs_impl.dart';
 final _schema = S.object(
   properties: {
     'tabItems': S.list(
+      description:
+          '''An array of objects, where each object defines a tab with a title and a child component.''',
       items: S.object(
         properties: {
-          'title': A2uiSchemas.stringReference(),
-          'child': A2uiSchemas.componentReference(),
+          'title': A2uiSchemas.stringReference(description: 'The tab title.'),
+          'child': A2uiSchemas.componentReference(
+            description:
+                '''The ID of the child component. Do NOT define the component inline.''',
+          ),
         },
         required: ['title', 'child'],
+        additionalProperties: false,
       ),
     ),
   },

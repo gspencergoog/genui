@@ -35,7 +35,7 @@ abstract class GoogleGenerativeAiContentGenerator implements ContentGenerator {
   factory GoogleGenerativeAiContentGenerator({
     required Catalog catalog,
     String? systemInstruction,
-    String outputToolName = 'provideFinalOutput',
+    String? outputToolName,
     GenerativeServiceFactory serviceFactory = defaultGenerativeServiceFactory,
     List<AiTool> additionalTools = const [],
     String modelName = 'models/gemini-2.5-flash',
@@ -56,7 +56,7 @@ abstract class GoogleGenerativeAiContentGenerator implements ContentGenerator {
       return GoogleGenerativeAiContentGeneratorV08(
         catalog: catalog,
         systemInstruction: systemInstruction,
-        outputToolName: outputToolName,
+        outputToolName: outputToolName ?? 'provideFinalOutput',
         serviceFactory: serviceFactory,
         additionalTools: additionalTools,
         modelName: modelName,

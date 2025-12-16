@@ -11,11 +11,22 @@ import '../../core_widgets/impl/date_time_input_impl.dart';
 final _schema = S.object(
   properties: {
     'value': A2uiSchemas.stringReference(
-      description: 'The selected date and/or time.',
+      description:
+          'The selected date and/or time value in ISO 8601 format. If not yet set, initialize with an empty string.',
     ),
-    'enableDate': S.boolean(),
-    'enableTime': S.boolean(),
-    'outputFormat': S.string(),
+    'enableDate': S.boolean(
+      description: 'If true, allows the user to select a date.',
+    ),
+    'enableTime': S.boolean(
+      description: 'If true, allows the user to select a time.',
+    ),
+    'outputFormat': S.string(
+      description:
+          '''The desired format for the output string after a date or time is selected.''',
+    ),
+    'label': A2uiSchemas.stringReference(
+      description: 'The text label for the input field.',
+    ),
   },
   required: ['value'],
 );

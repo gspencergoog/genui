@@ -11,9 +11,14 @@ import '../../core_widgets/impl/slider_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'value': A2uiSchemas.numberReference(),
-    'min': A2uiSchemas.numberReference(),
-    'max': A2uiSchemas.numberReference(),
+    'label': A2uiSchemas.stringReference(
+      description: 'The label for the slider.',
+    ),
+    'min': S.number(description: 'The minimum value of the slider.'),
+    'max': S.number(description: 'The maximum value of the slider.'),
+    'value': A2uiSchemas.numberReference(
+      description: 'The current value of the slider.',
+    ),
   },
   required: ['value'],
 );

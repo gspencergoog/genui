@@ -10,11 +10,20 @@ import '../../core_widgets/impl/button_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'child': A2uiSchemas.componentReference(),
-    'primary': S.boolean(),
-    'action': A2uiSchemas.action(),
+    'child': A2uiSchemas.componentReference(
+      description:
+          '''The ID of the child component. Use a 'Text' component for a labeled button. Only use an 'Icon' if the requirements explicitly ask for an icon-only button. Do NOT define the child component inline.''',
+    ),
+    'primary': S.boolean(
+      description:
+          'Indicates if this button should be styled as the primary action.',
+    ),
+    'action': A2uiSchemas.action(
+      description:
+          '''The client-side action to be dispatched when the button is clicked. It includes the action's name and an optional context payload.''',
+    ),
   },
-  required: ['child'],
+  required: ['component', 'child', 'action'],
 );
 
 final button = CatalogItem(

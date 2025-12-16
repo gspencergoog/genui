@@ -13,9 +13,18 @@ import '../../core_widgets/impl/list_impl.dart';
 
 final _schema = S.object(
   properties: {
-    'children': A2uiSchemas.childrenProperty(),
-    'direction': S.string(enumValues: ['vertical', 'horizontal']),
-    'alignment': S.string(enumValues: ['start', 'center', 'end', 'stretch']),
+    'children': A2uiSchemas.childrenProperty(
+      description:
+          '''Defines the children. Use an array of strings for a fixed set of children, or a template object to generate children from a data list.''',
+    ),
+    'direction': S.string(
+      description: 'The direction in which the list items are laid out.',
+      enumValues: ['vertical', 'horizontal'],
+    ),
+    'alignment': S.string(
+      description: 'Defines the alignment of children along the cross axis.',
+      enumValues: ['start', 'center', 'end', 'stretch'],
+    ),
   },
   required: ['children'],
 );

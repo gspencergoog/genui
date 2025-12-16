@@ -12,24 +12,30 @@ import '../../../model/v0_9/schemas.dart';
 import '../../core_widgets/impl/row_impl.dart';
 
 final _schema = S.object(
+  description:
+      '''A layout component that arranges its children horizontally. To create a grid layout, nest Columns within this Row.''',
   properties: {
     'children': A2uiSchemas.childrenProperty(
       description:
-          'Either an explicit list of widget IDs for the children, or a '
-          'template with a data binding to the list of children.',
+          '''Defines the children. Use an array of strings for a fixed set of children, or a template object to generate children from a data list. Children cannot be defined inline, they must be referred to by ID.''',
     ),
     'distribution': S.string(
+      description:
+          '''Defines the arrangement of children along the main axis (horizontally). Use 'spaceBetween' to push items to the edges, or 'start'/'end'/'center' to pack them together.''',
       enumValues: [
-        'start',
         'center',
         'end',
-        'spaceBetween',
         'spaceAround',
+        'spaceBetween',
         'spaceEvenly',
+        'start',
+        'stretch',
       ],
     ),
     'alignment': S.string(
-      enumValues: ['start', 'center', 'end', 'stretch', 'baseline'],
+      description:
+          '''Defines the alignment of children along the cross axis (vertically). This is similar to the CSS 'align-items' property, but uses camelCase values (e.g., 'start').''',
+      enumValues: ['start', 'center', 'end', 'stretch'],
     ),
   },
   required: ['children'],

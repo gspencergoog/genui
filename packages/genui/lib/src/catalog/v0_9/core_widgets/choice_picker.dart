@@ -9,15 +9,38 @@ import '../../../model/v0_9/schemas.dart';
 import '../../core_widgets/impl/choice_picker_impl.dart';
 
 final _schema = S.object(
+  description:
+      'A component that allows selecting one or more options from a list.',
   properties: {
-    'value': A2uiSchemas.stringArrayReference(),
-    'options': A2uiSchemas.objectArrayReference(),
+    'label': A2uiSchemas.stringReference(
+      description: 'The label for the group of options.',
+    ),
     'usageHint': S.string(
-      description: 'Hint for how the choice picker should be displayed.',
+      description:
+          'A hint for how the choice picker should be displayed and behave.',
       enumValues: ['multipleSelection', 'mutuallyExclusive'],
     ),
+    'options': S.list(
+      description: 'The list of available options to choose from.',
+      items: S.object(
+        properties: {
+          'label': A2uiSchemas.stringReference(
+            description: 'The text to display for this option.',
+          ),
+          'value': S.string(
+            description: 'The stable value associated with this option.',
+          ),
+        },
+        required: ['label', 'value'],
+        additionalProperties: false,
+      ),
+    ),
+    'value': A2uiSchemas.stringArrayReference(
+      description:
+          '''The list of currently selected values. This should be bound to a string array in the data model.''',
+    ),
   },
-  required: ['value', 'options'],
+  required: ['options', 'value', 'usageHint'],
 );
 
 /// A catalog item representing a choice picker widget.
