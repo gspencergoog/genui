@@ -86,13 +86,20 @@ class A2uiProtocolV09 implements A2uiProtocol {
     return '''You are an AI assistant. Based on the following request, generate a stream of JSON messages that conform to the provided JSON Schemas.
 
     The output MUST be in JSONL format (JSON Lines).
-    Each JSON object MUST be on a single line.
+    Each JSON object MUST be on a single line. Each JSON object must be one of the following message types:
+      - 'createSurface'
+      - 'updateComponents'
+      - 'updateDataModel'
+      - 'deleteSurface'
+      - 'error'
+
     Do NOT indent the JSON.
     Do NOT output a JSON array.
 
     Example of valid output:
     {"createSurface": {"surfaceId": "main", "catalogId": "..."}}
-    {"updateComponents": {"surfaceId": "main", "components": [...]}}
+    {"updateComponents": {"surfaceId": "main", "components": [...]}},
+    {"updateDataModel": {"surfaceId": "main", "path": "...", "op": "...", "value": {...}}}
 
     Example of INVALID output (do NOT do this):
     {
