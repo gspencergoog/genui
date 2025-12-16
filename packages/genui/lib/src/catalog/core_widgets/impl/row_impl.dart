@@ -69,42 +69,66 @@ Widget rowBuilder(CatalogItemContext itemContext) {
     buildChild: itemContext.buildChild,
     getComponent: itemContext.getComponent,
     explicitListBuilder: (childIds, buildChild, getComponent, dataContext) {
-      return Row(
-        mainAxisAlignment: _parseMainAxisAlignment(rowData.distribution),
-        crossAxisAlignment: _parseCrossAxisAlignment(rowData.alignment),
-        mainAxisSize: MainAxisSize.min,
-        children: childIds
-            .map(
-              (componentId) => buildWeightedChild(
-                componentId: componentId,
-                dataContext: dataContext,
-                buildChild: buildChild,
-                component: getComponent(componentId)!,
-              ),
-            )
-            .toList(),
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final CrossAxisAlignment crossAxisAlignment =
+              _parseCrossAxisAlignment(rowData.alignment);
+          final CrossAxisAlignment effectiveCrossAxisAlignment =
+              crossAxisAlignment == CrossAxisAlignment.stretch &&
+                  constraints.maxHeight == double.infinity
+              ? CrossAxisAlignment.start
+              : crossAxisAlignment;
+
+          return Row(
+            mainAxisAlignment: _parseMainAxisAlignment(rowData.distribution),
+            crossAxisAlignment: effectiveCrossAxisAlignment,
+            mainAxisSize: MainAxisSize.min,
+            children: childIds
+                .map(
+                  (componentId) => buildWeightedChild(
+                    componentId: componentId,
+                    dataContext: dataContext,
+                    buildChild: buildChild,
+                    component: getComponent(componentId)!,
+                  ),
+                )
+                .toList(),
+          );
+        },
       );
     },
     templateListWidgetBuilder: (context, list, componentId, dataBinding) {
       if (list is! List) {
         return const SizedBox.shrink();
       }
-      return Row(
-        mainAxisAlignment: _parseMainAxisAlignment(rowData.distribution),
-        crossAxisAlignment: _parseCrossAxisAlignment(rowData.alignment),
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var i = 0; i < list.length; i++) ...[
-            buildWeightedChild(
-              componentId: componentId,
-              dataContext: itemContext.dataContext.nested(
-                DataPath('$dataBinding/$i'),
-              ),
-              buildChild: itemContext.buildChild,
-              component: itemContext.getComponent(componentId),
-            ),
-          ],
-        ],
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final CrossAxisAlignment crossAxisAlignment =
+              _parseCrossAxisAlignment(rowData.alignment);
+          final CrossAxisAlignment effectiveCrossAxisAlignment =
+              crossAxisAlignment == CrossAxisAlignment.stretch &&
+                  constraints.maxHeight == double.infinity
+              ? CrossAxisAlignment.start
+              : crossAxisAlignment;
+
+          return Row(
+            mainAxisAlignment: _parseMainAxisAlignment(rowData.distribution),
+            crossAxisAlignment: effectiveCrossAxisAlignment,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < list.length; i++) ...[
+                buildWeightedChild(
+                  componentId: componentId,
+                  dataContext: itemContext.dataContext.nested(
+                    DataPath('$dataBinding/$i'),
+                  ),
+                  buildChild: itemContext.buildChild,
+                  component: itemContext.getComponent(componentId),
+                ),
+              ],
+            ],
+          );
+        },
       );
     },
   );

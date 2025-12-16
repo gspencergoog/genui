@@ -145,4 +145,93 @@ void main() {
       findsNothing,
     );
   });
+
+  // Verify that Row handles unbounded vertical constraints + stretch safely
+  testWidgets(
+    'Row widget forces start alignment if height is unbounded and alignment is stretch',
+    (WidgetTester tester) async {
+      final manager = A2uiMessageProcessor(
+        catalogs: [
+          Catalog(
+            [
+              CoreCatalogItems.row,
+              CoreCatalogItems.column,
+              CoreCatalogItems.text,
+            ],
+            catalogId: standardCatalogId,
+            binderFactory: V09DataBinder.new,
+            componentParser: const V09ComponentParser(),
+          ),
+        ],
+      );
+      const surfaceId = 'testSurface';
+      // Similar structure to the reproduction test
+      final components = [
+        const Component(
+          id: 'root',
+          props: {
+            'component': 'Column',
+            'alignment': 'stretch',
+            'children': ['row'],
+          },
+        ),
+        const Component(
+          id: 'row',
+          props: {
+            'component': 'Row',
+            'alignment':
+                'stretch', // Should be converted to start due to unbounded height
+            'children': ['col1', 'col2'],
+          },
+        ),
+        const Component(
+          id: 'col1',
+          props: {
+            'component': 'Column',
+            'children': ['text1'],
+          },
+        ),
+        const Component(
+          id: 'text1',
+          props: {'component': 'Text', 'text': 'Col 1'},
+        ),
+        const Component(
+          id: 'col2',
+          props: {
+            'component': 'Column',
+            'children': ['text2'],
+          },
+        ),
+        const Component(
+          id: 'text2',
+          props: {'component': 'Text', 'text': 'Col 2'},
+        ),
+      ];
+
+      manager.handleMessage(
+        v0_9.UpdateComponents(surfaceId: surfaceId, components: components),
+      );
+      manager.handleMessage(
+        const v0_9.CreateSurface(
+          surfaceId: surfaceId,
+          catalogId: standardCatalogId,
+        ),
+      );
+
+      // Use ListView to provide unbounded height
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ListView(
+              children: [GenUiSurface(host: manager, surfaceId: surfaceId)],
+            ),
+          ),
+        ),
+      );
+
+      // Should not crash
+      expect(find.text('Col 1'), findsOneWidget);
+      expect(find.text('Col 2'), findsOneWidget);
+    },
+  );
 }
