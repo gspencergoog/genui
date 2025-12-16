@@ -16,7 +16,7 @@ import 'model.dart';
 /// Generates a technical prompt for GenUI.
 String genUiTechPrompt(List<String> toolNames) {
   return '''
-${GenUiPromptFragments.basicChat}
+${GenUiPromptFragments.getBasicChat(A2uiProtocolVersion.v0_8)}
 
 You have access to the following tools: ${toolNames.join(', ')}.
 Use these tools to generate UI components when requested.
