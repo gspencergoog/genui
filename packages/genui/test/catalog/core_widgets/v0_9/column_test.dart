@@ -145,4 +145,62 @@ void main() {
       findsNothing,
     );
   });
+
+  // Verify that Column handles unbounded horizontal constraints + stretch safely
+  testWidgets(
+    'Column widget forces start alignment if width is unbounded and alignment is stretch',
+    (WidgetTester tester) async {
+      final manager = A2uiMessageProcessor(
+        catalogs: [
+          Catalog(
+            [CoreCatalogItems.column, CoreCatalogItems.text],
+            catalogId: standardCatalogId,
+            binderFactory: V09DataBinder.new,
+            componentParser: const V09ComponentParser(),
+          ),
+        ],
+      );
+      const surfaceId = 'testSurface';
+      final components = [
+        const Component(
+          id: 'root',
+          props: {
+            'component': 'Column',
+            'alignment':
+                'stretch', // Should be converted to start due to unbounded width
+            'children': ['text1'],
+          },
+        ),
+        const Component(
+          id: 'text1',
+          props: {'component': 'Text', 'text': 'Test Text'},
+        ),
+      ];
+
+      manager.handleMessage(
+        v0_9.UpdateComponents(surfaceId: surfaceId, components: components),
+      );
+      manager.handleMessage(
+        const v0_9.CreateSurface(
+          surfaceId: surfaceId,
+          catalogId: standardCatalogId,
+        ),
+      );
+
+      // Use SingleChildScrollView with horizontal scrolling to provide unbounded width
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: GenUiSurface(host: manager, surfaceId: surfaceId),
+            ),
+          ),
+        ),
+      );
+
+      // Should not crash
+      expect(find.text('Test Text'), findsOneWidget);
+    },
+  );
 }

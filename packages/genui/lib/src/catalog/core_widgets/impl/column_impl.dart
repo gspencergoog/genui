@@ -67,42 +67,66 @@ Widget columnBuilder(CatalogItemContext itemContext) {
     buildChild: itemContext.buildChild,
     getComponent: itemContext.getComponent,
     explicitListBuilder: (childIds, buildChild, getComponent, dataContext) {
-      return Column(
-        mainAxisAlignment: _parseMainAxisAlignment(columnData.distribution),
-        crossAxisAlignment: _parseCrossAxisAlignment(columnData.alignment),
-        mainAxisSize: MainAxisSize.min,
-        children: childIds
-            .map(
-              (componentId) => buildWeightedChild(
-                componentId: componentId,
-                dataContext: dataContext,
-                buildChild: buildChild,
-                component: getComponent(componentId)!,
-              ),
-            )
-            .toList(),
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final CrossAxisAlignment crossAxisAlignment =
+              _parseCrossAxisAlignment(columnData.alignment);
+          final CrossAxisAlignment effectiveCrossAxisAlignment =
+              crossAxisAlignment == CrossAxisAlignment.stretch &&
+                  constraints.maxWidth == double.infinity
+              ? CrossAxisAlignment.start
+              : crossAxisAlignment;
+
+          return Column(
+            mainAxisAlignment: _parseMainAxisAlignment(columnData.distribution),
+            crossAxisAlignment: effectiveCrossAxisAlignment,
+            mainAxisSize: MainAxisSize.min,
+            children: childIds
+                .map(
+                  (componentId) => buildWeightedChild(
+                    componentId: componentId,
+                    dataContext: dataContext,
+                    buildChild: buildChild,
+                    component: getComponent(componentId)!,
+                  ),
+                )
+                .toList(),
+          );
+        },
       );
     },
     templateListWidgetBuilder: (context, list, componentId, dataBinding) {
       if (list is! List) {
         return const SizedBox.shrink();
       }
-      return Column(
-        mainAxisAlignment: _parseMainAxisAlignment(columnData.distribution),
-        crossAxisAlignment: _parseCrossAxisAlignment(columnData.alignment),
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var i = 0; i < list.length; i++) ...[
-            buildWeightedChild(
-              componentId: componentId,
-              dataContext: itemContext.dataContext.nested(
-                DataPath('$dataBinding/$i'),
-              ),
-              buildChild: itemContext.buildChild,
-              component: itemContext.getComponent(componentId),
-            ),
-          ],
-        ],
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final CrossAxisAlignment crossAxisAlignment =
+              _parseCrossAxisAlignment(columnData.alignment);
+          final CrossAxisAlignment effectiveCrossAxisAlignment =
+              crossAxisAlignment == CrossAxisAlignment.stretch &&
+                  constraints.maxWidth == double.infinity
+              ? CrossAxisAlignment.start
+              : crossAxisAlignment;
+
+          return Column(
+            mainAxisAlignment: _parseMainAxisAlignment(columnData.distribution),
+            crossAxisAlignment: effectiveCrossAxisAlignment,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < list.length; i++) ...[
+                buildWeightedChild(
+                  componentId: componentId,
+                  dataContext: itemContext.dataContext.nested(
+                    DataPath('$dataBinding/$i'),
+                  ),
+                  buildChild: itemContext.buildChild,
+                  component: itemContext.getComponent(componentId),
+                ),
+              ],
+            ],
+          );
+        },
       );
     },
   );
