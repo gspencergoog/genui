@@ -57,7 +57,7 @@ Widget textBuilder(CatalogItemContext itemContext) {
       style = textTheme.bodySmall;
     case 'p':
     default:
-      style = textTheme.bodyMedium;
+      style = DefaultTextStyle.of(itemContext.buildContext).style;
   }
 
   return Padding(

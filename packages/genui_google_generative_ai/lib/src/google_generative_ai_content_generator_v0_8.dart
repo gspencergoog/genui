@@ -308,7 +308,7 @@ class GoogleGenerativeAiContentGeneratorV08
         google_ai.Part(
           functionResponse: google_ai.FunctionResponse(
             id: call.id,
-            name: call.name!,
+            name: call.name,
             response: protobuf.Struct.fromJson(toolResult),
           ),
         ),
