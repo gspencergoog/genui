@@ -1,4 +1,4 @@
-import 'package:dart_automerge/dart_automerge.dart';
+import 'package:automerge/automerge.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

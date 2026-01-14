@@ -1,6 +1,6 @@
-# dart_automerge_example
+# automerge_example
 
-Demonstrates how to use the dart_automerge plugin.
+Demonstrates how to use the automerge plugin.
 
 ## Getting Started
 

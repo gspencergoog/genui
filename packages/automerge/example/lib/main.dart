@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:dart_automerge/dart_automerge.dart';
+import 'package:automerge/automerge.dart';
 import 'package:flutter/material.dart';
 
 /// Entry point for the Automerge Sync Demo.

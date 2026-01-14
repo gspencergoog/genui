@@ -1,5 +1,5 @@
-name: dart_automerge_example
-description: "Demonstrates how to use the dart_automerge plugin."
+name: automerge_example
+description: "Demonstrates how to use the automerge plugin."
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -9,7 +9,7 @@ environment:
   sdk: ^3.10.7
 
 dependencies:
-  dart_automerge:
+  automerge:
     path: ../
   flutter:
     sdk: flutter

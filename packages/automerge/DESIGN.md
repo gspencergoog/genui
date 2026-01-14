@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-This package, `dart_automerge`, provides a high-performance, idiomatic Dart API for [Automerge](https://automerge.org/), a CRDT (Conflict-free Replicated Data Type) library.
+This package, `automerge`, provides a high-performance, idiomatic Dart API for [Automerge](https://automerge.org/), a CRDT (Conflict-free Replicated Data Type) library.
 
 The integration strategy relies on **Flutter Rust Bridge (FRB)** to interface with the robust **Rust** implementation of Automerge, and leverages **Autosurgeon** to simplify the complexity of data synchronization and patch application.
 
@@ -159,8 +159,8 @@ _Note: We can optimize passing JSON strings by using something more binary effic
 
 ### 5.2 Flutter Rust Bridge Setup
 
-- **Directory**: `packages/dart_automerge`
-- **Command**: `flutter_rust_bridge_codegen create packages/dart_automerge --template plugin`
+- **Directory**: `packages/automerge`
+- **Command**: `flutter_rust_bridge_codegen create packages/automerge --template plugin`
 - Dependency versions should track the latest stable `automerge` and `autosurgeon`.
 
 ## 6. Future Considerations

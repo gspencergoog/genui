@@ -16,8 +16,8 @@ workspace:
   - examples/simple_chat
   - examples/travel_app
   - examples/verdure/client
-  - packages/dart_automerge
-  - packages/dart_automerge/example
+  - packages/automerge
+  - packages/automerge/example
   - packages/genui
   - packages/genui_a2ui
   - packages/genui_a2ui/example

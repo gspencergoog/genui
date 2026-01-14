@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:dart_automerge/dart_automerge.dart';
+import 'package:automerge/automerge.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:integration_test/integration_test.dart';
