@@ -8,6 +8,27 @@ This project is a starting point for a Flutter
 [FFI plugin](https://flutter.dev/to/ffi-package),
 a specialized package that includes native code directly invoked with Dart FFI.
 
+## Prerequisites
+
+To build the native Rust code contained in this package, you must have the Rust toolchain installed.
+
+### Linux
+- **Rust**: Building requires `rustc` and `cargo`. We recommend installing via `rustup`:
+  ```bash
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  ```
+
+### macOS / iOS
+- **Rust**: Install via `rustup` (same as Linux).
+- **Xcode**: Required for compiling the C wrapper and linking.
+
+### Windows
+- **Rust**: Install via `rustup` (download from [rustup.rs](https://rustup.rs)).
+- **Visual Studio**: "Desktop development with C++" workload is required.
+
+### Android
+- **Android SDK**: Must be installed. The build tool handles the NDK downloading and configuration automatically.
+
 ## Project structure
 
 This template uses the following structure:
