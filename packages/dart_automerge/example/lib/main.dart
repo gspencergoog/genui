@@ -72,25 +72,22 @@ class _TwoDocsSyncPageState extends State<TwoDocsSyncPage> {
     _initDocs();
   }
 
-  /// Initializes two independent documents and their empty states.
+  /// Initializes the local documents, simulating a "shared start" state.
   Future<void> _initDocs() async {
-    // 1. Create two independent, empty documents.
-    //    [Doc.newDoc()] allocates a new Automerge backend in Rust.
+    // 1. Create Doc A and initialize its state.
+    //    We explicitly initialize the 'todos' list here.
     final docA = await Doc.newDoc();
-    final docB = await Doc.newDoc();
-
-    // 2. Initialize the schema for both documents.
-    //    We want a top-level 'todos' list.
-    //    Note: Automerge documents don't enforce schemas, but it's good practice
-    //    to initialize known containers.
     await docA.update((root) async {
       return {'todos': <Map<String, dynamic>>[]};
     });
-    // B starts fully independent. In a real scenario, B might clone A or start empty.
-    // Here we initialize it with the same structure so UI doesn't crash.
-    await docB.update((root) async {
-      return {'todos': <Map<String, dynamic>>[]};
-    });
+
+    // 2. Clone Doc B from Doc A.
+    //    This simulates a scenario where Device B starts with a copy of the
+    //    application state (e.g. pulled from a server or shared file).
+    //    Crucially, this ensures both docs share the same history for the
+    //    'todos' list creation, preventing a merge conflict where one list
+    //    completely overwrites the other.
+    final docB = await docA.fork();
 
     // 3. Create SyncStates.
     //    These are persistent state machines used by the sync protocol to minimize
