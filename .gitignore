@@ -28,6 +28,17 @@ dist/
 .coverage
 htmlcov/
 
+# Rust
+**/target/
+**/vendor/
+**/*.rs.bk
+**/*.rs.bak
+**/*.rs.old
+**/*.rs.orig
+**/*.rs.rej
+**/*.rs~
+Cargo.lock
+
 # ==============================================================================
 #
 # STANDARD FLUTTER GITIGNORE

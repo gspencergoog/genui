@@ -1,0 +1,111 @@
+name: Build Automerge Binaries
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build_android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,x86_64-linux-android
+      - uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25c
+      - name: Build Android
+        run: |
+          cd packages/automerge/rust
+          cargo install cargo-ndk
+          cargo ndk -t arm64-v8a -t x86_64 -o ../android/src/main/jniLibs build --release
+      - name: Archive Android Libs
+        run: |
+          cd packages/automerge/android/src/main/jniLibs
+          tar -czvf android_libs.tar.gz .
+      - uses: actions/upload-artifact@v3
+        with:
+          name: android_libs
+          path: packages/automerge/android/src/main/jniLibs/android_libs.tar.gz
+  build_ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios,x86_64-apple-ios
+      - name: Install cargo-lipo
+        run: cargo install cargo-lipo
+      - name: Build iOS
+        run: |
+          cd packages/automerge/rust
+          cargo lipo --release
+          mv target/universal/release/libdart_automerge.a .
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ios_libs
+          path: packages/automerge/rust/libdart_automerge.a
+  build_macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+      - name: Build macOS
+        run: |
+          cd packages/automerge/rust
+          cargo build --release --target aarch64-apple-darwin
+          cargo build --release --target x86_64-apple-darwin
+          lipo -create -output libdart_automerge.dylib target/aarch64-apple-darwin/release/libdart_automerge.dylib target/x86_64-apple-darwin/release/libdart_automerge.dylib
+      - uses: actions/upload-artifact@v3
+        with:
+          name: macos_libs
+          path: packages/automerge/rust/libdart_automerge.dylib
+
+  build_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build Linux
+        run: |
+          cd packages/automerge/rust
+          cargo build --release
+      - uses: actions/upload-artifact@v3
+        with:
+          name: linux_libs
+          path: packages/automerge/rust/target/release/libdart_automerge.so
+
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build Windows
+        run: |
+          cd packages/automerge/rust
+          cargo build --release
+      - uses: actions/upload-artifact@v3
+        with:
+          name: windows_libs
+          path: packages/automerge/rust/target/release/dart_automerge.dll
+
+  release:
+    needs: [build_android, build_ios, build_macos, build_windows, build_linux]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/download-artifact@v3
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            android_libs/android_libs.tar.gz
+            ios_libs/libdart_automerge.a
+            macos_libs/libdart_automerge.dylib
+            windows_libs/dart_automerge.dll
+            linux_libs/libdart_automerge.so

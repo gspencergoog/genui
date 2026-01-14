@@ -1,6 +1,6 @@
 name: automerge
-description: "A new Flutter FFI plugin project."
-version: 0.0.1
+description: "A Dart FFI plugin for automerge."
+version: 0.1.0
 homepage:
 
 resolution: workspace
