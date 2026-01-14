@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:dart_automerge/src/rust/api/doc.dart';
-import 'package:dart_automerge/src/rust/api/sync.dart' as sync_api;
-import 'package:dart_automerge/src/rust/api/sync.dart' show SyncStateHandle;
+import 'rust/api/doc.dart';
+import 'rust/api/sync.dart' as sync_api;
+import 'rust/api/sync.dart' show SyncStateHandle;
 
 class Doc {
   final DocHandle _handle;
@@ -13,37 +13,38 @@ class Doc {
 
   /// Creates a new, empty document.
   static Future<Doc> newDoc() async {
-    final handle = await DocHandle.newInstance();
+    final DocHandle handle = await DocHandle.newInstance();
     return Doc._(handle);
   }
 
   /// Loads a document from a binary byte array.
   static Future<Doc> load(Uint8List bytes) async {
-    final handle = await DocHandle.load(bytes: bytes);
+    final DocHandle handle = await DocHandle.load(bytes: bytes);
     return Doc._(handle);
   }
 
   /// Gets the current state of the document as a plain Dart object (Map/List).
-  Future<dynamic> get value async {
-    final jsonStr = await _handle.hydrateJson();
+  Future<Object?> get value async {
+    final String jsonStr = await _handle.hydrateJson();
     return jsonDecode(jsonStr);
   }
 
-  /// Updates the document by providing a callback that modifies the logical state.
+  /// Updates the document by providing a callback that modifies the logical
+  /// state.
   ///
   /// The [handler] receives the current state. The return value of [handler]
   /// is reconciled into the document.
   Future<void> update(
-    FutureOr<dynamic> Function(dynamic current) handler,
+    FutureOr<Object?> Function(Object? current) handler,
   ) async {
-    final current = await value;
-    final newValue = await handler(current);
+    final Object? current = await value;
+    final Object? newValue = await handler(current);
     await reconcile(newValue);
   }
 
   /// Directly reconciles a new value into the document root.
-  Future<void> reconcile(dynamic newValue) async {
-    final jsonStr = jsonEncode(newValue);
+  Future<void> reconcile(Object? newValue) async {
+    final String jsonStr = jsonEncode(newValue);
     await _handle.reconcileJson(jsonStr: jsonStr);
   }
 
@@ -54,7 +55,7 @@ class Doc {
 
   /// Forks the document at the current head.
   Future<Doc> fork() async {
-    final newHandle = await _handle.fork();
+    final DocHandle newHandle = await _handle.fork();
     return Doc._(newHandle);
   }
 
@@ -93,7 +94,7 @@ class SyncState {
   SyncState._(this._handle);
 
   static Future<SyncState> create() async {
-    final handle = await SyncStateHandle.create();
+    final sync_api.SyncStateHandle handle = await SyncStateHandle.create();
     return SyncState._(handle);
   }
 

@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:dart_automerge/dart_automerge.dart';
 import 'package:flutter/material.dart';
 
 /// Entry point for the Automerge Sync Demo.
 ///
-/// Initializes the Rust bridge ([RustLib.init()]) before running the Flutter app.
+/// Initializes the Rust bridge ([RustLib.init]) before running the Flutter app.
 Future<void> main() async {
   // Ensure the Rust library is initialized before using any Automerge APIs.
   // This loads the compiled native library and sets up the FFI bridge.
@@ -31,7 +32,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// A page demonstrating real-time synchronization between two local [Doc] instances.
+/// A page demonstrating real-time synchronization between two local [Doc]
+/// instances.
 ///
 /// This simulates a distributed system where "Device A" and "Device B" are
 /// modified independently and synced manually via a simulated network loop.
@@ -61,8 +63,8 @@ class _TwoDocsSyncPageState extends State<TwoDocsSyncPage> {
   // Local state mirrors for UI rendering.
   // Automerge Docs are opaque handles; we "hydrate" them into pure Dart Maps/Lists
   // for easy consumption by Flutter widgets.
-  Map<String, dynamic> _dataA = {};
-  Map<String, dynamic> _dataB = {};
+  Map<String, Object?> _dataA = {};
+  Map<String, Object?> _dataB = {};
 
   bool _isSyncing = false;
 
@@ -76,9 +78,9 @@ class _TwoDocsSyncPageState extends State<TwoDocsSyncPage> {
   Future<void> _initDocs() async {
     // 1. Create Doc A and initialize its state.
     //    We explicitly initialize the 'todos' list here.
-    final docA = await Doc.newDoc();
+    final Doc docA = await Doc.newDoc();
     await docA.update((root) async {
-      return {'todos': <Map<String, dynamic>>[]};
+      return {'todos': <Map<String, Object?>>[]};
     });
 
     // 2. Clone Doc B from Doc A.
@@ -87,13 +89,13 @@ class _TwoDocsSyncPageState extends State<TwoDocsSyncPage> {
     //    Crucially, this ensures both docs share the same history for the
     //    'todos' list creation, preventing a merge conflict where one list
     //    completely overwrites the other.
-    final docB = await docA.fork();
+    final Doc docB = await docA.fork();
 
     // 3. Create SyncStates.
-    //    These are persistent state machines used by the sync protocol to minimize
-    //    data transfer. They track "Have/Need" bloom filters.
-    final syncA = await SyncState.create();
-    final syncB = await SyncState.create();
+    //    These are persistent state machines used by the sync protocol to
+    //    minimize data transfer. They track "Have/Need" bloom filters.
+    final SyncState syncA = await SyncState.create();
+    final SyncState syncB = await SyncState.create();
 
     setState(() {
       _docA = docA;
@@ -107,15 +109,15 @@ class _TwoDocsSyncPageState extends State<TwoDocsSyncPage> {
 
   /// Reads the current value from both docs and updates the UI state.
   ///
-  /// This calls [doc.value], which internally uses [autosurgeon] to hydrate
-  /// the Rust CRDT state into a standard Dart [Map<String, dynamic>].
+  /// This calls [Doc.value], which internally uses autosurgeon to hydrate
+  /// the Rust CRDT state into a standard Dart [Map<String, Object?>].
   Future<void> _refreshData() async {
     if (_docA == null || _docB == null) return;
-    final valA = await _docA!.value;
-    final valB = await _docB!.value;
+    final Object? valA = await _docA!.value;
+    final Object? valB = await _docB!.value;
     setState(() {
-      _dataA = valA;
-      _dataB = valB;
+      _dataA = Map<String, Object?>.from(valA as Map);
+      _dataB = Map<String, Object?>.from(valB as Map);
     });
   }
 
@@ -127,8 +129,8 @@ class _TwoDocsSyncPageState extends State<TwoDocsSyncPage> {
   Future<void> _addTodo(Doc doc, String owner) async {
     await doc.update((root) {
       // 1. Get the current list of todos (or empty list if missing)
-      final todos =
-          (root['todos'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+      final List<Map<String, Object?>> todos =
+          ((root as Map)['todos'] as List?)?.cast<Map<String, Object?>>() ?? [];
 
       // 2. Add the new item.
       //    We rely on Random ID to avoid collisions, though Automerge handles
@@ -151,12 +153,12 @@ class _TwoDocsSyncPageState extends State<TwoDocsSyncPage> {
   /// Toggles the 'done' status of a Todo at [index].
   Future<void> _toggleTodo(Doc doc, int index) async {
     await doc.update((root) {
-      final todos =
-          (root['todos'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+      final List<Map<String, Object?>> todos =
+          ((root as Map)['todos'] as List?)?.cast<Map<String, Object?>>() ?? [];
       if (index < todos.length) {
         // Modifying a field deep in the JSON structure.
         // Automerge tracks this precise change (not a full object replacement).
-        todos[index]['done'] = !todos[index]['done'];
+        todos[index]['done'] = !(todos[index]['done'] as bool);
       }
       return {'todos': todos};
     });
@@ -172,25 +174,31 @@ class _TwoDocsSyncPageState extends State<TwoDocsSyncPage> {
     setState(() => _isSyncing = true);
 
     try {
-      bool changed = true;
-      int rounds = 0;
+      var changed = true;
+      var rounds = 0;
 
       // Loop until no more messages are generated (convergence).
-      // In a real app, this would be an event loop over a WebSocket or peer connection.
+      // In a real app, this would be an event loop over a WebSocket or
+      // peer connection.
       while (changed && rounds < 10) {
         changed = false;
         rounds++;
 
         // 1. Generate message from A to B (A tells B what it knows/needs)
-        final msgA = await _docA!.generateSyncMessage(_syncStateAtoB!);
+        final Uint8List? msgA = await _docA!.generateSyncMessage(
+          _syncStateAtoB!,
+        );
         if (msgA != null) {
-          // 2. B receives message from A, updates its state, and maybe generating a response next
+          // 2. B receives message from A, updates its state, and maybe
+          // generating a response next
           await _docB!.receiveSyncMessage(_syncStateBtoA!, msgA);
           changed = true;
         }
 
         // 3. Generate message from B to A (B responds with missing data)
-        final msgB = await _docB!.generateSyncMessage(_syncStateBtoA!);
+        final Uint8List? msgB = await _docB!.generateSyncMessage(
+          _syncStateBtoA!,
+        );
         if (msgB != null) {
           // 4. A receives message from B
           await _docA!.receiveSyncMessage(_syncStateAtoB!, msgB);
@@ -263,9 +271,9 @@ class _TwoDocsSyncPageState extends State<TwoDocsSyncPage> {
 /// A reusable widget to display the state of a single Document.
 class _DocView extends StatelessWidget {
   final String label;
-  final Map<String, dynamic> data;
+  final Map<String, Object?> data;
   final VoidCallback onAdd;
-  final Function(int) onToggle;
+  final void Function(int) onToggle;
   final Color color;
 
   const _DocView({
@@ -278,7 +286,7 @@ class _DocView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final todos = (data['todos'] as List?) ?? [];
+    final List<dynamic> todos = (data['todos'] as List?) ?? [];
 
     return Container(
       color: color,
@@ -298,10 +306,11 @@ class _DocView extends StatelessWidget {
             child: ListView.builder(
               itemCount: todos.length,
               itemBuilder: (context, index) {
-                final todo = todos[index];
-                final title = todo['title'] ?? 'Untitled';
+                final Map<String, Object?> todo = (todos[index] as Map)
+                    .cast<String, Object?>();
+                final String title = (todo['title'] as String?) ?? 'Untitled';
                 final isDone = todo['done'] == true;
-                final owner = todo['created_by'] ?? '?';
+                final String owner = (todo['created_by'] as String?) ?? '?';
 
                 return ListTile(
                   title: Text(

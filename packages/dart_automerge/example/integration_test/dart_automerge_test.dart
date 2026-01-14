@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dart_automerge/dart_automerge.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -10,7 +12,7 @@ void main() {
   });
 
   test('Doc creation and update', () async {
-    final doc = await Doc.newDoc();
+    final Doc doc = await Doc.newDoc();
     await doc.update((current) async {
       return {
         'key': 'value',
@@ -18,7 +20,8 @@ void main() {
       };
     });
 
-    final value = await doc.value;
+    final Map<String, Object?> value = (await doc.value as Map)
+        .cast<String, Object?>();
     expect(
       value,
       equals({
@@ -29,8 +32,8 @@ void main() {
   });
 
   test('Doc sync', () async {
-    final doc1 = await Doc.newDoc();
-    final doc2 = await Doc.newDoc();
+    final Doc doc1 = await Doc.newDoc();
+    final Doc doc2 = await Doc.newDoc();
 
     // Update doc1
     await doc1.update((current) async {
@@ -38,14 +41,14 @@ void main() {
     });
 
     // Create sync states
-    final syncState1 = await SyncState.create();
-    final syncState2 = await SyncState.create();
+    final SyncState syncState1 = await SyncState.create();
+    final SyncState syncState2 = await SyncState.create();
 
     // Exchange messages until synchronized
     // Simulating a simple loop
     for (var i = 0; i < 5; i++) {
-      final msg1 = await doc1.generateSyncMessage(syncState1);
-      final msg2 = await doc2.generateSyncMessage(syncState2);
+      final Uint8List? msg1 = await doc1.generateSyncMessage(syncState1);
+      final Uint8List? msg2 = await doc2.generateSyncMessage(syncState2);
 
       if (msg1 == null && msg2 == null) break;
 
@@ -57,7 +60,8 @@ void main() {
       }
     }
 
-    final val2 = await doc2.value;
+    final Map<String, Object?> val2 = (await doc2.value as Map)
+        .cast<String, Object?>();
     expect(val2, equals({'shared': 'data'}));
   });
 }
