@@ -1,7 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+
+import 'init_stub.dart'
+    if (dart.library.io) 'init_io.dart'
+    if (dart.library.js_interop) 'init_web.dart';
 
 import 'package:automerge/automerge.dart';
 import 'package:flutter/material.dart';
@@ -12,14 +15,7 @@ import 'package:flutter/material.dart';
 Future<void> main() async {
   // Ensure the Rust library is initialized before using any Automerge APIs.
   // This loads the compiled native library and sets up the FFI bridge.
-  if (Platform.isIOS || Platform.isMacOS) {
-    // On iOS and macOS, the library is statically linked.
-    await RustLib.init(
-      externalLibrary: ExternalLibrary.process(iKnowHowToUseIt: true),
-    );
-  } else {
-    await RustLib.init();
-  }
+  await initPlatformState();
   runApp(const MyApp());
 }
 

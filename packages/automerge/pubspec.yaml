@@ -41,6 +41,10 @@ flutter:
   # adding or updating assets for this project.
   #
   # Please refer to README.md for a detailed explanation.
+  assets:
+    - assets/pkg/dart_automerge.js
+    - assets/pkg/dart_automerge_bg.wasm
+
   plugin:
     platforms:
       android:
@@ -53,6 +57,9 @@ flutter:
         ffiPlugin: true
       windows:
         ffiPlugin: true
+      web:
+        pluginClass: AutomergeWeb
+        fileName: automerge_web.dart
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
