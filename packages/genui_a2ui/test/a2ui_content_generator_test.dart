@@ -107,7 +107,7 @@ void main() {
       final completer = Completer<A2uiMessage>();
       contentGenerator.a2uiMessageStream.listen(completer.complete);
 
-      final testMessage = A2uiMessage.fromJson({
+      final A2uiMessage testMessage = const A2uiProtocolV08().parseJson({
         'surfaceUpdate': {
           'surfaceId': 's1',
           'components': [

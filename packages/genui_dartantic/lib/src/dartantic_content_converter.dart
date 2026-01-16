@@ -63,7 +63,7 @@ class DartanticContentConverter {
   }
 
   /// Converts GenUI chat history to a list of dartantic
-  /// [dartantic.ChatMessage].
+  /// [genui.ChatMessage].
   ///
   /// Maps GenUI message types to dartantic roles:
   /// - [genui.UserMessage], [genui.UserUiInteractionMessage] ->

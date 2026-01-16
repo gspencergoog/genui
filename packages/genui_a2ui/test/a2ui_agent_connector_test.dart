@@ -112,6 +112,9 @@ void main() {
       ]);
       final String? responseText = await connector.connectAndSend(userMessage);
 
+      // Allow microtasks to complete for stream processing
+      await Future<void>.delayed(Duration.zero);
+
       expect(responseText, 'Hello');
       expect(fakeClient.lastMessageStreamParams, isNotNull);
       final a2a.Message sentMessage = fakeClient.lastMessageStreamParams!;

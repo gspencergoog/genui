@@ -26,8 +26,13 @@ final Logger _log = genui.genUiLogger;
 /// the agent card, sending messages, and receiving the A2UI protocol stream.
 class A2uiAgentConnector {
   /// Creates a [A2uiAgentConnector] that connects to the given [url].
-  A2uiAgentConnector({required this.url, A2AClient? client, String? contextId})
-    : _contextId = contextId {
+  A2uiAgentConnector({
+    required this.url,
+    genui.A2uiProtocol? protocol,
+    A2AClient? client,
+    String? contextId,
+  }) : _contextId = contextId,
+       protocol = protocol ?? const genui.A2uiProtocolV08() {
     this.client =
         client ??
         A2AClient(
@@ -44,6 +49,9 @@ class A2uiAgentConnector {
   /// The URL of the A2UI Agent.
   final Uri url;
 
+  /// The A2UI protocol to use.
+  final genui.A2uiProtocol protocol;
+
   final _controller = StreamController<genui.A2uiMessage>.broadcast();
   final _errorController = StreamController<Object>.broadcast();
   @visibleForTesting
@@ -53,6 +61,9 @@ class A2uiAgentConnector {
 
   String? _contextId;
   String? get contextId => _contextId;
+
+  String get _a2aExtensionUrl =>
+      'https://a2ui.org/a2a-extension/a2ui/${protocol.version.label}';
 
   /// The stream of A2UI protocol lines.
   ///
@@ -134,6 +145,10 @@ class A2uiAgentConnector {
         metadata: {'a2uiClientCapabilities': clientCapabilities.toJson()},
       );
     }
+    // Map protocol version to extension URL.
+    messageToSend = messageToSend.copyWith(extensions: [_a2aExtensionUrl]);
+
+    // Payload wrapper is not needed; we pass the message directly.
 
     _log.info('--- OUTGOING REQUEST ---');
     _log.info('URL: ${url.toString()}');
@@ -252,13 +267,15 @@ class A2uiAgentConnector {
 
     final dataPart = Part.data(data: {'a2uiEvent': clientEvent});
     final message = Message(
+      messageId: const Uuid().v4(),
       role: Role.user,
       parts: [dataPart],
       contextId: contextId,
       referenceTaskIds: [taskId!],
-      messageId: const Uuid().v4(),
-      extensions: [a2uiExtensionUri.toString()],
+      extensions: [_a2aExtensionUrl],
     );
+
+    // Payload wrapper is not needed; we pass the message directly.
 
     try {
       final Task response = await client.messageSend(message);
@@ -279,20 +296,22 @@ class A2uiAgentConnector {
       'Processing a2ui messages from data part:\n'
       '${const JsonEncoder.withIndent('  ').convert(data)}',
     );
-    if (data.containsKey('surfaceUpdate') ||
-        data.containsKey('dataModelUpdate') ||
-        data.containsKey('beginRendering') ||
-        data.containsKey('deleteSurface')) {
-      if (!_controller.isClosed) {
-        _log.finest(
-          'Adding message to stream: '
-          '${const JsonEncoder.withIndent('  ').convert(data)}',
+    protocol
+        .parsePayload(data)
+        .listen(
+          (message) {
+            if (!_controller.isClosed) {
+              _log.finest(
+                'Adding message to stream: '
+                '${const JsonEncoder.withIndent('  ').convert(message)}',
+              );
+              _controller.add(message);
+            }
+          },
+          onError: (Object error) {
+            _log.warning('Error parsing A2UI message: $error');
+          },
         );
-        _controller.add(genui.A2uiMessage.fromJson(data));
-      }
-    } else {
-      _log.warning('A2A data part did not contain any known A2UI messages.');
-    }
   }
 
   /// Closes the connection to the agent.
