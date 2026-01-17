@@ -25,7 +25,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': 'Tabs',
           'tabItems': [
             {'title': 'Tab 1', 'child': 'text1'},
@@ -35,11 +35,17 @@ void main() {
       ),
       const Component(
         id: 'text1',
-        props: {'component': 'Text', 'text': 'This is the first tab.'},
+        componentProperties: {
+          'component': 'Text',
+          'text': 'This is the first tab.',
+        },
       ),
       const Component(
         id: 'text2',
-        props: {'component': 'Text', 'text': 'This is the second tab.'},
+        componentProperties: {
+          'component': 'Text',
+          'text': 'This is the second tab.',
+        },
       ),
     ];
     manager.handleMessage(

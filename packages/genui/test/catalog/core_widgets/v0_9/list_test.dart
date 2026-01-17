@@ -23,7 +23,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': 'List',
           'children': {
             'explicitList': ['text1', 'text2'],
@@ -32,11 +32,11 @@ void main() {
       ),
       const Component(
         id: 'text1',
-        props: {'component': 'Text', 'text': 'First'},
+        componentProperties: {'component': 'Text', 'text': 'First'},
       ),
       const Component(
         id: 'text2',
-        props: {'component': 'Text', 'text': 'Second'},
+        componentProperties: {'component': 'Text', 'text': 'Second'},
       ),
     ];
     manager.handleMessage(

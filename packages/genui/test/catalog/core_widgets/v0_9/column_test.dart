@@ -23,7 +23,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': 'Column',
           'children': {
             'explicitList': ['text1', 'text2'],
@@ -32,11 +32,11 @@ void main() {
       ),
       const Component(
         id: 'text1',
-        props: {'component': 'Text', 'text': 'First'},
+        componentProperties: {'component': 'Text', 'text': 'First'},
       ),
       const Component(
         id: 'text2',
-        props: {'component': 'Text', 'text': 'Second'},
+        componentProperties: {'component': 'Text', 'text': 'Second'},
       ),
     ];
     manager.handleMessage(
@@ -78,7 +78,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': 'Column',
           'children': {
             'explicitList': ['text1', 'text2', 'text3'],
@@ -87,17 +87,21 @@ void main() {
       ),
       const Component(
         id: 'text1',
-        props: {'component': 'Text', 'text': 'First'},
+        componentProperties: {'component': 'Text', 'text': 'First'},
         weight: 1,
       ),
       const Component(
         id: 'text2',
-        props: {'component': 'Text', 'text': 'Second'},
+        componentProperties: {'component': 'Text', 'text': 'Second'},
         weight: 2,
       ),
       const Component(
         id: 'text3',
-        props: {'component': 'Text', 'text': 'Third', 'weight': 0},
+        componentProperties: {
+          'component': 'Text',
+          'text': 'Third',
+          'weight': 0,
+        },
       ),
     ];
     manager.handleMessage(
@@ -146,9 +150,10 @@ void main() {
     );
   });
 
-  // Verify that Column handles unbounded horizontal constraints + stretch safely
+  // Verify that Column handles unbounded horizontal constraints + stretch
+  // safely
   testWidgets(
-    'Column widget forces start alignment if width is unbounded and alignment is stretch',
+    '''Column widget forces start alignment if width is unbounded and alignment is stretch''',
     (WidgetTester tester) async {
       final manager = A2uiMessageProcessor(
         catalogs: [
@@ -164,16 +169,17 @@ void main() {
       final components = [
         const Component(
           id: 'root',
-          props: {
+          componentProperties: {
             'component': 'Column',
             'alignment':
-                'stretch', // Should be converted to start due to unbounded width
+                // Should be converted to start due to unbounded width.
+                'stretch',
             'children': ['text1'],
           },
         ),
         const Component(
           id: 'text1',
-          props: {'component': 'Text', 'text': 'Test Text'},
+          componentProperties: {'component': 'Text', 'text': 'Test Text'},
         ),
       ];
 
@@ -187,7 +193,8 @@ void main() {
         ),
       );
 
-      // Use SingleChildScrollView with horizontal scrolling to provide unbounded width
+      // Use SingleChildScrollView with horizontal scrolling to provide
+      // unbounded width
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

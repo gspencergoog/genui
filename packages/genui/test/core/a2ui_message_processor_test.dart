@@ -46,7 +46,7 @@ void main() {
       final components = [
         const Component(
           id: 'root',
-          props: {'component': 'Text', 'text': 'Hello'},
+          componentProperties: {'component': 'Text', 'text': 'Hello'},
         ),
       ];
 
@@ -113,7 +113,7 @@ void main() {
       final components = [
         const Component(
           id: 'root',
-          props: {'component': 'Text', 'text': 'Updated'},
+          componentProperties: {'component': 'Text', 'text': 'Updated'},
         ),
       ];
       final Future<GenUiUpdate> futureUpdate =
@@ -136,13 +136,13 @@ void main() {
         final oldComponents = [
           const Component(
             id: 'root',
-            props: {'component': 'Text', 'text': 'Old'},
+            componentProperties: {'component': 'Text', 'text': 'Old'},
           ),
         ];
         final newComponents = [
           const Component(
             id: 'root',
-            props: {'component': 'Text', 'text': 'New'},
+            componentProperties: {'component': 'Text', 'text': 'New'},
           ),
         ];
 
@@ -179,7 +179,7 @@ void main() {
       final components = [
         const Component(
           id: 'root',
-          props: {'component': 'Text', 'text': 'Hello'},
+          componentProperties: {'component': 'Text', 'text': 'Hello'},
         ),
       ];
       messageProcessor.handleMessage(

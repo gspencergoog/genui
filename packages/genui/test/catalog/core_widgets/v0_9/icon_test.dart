@@ -23,7 +23,10 @@ void main() {
     );
     const surfaceId = 'testSurface';
     final components = [
-      const Component(id: 'root', props: {'component': 'Icon', 'name': 'add'}),
+      const Component(
+        id: 'root',
+        componentProperties: {'component': 'Icon', 'name': 'add'},
+      ),
     ];
     manager.handleMessage(
       v0_9.UpdateComponents(surfaceId: surfaceId, components: components),
@@ -63,7 +66,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': 'Icon',
           'name': {'path': '/iconName'},
         },

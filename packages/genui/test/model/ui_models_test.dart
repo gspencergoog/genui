@@ -69,7 +69,10 @@ void main() {
 
   group('Component', () {
     test('defaults to v0.8', () {
-      const component = Component(id: 'test', props: {'foo': 'bar'});
+      const component = Component(
+        id: 'test',
+        componentProperties: {'foo': 'bar'},
+      );
       expect(component.version, A2uiProtocolVersion.v0_8);
       expect(component.toJson(), {'id': 'test', 'foo': 'bar'});
     });
@@ -77,7 +80,7 @@ void main() {
     test('serializes v0.8 correctly', () {
       const component = Component(
         id: 'test',
-        props: {'foo': 'bar'},
+        componentProperties: {'foo': 'bar'},
         version: A2uiProtocolVersion.v0_8,
       );
       expect(component.toJson(), {'id': 'test', 'foo': 'bar'});
@@ -86,7 +89,7 @@ void main() {
     test('serializes v0.9 correctly', () {
       const component = Component(
         id: 'test',
-        props: {'foo': 'bar'},
+        componentProperties: {'foo': 'bar'},
         version: A2uiProtocolVersion.v0_9,
       );
       expect(component.toJson(), {
@@ -102,7 +105,7 @@ void main() {
         version: A2uiProtocolVersion.v0_8,
       );
       expect(component.id, 'test');
-      expect(component.props, {'foo': 'bar'});
+      expect(component.componentProperties, {'foo': 'bar'});
       expect(component.version, A2uiProtocolVersion.v0_8);
     });
 
@@ -116,7 +119,7 @@ void main() {
         version: A2uiProtocolVersion.v0_9,
       );
       expect(component.id, 'test');
-      expect(component.props, {'foo': 'bar'});
+      expect(component.componentProperties, {'foo': 'bar'});
       expect(component.version, A2uiProtocolVersion.v0_9);
     });
 
@@ -127,7 +130,7 @@ void main() {
         version: A2uiProtocolVersion.v0_9,
       );
       expect(component.id, 'test');
-      expect(component.props, isEmpty);
+      expect(component.componentProperties, isEmpty);
       expect(component.version, A2uiProtocolVersion.v0_9);
     });
   });

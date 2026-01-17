@@ -78,7 +78,7 @@ void main() {
           components: [
             Component(
               id: 'root',
-              props: {'component': 'Text', 'text': 'Hello'},
+              componentProperties: {'component': 'Text', 'text': 'Hello'},
               version: A2uiProtocolVersion.v0_8,
             ),
           ],

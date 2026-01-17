@@ -26,7 +26,7 @@ void main() {
       const Component(
         version: A2uiProtocolVersion.v0_9,
         id: 'root',
-        props: {
+        componentProperties: {
           'component': 'Slider',
           'value': {'path': '/myValue'},
           'min': {'literalNumber': 0.0},
@@ -83,7 +83,7 @@ void main() {
       const Component(
         version: A2uiProtocolVersion.v0_9,
         id: 'root',
-        props: {
+        componentProperties: {
           'component': 'Slider',
           'value': {'path': '/myValue'},
           'min': {'path': '/myMin'},

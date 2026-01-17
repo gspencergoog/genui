@@ -21,7 +21,10 @@ void main() {
     );
     const surfaceId = 'testSurface';
     final components = [
-      const Component(id: 'root', props: {'component': 'Divider'}),
+      const Component(
+        id: 'root',
+        componentProperties: {'component': 'Divider'},
+      ),
     ];
     manager.handleMessage(
       v0_9.UpdateComponents(surfaceId: surfaceId, components: components),

@@ -24,7 +24,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': {
             'CheckBox': {
               'label': {'literalString': 'Check me'},

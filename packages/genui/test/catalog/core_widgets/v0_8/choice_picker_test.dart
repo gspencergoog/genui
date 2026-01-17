@@ -24,7 +24,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': {
             'ChoicePicker': {
               'value': {'path': '/mySelections'},
@@ -103,7 +103,7 @@ void main() {
       final components = [
         const Component(
           id: 'root',
-          props: {
+          componentProperties: {
             'component': {
               'ChoicePicker': {
                 'value': {'path': '/mySelections'},

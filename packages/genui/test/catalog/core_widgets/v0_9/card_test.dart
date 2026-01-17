@@ -23,11 +23,11 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {'component': 'Card', 'child': 'text'},
+        componentProperties: {'component': 'Card', 'child': 'text'},
       ),
       const Component(
         id: 'text',
-        props: {'component': 'Text', 'text': 'This is a card.'},
+        componentProperties: {'component': 'Text', 'text': 'This is a card.'},
       ),
     ];
     manager.handleMessage(

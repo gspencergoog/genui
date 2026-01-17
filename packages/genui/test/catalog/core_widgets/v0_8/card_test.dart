@@ -22,7 +22,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': {
             'Card': {'child': 'text'},
           },
@@ -30,7 +30,7 @@ void main() {
       ),
       const Component(
         id: 'text',
-        props: {
+        componentProperties: {
           'component': {
             'Text': {
               'text': {'literalString': 'This is a card.'},

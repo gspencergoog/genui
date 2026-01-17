@@ -14,7 +14,12 @@ To use this package, you will need a Gemini API key. If you don't already have o
 
 ### Installation
 
-Add this package to your `pubspec.yaml`: "genui_google_generative_ai"
+Use `flutter pub add` to add the latest versions of `genui` and `genui_google_generative_ai` as
+dependencies in your `pubspec.yaml` file:
+
+```bash
+flutter pub add genui genui_google_generative_ai
+```
 
 ### Usage
 
@@ -42,7 +47,7 @@ final conversation = GenUiConversation(
 
 The API key can be provided in two ways:
 
-1. **Environment Variable** (recommended): Set the `GEMINI_API_KEY` or `GOOGLE_API_KEY` environment variable
+1. **Environment Variable** (recommended): Set the `GEMINI_API_KEY` environment variable
 2. **Constructor Parameter**: Pass the API key directly to the constructor
 
 If neither is provided, the package will attempt to use the default environment variable.

@@ -22,7 +22,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': {
             'Column': {
               'children': {
@@ -34,7 +34,7 @@ void main() {
       ),
       const Component(
         id: 'text1',
-        props: {
+        componentProperties: {
           'component': {
             'Text': {
               'text': {'literalString': 'First'},
@@ -44,7 +44,7 @@ void main() {
       ),
       const Component(
         id: 'text2',
-        props: {
+        componentProperties: {
           'component': {
             'Text': {
               'text': {'literalString': 'Second'},
@@ -92,7 +92,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': {
             'Column': {
               'children': {
@@ -104,7 +104,7 @@ void main() {
       ),
       const Component(
         id: 'text1',
-        props: {
+        componentProperties: {
           'component': {
             'Text': {
               'text': {'literalString': 'First'},
@@ -115,7 +115,7 @@ void main() {
       ),
       const Component(
         id: 'text2',
-        props: {
+        componentProperties: {
           'component': {
             'Text': {
               'text': {'literalString': 'Second'},
@@ -126,7 +126,7 @@ void main() {
       ),
       const Component(
         id: 'text3',
-        props: {
+        componentProperties: {
           'component': {
             'Text': {
               'text': {'literalString': 'Third'},

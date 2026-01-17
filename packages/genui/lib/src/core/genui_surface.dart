@@ -92,7 +92,7 @@ class _GenUiSurfaceState extends State<GenUiSurface> {
       return Placeholder(child: Text('Widget with id: $widgetId not found.'));
     }
 
-    final JsonMap widgetData = data.props;
+    final JsonMap widgetData = data.componentProperties;
     genUiLogger.finest('Building widget $widgetId');
     return catalog.buildWidget(
       CatalogItemContext(
@@ -135,7 +135,8 @@ class _GenUiSurfaceState extends State<GenUiSurface> {
       final modalId = event.context['modalId'] as String;
       final Component? modalComponent = definition.components[modalId];
       if (modalComponent == null) return;
-      final contentChildId = modalComponent.props['contentChild'] as String;
+      final contentChildId =
+          modalComponent.componentProperties['contentChild'] as String;
       showModalBottomSheet<void>(
         context: context,
         builder: (context) => _buildWidget(

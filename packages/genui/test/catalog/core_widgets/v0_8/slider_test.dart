@@ -24,7 +24,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': {
             'Slider': {
               'value': {'path': '/myValue'},
@@ -83,7 +83,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': {
             'Slider': {
               'value': {'path': '/myValue'},

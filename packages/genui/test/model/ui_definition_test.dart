@@ -15,7 +15,7 @@ void main() {
         components: {
           'root': const Component(
             id: 'root',
-            props: {'component': 'Text', 'text': 'Hello'},
+            componentProperties: {'component': 'Text', 'text': 'Hello'},
           ),
         },
       );

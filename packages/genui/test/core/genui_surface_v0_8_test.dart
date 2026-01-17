@@ -26,7 +26,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': {
             'Button': {
               'child': 'text',
@@ -37,7 +37,7 @@ void main() {
       ),
       const Component(
         id: 'text',
-        props: {
+        componentProperties: {
           'component': {
             'Text': {
               'text': {'literalString': 'Hello'},
@@ -73,7 +73,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': {
             'Button': {
               'child': 'text',
@@ -84,7 +84,7 @@ void main() {
       ),
       const Component(
         id: 'text',
-        props: {
+        componentProperties: {
           'component': {
             'Text': {
               'text': {'literalString': 'Hello'},

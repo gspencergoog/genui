@@ -29,7 +29,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': 'Modal',
           'entryPointChild': 'button',
           'contentChild': 'text',
@@ -37,7 +37,7 @@ void main() {
       ),
       const Component(
         id: 'button',
-        props: {
+        componentProperties: {
           'component': 'Button',
           'child': 'button_text',
           'action': {
@@ -48,11 +48,11 @@ void main() {
       ),
       const Component(
         id: 'button_text',
-        props: {'component': 'Text', 'text': 'Open Modal'},
+        componentProperties: {'component': 'Text', 'text': 'Open Modal'},
       ),
       const Component(
         id: 'text',
-        props: {'component': 'Text', 'text': 'This is a modal.'},
+        componentProperties: {'component': 'Text', 'text': 'This is a modal.'},
       ),
     ];
     manager.handleMessage(

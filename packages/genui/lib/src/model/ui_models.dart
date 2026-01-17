@@ -144,7 +144,7 @@ final class Component {
   /// Creates a [Component].
   const Component({
     required this.id,
-    required this.props,
+    required this.componentProperties,
     this.weight,
     this.version = A2uiProtocolVersion.v0_8,
   });
@@ -170,7 +170,7 @@ final class Component {
     props.remove('weight');
     return Component(
       id: id,
-      props: props,
+      componentProperties: props,
       weight: weight,
       version: A2uiProtocolVersion.v0_8,
     );
@@ -179,12 +179,11 @@ final class Component {
   factory Component._fromV09Json(JsonMap json) {
     final id = json['id'] as String;
     final int? weight = (json['weight'] as num?)?.toInt();
-    final Map<String, Object?> props = Map.of(json);
-    props.remove('id');
-    props.remove('weight');
+    final Map<String, Object?> props =
+        (json['props'] as Map<String, Object?>?) ?? <String, Object?>{};
     return Component(
       id: id,
-      props: props,
+      componentProperties: props,
       weight: weight,
       version: A2uiProtocolVersion.v0_9,
     );
@@ -194,7 +193,7 @@ final class Component {
   final String id;
 
   /// The properties of the component.
-  final JsonMap props;
+  final JsonMap componentProperties;
 
   /// The weight of the component, used for layout in Row/Column.
   final int? weight;
@@ -206,14 +205,22 @@ final class Component {
   JsonMap toJson() {
     switch (version) {
       case A2uiProtocolVersion.v0_8:
-        return {'id': id, if (weight != null) 'weight': weight, ...props};
+        return {
+          'id': id,
+          if (weight != null) 'weight': weight,
+          ...componentProperties,
+        };
       case A2uiProtocolVersion.v0_9:
-        return {'id': id, if (weight != null) 'weight': weight, 'props': props};
+        return {
+          'id': id,
+          if (weight != null) 'weight': weight,
+          'props': componentProperties,
+        };
     }
   }
 
   /// The type of the component.
-  String get type => props['component'] as String;
+  String get type => componentProperties['component'] as String;
 
   @override
   bool operator ==(Object other) =>
@@ -221,13 +228,16 @@ final class Component {
       id == other.id &&
       weight == other.weight &&
       version == other.version &&
-      const DeepCollectionEquality().equals(props, other.props);
+      const DeepCollectionEquality().equals(
+        componentProperties,
+        other.componentProperties,
+      );
 
   @override
   int get hashCode => Object.hash(
     id,
     weight,
     version,
-    const DeepCollectionEquality().hash(props),
+    const DeepCollectionEquality().hash(componentProperties),
   );
 }

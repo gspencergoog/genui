@@ -22,10 +22,8 @@ void main() {
     testWidgets('buildWidget finds and builds the correct widget', (
       WidgetTester tester,
     ) async {
-      final catalog = Catalog([
-        CoreCatalogItems.column,
-        CoreCatalogItems.text,
-      ],
+      final catalog = Catalog(
+        [CoreCatalogItems.column, CoreCatalogItems.text],
         binderFactory: V09DataBinder.new,
         componentParser: const V09ComponentParser(),
       );
@@ -53,7 +51,7 @@ void main() {
                     binder: V09DataBinder(DataContext(DataModel(), '/')),
                     getComponent: (String componentId) => const Component(
                       id: 'child1',
-                      props: {
+                      componentProperties: {
                         'component': 'Text',
                         'text': {'literalString': 'Hello'},
                       },

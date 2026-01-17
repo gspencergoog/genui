@@ -28,7 +28,7 @@ void main() {
       final components = [
         const Component(
           id: 'root',
-          props: {
+          componentProperties: {
             'component': {
               'Text': {
                 'text': {'literalString': 'Hi there!'},
@@ -86,7 +86,7 @@ void main() {
       final components = [
         const Component(
           id: 'root',
-          props: {
+          componentProperties: {
             'component': {
               'Text': {
                 'text': {'literalString': 'UI Content'},

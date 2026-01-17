@@ -26,7 +26,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': {
             'Button': {
               'child': 'button_text',
@@ -37,7 +37,7 @@ void main() {
       ),
       const Component(
         id: 'button_text',
-        props: {
+        componentProperties: {
           'component': {
             'Text': {
               'text': {'literalString': 'Click Me'},

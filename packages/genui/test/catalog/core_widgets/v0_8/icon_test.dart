@@ -24,7 +24,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': {
             'Icon': {
               'name': {'literalString': 'add'},
@@ -71,7 +71,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': {
             'Icon': {
               'name': {'path': '/iconName'},

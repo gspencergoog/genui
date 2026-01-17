@@ -24,7 +24,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': {
             'Tabs': {
               'tabItems': [
@@ -43,7 +43,7 @@ void main() {
       ),
       const Component(
         id: 'text1',
-        props: {
+        componentProperties: {
           'component': {
             'Text': {
               'text': {'literalString': 'This is the first tab.'},
@@ -53,7 +53,7 @@ void main() {
       ),
       const Component(
         id: 'text2',
-        props: {
+        componentProperties: {
           'component': {
             'Text': {
               'text': {'literalString': 'This is the second tab.'},

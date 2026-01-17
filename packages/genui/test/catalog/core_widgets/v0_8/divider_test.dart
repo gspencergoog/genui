@@ -22,7 +22,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: <String, Object?>{
+        componentProperties: <String, Object?>{
           'component': <String, Object?>{'Divider': <String, Object?>{}},
         },
       ),

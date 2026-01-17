@@ -27,7 +27,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': 'TextField',
           'text': {'path': '/myValue'},
           'label': 'My Label',

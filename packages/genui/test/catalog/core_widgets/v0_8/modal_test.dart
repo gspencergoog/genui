@@ -28,7 +28,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: <String, Object?>{
+        componentProperties: <String, Object?>{
           'component': <String, Object?>{
             'Modal': <String, Object?>{
               'entryPointChild': 'button',
@@ -39,7 +39,7 @@ void main() {
       ),
       const Component(
         id: 'button',
-        props: <String, Object?>{
+        componentProperties: <String, Object?>{
           'component': <String, Object?>{
             'Button': <String, Object?>{
               'child': 'button_text',
@@ -55,7 +55,7 @@ void main() {
       ),
       const Component(
         id: 'button_text',
-        props: <String, Object?>{
+        componentProperties: <String, Object?>{
           'component': <String, Object?>{
             'Text': <String, Object?>{
               'text': <String, Object?>{'literalString': 'Open Modal'},
@@ -65,7 +65,7 @@ void main() {
       ),
       const Component(
         id: 'text',
-        props: <String, Object?>{
+        componentProperties: <String, Object?>{
           'component': <String, Object?>{
             'Text': <String, Object?>{
               'text': <String, Object?>{'literalString': 'This is a modal.'},

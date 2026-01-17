@@ -27,7 +27,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': 'Button',
           'child': 'button_text',
           'action': {'name': 'testAction'},
@@ -35,7 +35,7 @@ void main() {
       ),
       const Component(
         id: 'button_text',
-        props: {'component': 'Text', 'text': 'Click Me'},
+        componentProperties: {'component': 'Text', 'text': 'Click Me'},
       ),
     ];
     manager.handleMessage(

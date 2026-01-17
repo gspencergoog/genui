@@ -25,7 +25,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        props: {
+        componentProperties: {
           'component': 'DateTimeInput',
           'value': {'path': '/myDateTime'},
         },
