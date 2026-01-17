@@ -63,6 +63,9 @@ class A2uiContentGenerator implements ContentGenerator {
           'A2uiContentGenerator is stateful and ignores history.',
         );
       }
+      if (message is! UserMessage) {
+        throw ArgumentError('Message must be of type UserMessage');
+      }
       final String? responseText = await connector.connectAndSend(
         message,
         clientCapabilities: clientCapabilities,

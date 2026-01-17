@@ -5,11 +5,13 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:a2a/a2a.dart' hide Logger;
 import 'package:flutter/foundation.dart';
 import 'package:genui/genui.dart' as genui;
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
+
+import 'a2a/a2a.dart' hide AgentCard;
+import 'a2a/a2a.dart' as a2a;
 
 final Logger _log = genui.genUiLogger;
 
@@ -45,7 +47,7 @@ class A2uiAgentConnector {
     this.protocolVersion = genui.A2uiProtocolVersion.v0_8,
   }) : _contextId = contextId,
        _protocol = genui.A2uiProtocol.fromVersion(protocolVersion) {
-    this.client = client ?? A2AClient(url.toString());
+    this.client = client ?? A2AClient(url: url.toString());
   }
 
   /// The version of the A2UI protocol to use.
@@ -57,10 +59,11 @@ class A2uiAgentConnector {
   final Uri url;
 
   final _controller = StreamController<genui.A2uiMessage>.broadcast();
-  // ... (rest of fields)
   final _errorController = StreamController<Object>.broadcast();
+
   @visibleForTesting
   late A2AClient client;
+
   @visibleForTesting
   String? taskId;
 
@@ -80,7 +83,7 @@ class A2uiAgentConnector {
   /// The agent card contains metadata about the agent, such as its name,
   /// description, and version.
   Future<AgentCard> getAgentCard() async {
-    final A2AAgentCard card = await client.getAgentCard();
+    final a2a.AgentCard card = await client.getAgentCard();
     return AgentCard(
       name: card.name,
       description: card.description,
@@ -92,135 +95,129 @@ class A2uiAgentConnector {
   ///
   /// Returns the text response from the agent, if any.
   Future<String?> connectAndSend(
-    genui.ChatMessage chatMessage, {
+    genui.UserMessage message, {
     genui.A2UiClientCapabilities? clientCapabilities,
   }) async {
-    // ... (message construction)
-    final List<Object> parts = (chatMessage is genui.UserMessage)
-        ? chatMessage.parts
-        : (chatMessage is genui.UserUiInteractionMessage)
-        ? chatMessage.parts
-        : <A2ATextPart>[];
-    final message = A2AMessage()
-      ..messageId = const Uuid().v4()
-      ..role = 'user'
-      ..parts = parts.map<A2APart>((part) {
-        switch (part) {
-          case genui.TextPart():
-            return A2ATextPart()..text = part.text;
-          case genui.DataPart():
-            return A2ADataPart()..data = part.data as A2ASV? ?? {};
-          case genui.ImagePart():
-            if (part.url != null) {
-              return A2AFilePart()
-                ..file = (A2AFileWithUri()
-                  ..uri = part.url.toString()
-                  ..mimeType = part.mimeType);
-            } else {
-              String base64Data;
-              if (part.bytes != null) {
-                base64Data = base64Encode(part.bytes!);
-              } else if (part.base64 != null) {
-                base64Data = part.base64!;
-              } else {
-                _log.warning('ImagePart has no data (url, bytes, or base64)');
-                return A2ATextPart()..text = '[Empty Image]';
-              }
-              return A2AFilePart()
-                ..file = (A2AFileWithBytes()
-                  ..bytes = base64Data
-                  ..mimeType = part.mimeType);
-            }
-          default:
-            _log.warning('Unknown message part type: ${part.runtimeType}');
-            return A2ATextPart()..text = '[Unknown Part]';
+    final List<Part> parts = [];
+    for (final genui.MessagePart part in message.parts) {
+      if (part is genui.TextPart) {
+        parts.add(Part.text(text: part.text));
+      } else if (part is genui.ImagePart) {
+        if (part.url != null) {
+          parts.add(
+            Part.file(
+              file: FileType.uri(
+                uri: part.url.toString(),
+                mimeType: part.mimeType,
+              ),
+            ),
+          );
+        } else if (part.bytes != null) {
+          parts.add(
+            Part.file(
+              file: FileType.bytes(
+                bytes: base64Encode(part.bytes!),
+                mimeType: part.mimeType,
+              ),
+            ),
+          );
+        } else if (part.base64 != null) {
+          parts.add(
+            Part.file(
+              file: FileType.bytes(
+                bytes: part.base64!,
+                mimeType: part.mimeType,
+              ),
+            ),
+          );
         }
-      }).toList();
+      }
+    }
 
-    if (taskId != null) {
-      message.referenceTaskIds = [taskId!];
-    }
-    if (contextId != null) {
-      message.contextId = contextId;
-    }
-    final payload = A2AMessageSendParams()..message = message;
+    final a2aMessage = Message(
+      role: Role.user,
+      parts: parts,
+      messageId: const Uuid().v4(),
+      contextId: _contextId,
+      taskId: taskId,
+      metadata: clientCapabilities != null
+          ? {
+              'clientUiCapabilities': {
+                'supportedCatalogIds': clientCapabilities.supportedCatalogIds,
+              },
+            }
+          : null,
+    );
+
+    _log.info('Sending A2A message: ${a2aMessage.messageId}');
 
     // Set extensions based on protocol version
+    final List<String> extensions;
     if (protocolVersion == genui.A2uiProtocolVersion.v0_9) {
-      payload.extensions = ['https://a2ui.org/ext/a2a-ui/v0.9'];
+      extensions = ['https://a2ui.org/ext/a2a-ui/v0.9'];
     } else {
-      payload.extensions = ['https://a2ui.org/a2a-extension/a2ui/v0.8'];
+      extensions = ['https://a2ui.org/a2a-extension/a2ui/v0.8'];
     }
+    final Message messageWithExtensions = a2aMessage.copyWith(
+      extensions: extensions,
+    );
 
     _log.info('--- OUTGOING REQUEST ---');
     _log.info('URL: ${url.toString()}');
     _log.info('Method: message/stream');
     _log.info(
       'Payload: '
-      '${const JsonEncoder.withIndent('  ').convert(payload.toJson())}',
+      '${const JsonEncoder.withIndent('  ').convert(messageWithExtensions.toJson())}',
     );
     _log.info('----------------------');
 
-    final Stream<A2ASendStreamMessageResponse> events = client
-        .sendMessageStream(payload);
+    final Stream<Event> events = client.messageStream(messageWithExtensions);
 
     String? responseText;
     try {
-      A2AMessage? finalResponse;
       await for (final event in events) {
         _log.info('Received raw A2A event: ${event.toJson()}');
         const encoder = JsonEncoder.withIndent('  ');
         final String prettyJson = encoder.convert(event.toJson());
         _log.info('Received A2A event:\n$prettyJson');
 
-        if (event.isError) {
-          final errorResponse = event as A2AJSONRPCErrorResponseSSM;
-          final int? code = errorResponse.error?.rpcErrorCode;
-          final errorMessage = 'A2A Error: $code';
-          _log.severe(errorMessage);
-          if (!_errorController.isClosed) {
-            _errorController.add(errorMessage);
+        if (event is StatusUpdate) {
+          taskId = event.taskId;
+          _contextId = event.contextId;
+          final Message? msg = event.status.message;
+          if (msg != null) {
+            final String msgPrettyJson = encoder.convert(msg.toJson());
+            _log.info('Received A2A Message:\n$msgPrettyJson');
+            for (final Part part in msg.parts) {
+              if (part is DataPart) {
+                processA2uiMessages(part.data);
+              } else if (part is TextPart) {
+                responseText = part.text;
+              }
+            }
           }
-          continue;
-        }
-
-        final response = event as A2ASendStreamMessageSuccessResponse;
-        final A2AResult? result = response.result;
-        if (result is A2ATask) {
-          taskId = result.id;
-          _contextId = result.contextId;
-        }
-
-        A2AMessage? message;
-        if (result is A2ATask) {
-          message = result.status?.message;
-        } else if (result is A2AMessage) {
-          message = result;
-        } else if (result is A2ATaskStatusUpdateEvent) {
-          message = result.status?.message;
-        }
-
-        if (message != null) {
-          finalResponse = message;
-          const encoder = JsonEncoder.withIndent('  ');
-          final String prettyJson = encoder.convert(message.toJson());
-          _log.info('Received A2A Message:\n$prettyJson');
-          for (final A2APart part in message.parts ?? []) {
-            if (part is A2ADataPart) {
-              _processA2uiMessages(part.data);
+        } else if (event is TaskStatusUpdate) {
+          taskId = event.taskId;
+          _contextId = event.contextId;
+          final Message? msg = event.status.message;
+          if (msg != null) {
+            final String msgPrettyJson = encoder.convert(msg.toJson());
+            _log.info('Received A2A Message:\n$msgPrettyJson');
+            for (final Part part in msg.parts) {
+              if (part is DataPart) {
+                processA2uiMessages(part.data);
+              } else if (part is TextPart) {
+                responseText = part.text;
+              }
             }
           }
         }
       }
-      if (finalResponse != null) {
-        for (final A2APart part in finalResponse.parts ?? []) {
-          if (part is A2ATextPart) {
-            responseText = part.text;
-          }
-        }
+    } catch (e, s) {
+      _log.severe('Error in A2A stream: $e', e, s);
+      if (!_errorController.isClosed) {
+        _errorController.add(e);
       }
-    } on FormatException catch (e, s) {
-      _log.severe('Error parsing A2A response: $e', e, s);
     }
     return responseText;
   }
@@ -229,39 +226,41 @@ class A2uiAgentConnector {
   ///
   /// This is used to send user interaction events to the agent, such as
   /// button clicks or form submissions.
-  Future<void> sendEvent(Map<String, Object?> event) async {
+  Future<void> sendEvent(genui.UiEvent event) async {
     if (taskId == null) {
       _log.severe('Cannot send event, no active task ID.');
       return;
     }
 
-    final Map<String, Object?> clientEvent = {
-      'action': event['action'],
-      'sourceComponentId': event['sourceComponentId'],
-      'timestamp': DateTime.now().toIso8601String(),
-      'context': event['context'],
-    };
+    // Convert UiEvent to map for logging (optional)
+    final genui.JsonMap eventMap = event.toMap();
 
-    _log.finest('Sending client event: $clientEvent');
+    _log.finest('Sending client event: $eventMap');
 
-    final dataPart = A2ADataPart()..data = {'a2uiEvent': clientEvent};
-    final message = A2AMessage()
-      ..role = 'user'
-      ..parts = [dataPart]
-      ..contextId = contextId
-      ..referenceTaskIds = [taskId!];
+    final dataPart = Part.data(data: {'a2uiEvent': eventMap});
+    final a2aMessage = Message(
+      role: Role.user,
+      parts: [dataPart],
+      messageId: const Uuid().v4(),
+      contextId: _contextId,
+      taskId: taskId,
+    );
 
-    final payload = A2AMessageSendParams()..message = message;
+    _log.info('Sending A2A event message: ${a2aMessage.messageId}');
 
     // Set extensions based on protocol version
+    final List<String> extensions;
     if (protocolVersion == genui.A2uiProtocolVersion.v0_9) {
-      payload.extensions = ['https://a2ui.org/ext/a2a-ui/v0.9'];
+      extensions = ['https://a2ui.org/ext/a2a-ui/v0.9'];
     } else {
-      payload.extensions = ['https://a2ui.org/a2a-extension/a2ui/v0.8'];
+      extensions = ['https://a2ui.org/a2a-extension/a2ui/v0.8'];
     }
+    final Message messageWithExtensions = a2aMessage.copyWith(
+      extensions: extensions,
+    );
 
     try {
-      await client.sendMessage(payload);
+      await client.messageSend(messageWithExtensions);
       _log.fine(
         'Successfully sent event for task $taskId (context $contextId)',
       );
@@ -270,7 +269,7 @@ class A2uiAgentConnector {
     }
   }
 
-  void _processA2uiMessages(Map<String, Object?> data) {
+  void processA2uiMessages(Map<String, Object?> data) {
     _log.finer(
       'Processing a2ui messages from data part:\n'
       '${const JsonEncoder.withIndent('  ').convert(data)}',
@@ -303,5 +302,6 @@ class A2uiAgentConnector {
     if (!_errorController.isClosed) {
       _errorController.close();
     }
+    client.close();
   }
 }
