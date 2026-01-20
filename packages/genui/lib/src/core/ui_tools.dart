@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:json_schema_builder/json_schema_builder.dart';
-
 import '../model/a2ui_message.dart';
 import '../model/a2ui_schemas.dart';
 import '../model/catalog.dart';
@@ -14,14 +12,14 @@ import '../primitives/simple_items.dart';
 /// An [AiTool] for adding or updating a UI surface.
 ///
 /// This tool allows the AI to create a new UI surface or update an existing
-/// one with a new definition.
-class SurfaceUpdateTool extends AiTool<JsonMap> {
-  /// Creates an [SurfaceUpdateTool].
-  SurfaceUpdateTool({required this.handleMessage, required Catalog catalog})
+/// one with a new set of components.
+class UpdateComponentsTool extends AiTool<JsonMap> {
+  /// Creates an [UpdateComponentsTool].
+  UpdateComponentsTool({required this.handleMessage, required Catalog catalog})
     : super(
-        name: 'surfaceUpdate',
+        name: 'updateComponents',
         description: 'Updates a surface with a new set of components.',
-        parameters: A2uiSchemas.surfaceUpdateSchema(catalog),
+        parameters: A2uiSchemas.updateComponentsSchema(catalog),
       );
 
   /// The callback to invoke when adding or updating a surface.
@@ -32,13 +30,13 @@ class SurfaceUpdateTool extends AiTool<JsonMap> {
     final surfaceId = args[surfaceIdKey] as String;
     final List<Component> components = (args['components'] as List).map((e) {
       final component = e as JsonMap;
-      return Component(
-        id: component['id'] as String,
-        componentProperties: component['component'] as JsonMap,
-        weight: (component['weight'] as num?)?.toInt(),
-      );
+      // In v0.9, the component object is flattened (no 'component' wrapper).
+      // Component.fromJson expects the flattened map.
+      return Component.fromJson(component);
     }).toList();
-    handleMessage(SurfaceUpdate(surfaceId: surfaceId, components: components));
+    handleMessage(
+      UpdateComponents(surfaceId: surfaceId, components: components),
+    );
     return {
       surfaceIdKey: surfaceId,
       'status': 'UI Surface $surfaceId updated.',
@@ -55,15 +53,7 @@ class DeleteSurfaceTool extends AiTool<JsonMap> {
     : super(
         name: 'deleteSurface',
         description: 'Removes a UI surface that is no longer needed.',
-        parameters: S.object(
-          properties: {
-            surfaceIdKey: S.string(
-              description:
-                  'The unique identifier for the UI surface to remove.',
-            ),
-          },
-          required: [surfaceIdKey],
-        ),
+        parameters: A2uiSchemas.deleteSurfaceSchema(),
       );
 
   /// The callback to invoke when deleting a surface.
@@ -72,40 +62,40 @@ class DeleteSurfaceTool extends AiTool<JsonMap> {
   @override
   Future<JsonMap> invoke(JsonMap args) async {
     final surfaceId = args[surfaceIdKey] as String;
-    handleMessage(SurfaceDeletion(surfaceId: surfaceId));
+    handleMessage(DeleteSurface(surfaceId: surfaceId));
     return {'status': 'Surface $surfaceId deleted.'};
   }
 }
 
-/// An [AiTool] for signaling the client to begin rendering.
+/// An [AiTool] for signaling the client to create a surface.
 ///
-/// This tool allows the AI to specify the root component of a UI surface.
-class BeginRenderingTool extends AiTool<JsonMap> {
-  /// Creates a [BeginRenderingTool].
-  BeginRenderingTool({required this.handleMessage, this.catalogId})
+/// This tool allows the AI to create a new surface.
+class CreateSurfaceTool extends AiTool<JsonMap> {
+  /// Creates a [CreateSurfaceTool].
+  CreateSurfaceTool({required this.handleMessage})
     : super(
-        name: 'beginRendering',
-        description:
-            'Signals the client to begin rendering a surface with a '
-            'root component.',
-        parameters: A2uiSchemas.beginRenderingSchemaNoCatalogId(),
+        name: 'createSurface',
+        description: 'Creates a new empty surface.',
+        parameters: A2uiSchemas.createSurfaceSchema(),
       );
 
-  /// The callback to invoke when signaling to begin rendering.
+  /// The callback to invoke when signaling to create a surface.
   final void Function(A2uiMessage message) handleMessage;
-
-  /// The ID of the catalog to use for rendering this surface.
-  final String? catalogId;
 
   @override
   Future<JsonMap> invoke(JsonMap args) async {
     final surfaceId = args[surfaceIdKey] as String;
-    final root = args['root'] as String;
+    final catalogId = args['catalogId'] as String;
+    final theme = args['theme'] as JsonMap?;
+    final bool attachDataModel = args['attachDataModel'] as bool? ?? false;
     handleMessage(
-      BeginRendering(surfaceId: surfaceId, root: root, catalogId: catalogId),
+      CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: catalogId,
+        theme: theme,
+        attachDataModel: attachDataModel,
+      ),
     );
-    return {
-      'status': 'Surface $surfaceId rendered and waiting for user input.',
-    };
+    return {'status': 'Surface $surfaceId created.'};
   }
 }

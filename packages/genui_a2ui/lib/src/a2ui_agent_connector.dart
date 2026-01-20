@@ -279,9 +279,9 @@ class A2uiAgentConnector {
       'Processing a2ui messages from data part:\n'
       '${const JsonEncoder.withIndent('  ').convert(data)}',
     );
-    if (data.containsKey('surfaceUpdate') ||
-        data.containsKey('dataModelUpdate') ||
-        data.containsKey('beginRendering') ||
+    if (data.containsKey('updateComponents') ||
+        data.containsKey('updateDataModel') ||
+        data.containsKey('createSurface') ||
         data.containsKey('deleteSurface')) {
       if (!_controller.isClosed) {
         _log.finest(

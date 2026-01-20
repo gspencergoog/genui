@@ -15,35 +15,33 @@ void main() {
     const surfaceId = 'testSurface';
     final components = [
       const Component(
-        id: 'row',
+        id: 'root',
         componentProperties: {
-          'Row': {
-            'children': {
-              'explicitList': ['text_field'],
-            },
+          'type': 'Row',
+          'children': {
+            'explicitList': ['text_field'],
           },
         },
       ),
       const Component(
         id: 'text_field',
         componentProperties: {
-          'TextField': {
-            'label': {'literalString': 'Input'},
-          },
+          'type': 'TextField',
+          'label': {'literalString': 'Input'},
         },
         // "weight" property is left unset.
       ),
     ];
 
     a2uiProcessor.handleMessage(
-      SurfaceUpdate(surfaceId: surfaceId, components: components),
+      const CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: 'a2ui.org:standard_catalog_0_8_0',
+        theme: null,
+      ),
     );
     a2uiProcessor.handleMessage(
-      const BeginRendering(
-        surfaceId: surfaceId,
-        root: 'row',
-        catalogId: 'a2ui.org:standard_catalog_0_8_0',
-      ),
+      UpdateComponents(surfaceId: surfaceId, components: components),
     );
 
     await tester.pumpWidget(
@@ -78,35 +76,33 @@ void main() {
     const surfaceId = 'testSurface';
     final components = [
       const Component(
-        id: 'row',
+        id: 'root',
         componentProperties: {
-          'Row': {
-            'children': {
-              'explicitList': ['text_field'],
-            },
+          'type': 'Row',
+          'children': {
+            'explicitList': ['text_field'],
           },
         },
       ),
       const Component(
         id: 'text_field',
         componentProperties: {
-          'TextField': {
-            'label': {'literalString': 'Input'},
-          },
+          'type': 'TextField',
+          'label': {'literalString': 'Input'},
         },
         weight: 1,
       ),
     ];
 
     manager.handleMessage(
-      SurfaceUpdate(surfaceId: surfaceId, components: components),
+      const CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: 'a2ui.org:standard_catalog_0_8_0',
+        theme: null,
+      ),
     );
     manager.handleMessage(
-      const BeginRendering(
-        surfaceId: surfaceId,
-        root: 'row',
-        catalogId: 'a2ui.org:standard_catalog_0_8_0',
-      ),
+      UpdateComponents(surfaceId: surfaceId, components: components),
     );
 
     await tester.pumpWidget(

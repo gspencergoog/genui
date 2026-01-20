@@ -131,24 +131,18 @@ class A2uiSchemas {
     },
   );
 
-  /// Schema for a beginRendering message, which provides the root widget ID for
-  /// the given surface so that the surface can be rendered.
-  static Schema beginRenderingSchema() => S.object(
+  /// Schema for a createSurface message, which creates a new surface
+  /// and optionally attaches a data model.
+  static Schema createSurfaceSchema() => S.object(
     properties: {
       surfaceIdKey: S.string(
-        description: 'The surface ID of the surface to render.',
-      ),
-      'root': S.string(
-        description:
-            'The root widget ID for the surface. '
-            'All components must be descendents of this root in order to be '
-            'displayed.',
+        description: 'The surface ID of the surface to create.',
       ),
       'catalogId': S.string(
         description:
             'The identifier of the component catalog to use for this surface.',
       ),
-      'styles': S.object(
+      'theme': S.object(
         properties: {
           'font': S.string(description: 'The base font for this surface'),
           'primaryColor': S.string(
@@ -156,96 +150,72 @@ class A2uiSchemas {
           ),
         },
       ),
-    },
-    required: [surfaceIdKey, 'root'],
-  );
-
-  /// Schema for a beginRendering message, which provides the root widget ID for
-  /// the given surface so that the surface can be rendered.
-  static Schema beginRenderingSchemaNoCatalogId() => S.object(
-    properties: {
-      surfaceIdKey: S.string(
-        description: 'The surface ID of the surface to render.',
-      ),
-      'root': S.string(
+      'attachDataModel': S.boolean(
         description:
-            'The root widget ID for the surface. '
-            'All components must be descendents of this root in order to be '
-            'displayed.',
-      ),
-      'styles': S.object(
-        properties: {
-          'font': S.string(description: 'The base font for this surface'),
-          'primaryColor': S.string(
-            description: 'The seed color for the theme of this surface.',
-          ),
-        },
+            'Whether to attach the current data model to every client message.',
       ),
     },
-    required: [surfaceIdKey, 'root'],
+    required: [surfaceIdKey, 'catalogId'],
   );
 
   /// Schema for a `deleteSurface` message which will delete the given surface.
-  static Schema surfaceDeletionSchema() => S.object(
+  static Schema deleteSurfaceSchema() => S.object(
     properties: {surfaceIdKey: S.string()},
     required: [surfaceIdKey],
   );
 
-  /// Schema for a `dataModelUpdate` message which will update the given path in
+  /// Schema for a `updateDataModel` message which will update the given path in
   /// the data model. If the path is omitted, the entire data model is replaced.
-  static Schema dataModelUpdateSchema() => S.object(
+  static Schema updateDataModelSchema() => S.object(
     properties: {
       surfaceIdKey: S.string(),
       'path': S.string(),
-      'contents': S.any(
-        description: 'The new contents to write to the data model.',
-      ),
+      'value': S.any(description: 'The new value to write to the data model.'),
     },
-    required: [surfaceIdKey, 'contents'],
+    required: [surfaceIdKey, 'value'],
   );
 
-  /// Schema for a `surfaceUpdate` message which defines the components to be
+  /// Schema for a `updateComponents` message which defines the components to be
   /// rendered on a surface.
-  static Schema surfaceUpdateSchema(Catalog catalog) => S.object(
-    properties: {
-      surfaceIdKey: S.string(
-        description:
-            'The unique identifier for the UI surface to create or '
-            'update. If you are adding a new surface this *must* be a '
-            'new, unique identified that has never been used for any '
-            'existing surfaces shown.',
-      ),
-      'components': S.list(
-        description: 'A list of component definitions.',
-        minItems: 1,
-        items: S.object(
+  static Schema updateComponentsSchema(Catalog catalog) {
+    // We expect the catalog to be an ObjectSchema with a 'components' property
+    // which is also an ObjectSchema containing the component definitions.
+    // ignore: unused_local_variable
+    final Map<String, Schema> catalogComponents =
+        ((catalog.definition as ObjectSchema).properties!['components']!
+                as ObjectSchema)
+            .properties!;
+
+    return S.object(
+      properties: {
+        surfaceIdKey: S.string(
           description:
-              'Represents a *single* component in a UI widget tree. '
-              'This component could be one of many supported types.',
-          properties: {
-            'id': S.string(),
-            'weight': S.integer(
-              description:
-                  'Optional layout weight for use in Row/Column children.',
-            ),
-            'component': S.object(
-              description:
-                  '''A wrapper object that MUST contain exactly one key, which is the name of the component type (e.g., 'Text'). The value is an object containing the properties for that specific component.''',
-              properties: {
-                for (var entry
-                    in ((catalog.definition as ObjectSchema)
-                                .properties!['components']!
-                            as ObjectSchema)
-                        .properties!
-                        .entries)
-                  entry.key: entry.value,
-              },
-            ),
-          },
-          required: ['id', 'component'],
+              'The unique identifier for the UI surface to create or '
+              'update. If you are adding a new surface this *must* be a '
+              'new, unique identified that has never been used for any '
+              'existing surfaces shown.',
         ),
-      ),
-    },
-    required: [surfaceIdKey, 'components'],
-  );
+        'components': S.list(
+          description: 'A list of component definitions.',
+          minItems: 1,
+          items: S.object(
+            description:
+                'Represents a *single* component in a UI widget tree. '
+                'This component could be one of many supported types.',
+            properties: {
+              'id': S.string(),
+              'weight': S.integer(
+                description:
+                    'Optional layout weight for use in Row/Column children.',
+              ),
+              'type': S.string(
+                description: 'The type of the component (e.g., Button, Text).',
+              ),
+            },
+          ),
+        ),
+      },
+      required: [surfaceIdKey, 'components'],
+    );
+  }
 }

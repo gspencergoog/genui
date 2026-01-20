@@ -44,11 +44,18 @@ class ExampleValidationError {
 /// additional catalogs.
 ///
 /// Returns a list of validation errors. An empty list means success.
+/// Validates the examples for a single catalog item.
+///
+/// The [item] is the [CatalogItem] to validate.
+/// The [catalog] is the full catalog used for context, including any
+/// additional catalogs.
+///
+/// Returns a list of validation errors. An empty list means success.
 Future<List<ExampleValidationError>> validateCatalogItemExamples(
   CatalogItem item,
   Catalog catalog,
 ) async {
-  final Schema schema = A2uiSchemas.surfaceUpdateSchema(catalog);
+  final Schema schema = A2uiSchemas.updateComponentsSchema(catalog);
   final errors = <ExampleValidationError>[];
 
   for (var i = 0; i < item.exampleData.length; i++) {
@@ -76,13 +83,13 @@ Future<List<ExampleValidationError>> validateCatalogItemExamples(
       );
     }
 
-    final surfaceUpdate = SurfaceUpdate(
+    final updateComponents = UpdateComponents(
       surfaceId: 'test-surface',
       components: components,
     );
 
     final List<ValidationError> validationErrors = await schema.validate(
-      surfaceUpdate.toJson(),
+      updateComponents.toJson(),
     );
     if (validationErrors.isNotEmpty) {
       errors.add(

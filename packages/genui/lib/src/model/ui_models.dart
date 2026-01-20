@@ -91,8 +91,8 @@ class UiDefinition {
   Map<String, Component> get components => UnmodifiableMapView(_components);
   final Map<String, Component> _components;
 
-  /// (Future) The styles for this surface.
-  final JsonMap? styles;
+  /// (Future) The theme for this surface.
+  final JsonMap? theme;
 
   /// Creates a [UiDefinition].
   UiDefinition({
@@ -100,7 +100,7 @@ class UiDefinition {
     this.rootComponentId,
     this.catalogId,
     Map<String, Component> components = const {},
-    this.styles,
+    this.theme,
   }) : _components = components;
 
   /// Creates a copy of this [UiDefinition] with the given fields replaced.
@@ -108,14 +108,14 @@ class UiDefinition {
     String? rootComponentId,
     String? catalogId,
     Map<String, Component>? components,
-    JsonMap? styles,
+    JsonMap? theme,
   }) {
     return UiDefinition(
       surfaceId: surfaceId,
       rootComponentId: rootComponentId ?? this.rootComponentId,
       catalogId: catalogId ?? this.catalogId,
       components: components ?? _components,
-      styles: styles ?? this.styles,
+      theme: theme ?? this.theme,
     );
   }
 
@@ -148,13 +148,21 @@ final class Component {
 
   /// Creates a [Component] from a JSON map.
   factory Component.fromJson(JsonMap json) {
-    if (json['component'] == null) {
-      throw ArgumentError('Component.fromJson: component property is null');
+    if (json['id'] == null) {
+      throw ArgumentError('Component.fromJson: id property is null');
     }
+    // Deep copy to facilitate testing where the same map might be reused.
+    final Map<String, Object?> properties = Map.of(json);
+    properties.remove('id');
+    properties.remove('weight');
+
+    // Ensure properties map contains 'type' if it was top level.
+    // In v0.9, 'type' is just a property.
+
     return Component(
       id: json['id'] as String,
-      componentProperties: json['component'] as JsonMap,
-      weight: json['weight'] as int?,
+      componentProperties: properties,
+      weight: (json['weight'] as num?)?.toInt(),
     );
   }
 
@@ -171,13 +179,20 @@ final class Component {
   JsonMap toJson() {
     return {
       'id': id,
-      'component': componentProperties,
       if (weight != null) 'weight': weight,
+      ...componentProperties,
     };
   }
 
   /// The type of the component.
-  String get type => componentProperties.keys.first;
+  String get type {
+    final Object? t = componentProperties['type'];
+    if (t is String) return t;
+    // Fallback or error? v0.9 requires 'type'.
+    // If not found, return empty or throw?
+    // Return empty string to be safe, or check if we support implicit types (we don't).
+    return '';
+  }
 
   @override
   bool operator ==(Object other) =>

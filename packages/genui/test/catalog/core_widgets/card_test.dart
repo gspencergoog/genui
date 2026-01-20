@@ -19,29 +19,26 @@ void main() {
     const surfaceId = 'testSurface';
     final components = [
       const Component(
-        id: 'card',
-        componentProperties: {
-          'Card': {'child': 'text'},
-        },
+        id: 'root',
+        componentProperties: {'type': 'Card', 'child': 'text'},
       ),
       const Component(
         id: 'text',
         componentProperties: {
-          'Text': {
-            'text': {'literalString': 'This is a card.'},
-          },
+          'type': 'Text',
+          'text': {'literalString': 'This is a card.'},
         },
       ),
     ];
     manager.handleMessage(
-      SurfaceUpdate(surfaceId: surfaceId, components: components),
+      const CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: 'test_catalog',
+        theme: null,
+      ),
     );
     manager.handleMessage(
-      const BeginRendering(
-        surfaceId: surfaceId,
-        root: 'card',
-        catalogId: 'test_catalog',
-      ),
+      UpdateComponents(surfaceId: surfaceId, components: components),
     );
 
     await tester.pumpWidget(

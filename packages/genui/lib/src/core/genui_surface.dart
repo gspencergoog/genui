@@ -136,8 +136,7 @@ class _GenUiSurfaceState extends State<GenUiSurface> {
       final Component? modalComponent = definition.components[modalId];
       if (modalComponent == null) return;
       final contentChildId =
-          (modalComponent.componentProperties['Modal'] as Map)['contentChild']
-              as String;
+          modalComponent.componentProperties['content'] as String;
       showModalBottomSheet<void>(
         context: context,
         builder: (context) => _buildWidget(

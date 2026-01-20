@@ -12,7 +12,7 @@ import 'package:genui/src/model/tools.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 void main() {
-  group('$SurfaceUpdateTool', () {
+  group('$UpdateComponentsTool', () {
     test('invoke calls handleMessage with correct arguments', () async {
       final messages = <A2uiMessage>[];
 
@@ -20,7 +20,7 @@ void main() {
         messages.add(message);
       }
 
-      final tool = SurfaceUpdateTool(
+      final tool = UpdateComponentsTool(
         handleMessage: fakeHandleMessage,
         catalog: Catalog([
           CatalogItem(
@@ -38,9 +38,9 @@ void main() {
         'components': [
           {
             'id': 'rootWidget',
-            'component': {
-              'Text': {'text': 'Hello'},
-            },
+            // v0.9 flattened structure
+            'type': 'Text',
+            'text': 'Hello',
           },
         ],
       };
@@ -48,20 +48,21 @@ void main() {
       await tool.invoke(args);
 
       expect(messages.length, 1);
-      expect(messages[0], isA<SurfaceUpdate>());
-      final surfaceUpdate = messages[0] as SurfaceUpdate;
-      expect(surfaceUpdate.surfaceId, 'testSurface');
-      expect(surfaceUpdate.components.length, 1);
-      expect(surfaceUpdate.components[0].id, 'rootWidget');
-      expect(surfaceUpdate.components[0].componentProperties, {
-        'Text': {'text': 'Hello'},
+      expect(messages[0], isA<UpdateComponents>());
+      final updateComponents = messages[0] as UpdateComponents;
+      expect(updateComponents.surfaceId, 'testSurface');
+      expect(updateComponents.components.length, 1);
+      expect(updateComponents.components[0].id, 'rootWidget');
+      expect(updateComponents.components[0].componentProperties, {
+        'type': 'Text',
+        'text': 'Hello',
       });
-      expect(surfaceUpdate.components[0].weight, isNull);
+      expect(updateComponents.components[0].weight, isNull);
     });
 
     test('invoke correctly parses int weight', () async {
       final messages = <A2uiMessage>[];
-      final tool = SurfaceUpdateTool(
+      final tool = UpdateComponentsTool(
         handleMessage: messages.add,
         catalog: const Catalog([], catalogId: 'test_catalog'),
       );
@@ -69,24 +70,20 @@ void main() {
       final Map<String, Object> args = {
         surfaceIdKey: 'testSurface',
         'components': [
-          {
-            'id': 'weightedWidget',
-            'component': {'Text': <Object?, Object?>{}},
-            'weight': 1,
-          },
+          {'id': 'weightedWidget', 'type': 'Text', 'weight': 1},
         ],
       };
 
       await tool.invoke(args);
 
       expect(messages.length, 1);
-      final surfaceUpdate = messages[0] as SurfaceUpdate;
-      expect(surfaceUpdate.components[0].weight, 1);
+      final updateComponents = messages[0] as UpdateComponents;
+      expect(updateComponents.components[0].weight, 1);
     });
 
     test('invoke correctly parses double weight', () async {
       final messages = <A2uiMessage>[];
-      final tool = SurfaceUpdateTool(
+      final tool = UpdateComponentsTool(
         handleMessage: messages.add,
         catalog: const Catalog([], catalogId: 'test_catalog'),
       );
@@ -94,19 +91,15 @@ void main() {
       final Map<String, Object> args = {
         surfaceIdKey: 'testSurface',
         'components': [
-          {
-            'id': 'weightedWidget',
-            'component': {'Text': <Object?, Object?>{}},
-            'weight': 1.0,
-          },
+          {'id': 'weightedWidget', 'type': 'Text', 'weight': 1.0},
         ],
       };
 
       await tool.invoke(args);
 
       expect(messages.length, 1);
-      final surfaceUpdate = messages[0] as SurfaceUpdate;
-      expect(surfaceUpdate.components[0].weight, 1);
+      final updateComponents = messages[0] as UpdateComponents;
+      expect(updateComponents.components[0].weight, 1);
     });
   });
 
@@ -125,13 +118,13 @@ void main() {
       await tool.invoke(args);
 
       expect(messages.length, 1);
-      expect(messages[0], isA<SurfaceDeletion>());
-      final deleteSurface = messages[0] as SurfaceDeletion;
+      expect(messages[0], isA<DeleteSurface>());
+      final deleteSurface = messages[0] as DeleteSurface;
       expect(deleteSurface.surfaceId, 'testSurface');
     });
   });
 
-  group('BeginRenderingTool', () {
+  group('CreateSurfaceTool', () {
     test('invoke calls handleMessage with correct arguments', () async {
       final messages = <A2uiMessage>[];
 
@@ -139,24 +132,24 @@ void main() {
         messages.add(message);
       }
 
-      final tool = BeginRenderingTool(
-        handleMessage: fakeHandleMessage,
-        catalogId: 'test_catalog',
-      );
+      final tool = CreateSurfaceTool(handleMessage: fakeHandleMessage);
 
-      final Map<String, String> args = {
+      final Map<String, Object> args = {
         surfaceIdKey: 'testSurface',
-        'root': 'rootWidget',
+        'catalogId': 'test_catalog',
+        'theme': {'primaryColor': '#FFFFFF'},
+        'attachDataModel': true,
       };
 
       await tool.invoke(args);
 
       expect(messages.length, 1);
-      expect(messages[0], isA<BeginRendering>());
-      final beginRendering = messages[0] as BeginRendering;
-      expect(beginRendering.surfaceId, 'testSurface');
-      expect(beginRendering.root, 'rootWidget');
-      expect(beginRendering.catalogId, 'test_catalog');
+      expect(messages[0], isA<CreateSurface>());
+      final createSurface = messages[0] as CreateSurface;
+      expect(createSurface.surfaceId, 'testSurface');
+      expect(createSurface.catalogId, 'test_catalog');
+      expect(createSurface.theme, {'primaryColor': '#FFFFFF'});
+      expect(createSurface.attachDataModel, isTrue);
     });
   });
 }

@@ -22,54 +22,53 @@ void main() {
     const surfaceId = 'testSurface';
     final components = [
       const Component(
-        id: 'modal',
+        id: 'root',
         componentProperties: {
-          'Modal': {'entryPointChild': 'button', 'contentChild': 'text'},
+          'type': 'Modal',
+          'trigger': 'button',
+          'content': 'text',
         },
       ),
       const Component(
         id: 'button',
         componentProperties: {
-          'Button': {
-            'child': 'button_text',
-            'action': {
-              'name': 'showModal',
-              'context': [
-                {
-                  'key': 'modalId',
-                  'value': {'literalString': 'modal'},
-                },
-              ],
-            },
+          'type': 'Button',
+          'child': 'button_text',
+          'action': {
+            'name': 'showModal',
+            'context': [
+              {
+                'key': 'modalId',
+                'value': {'literalString': 'root'},
+              },
+            ],
           },
         },
       ),
       const Component(
         id: 'button_text',
         componentProperties: {
-          'Text': {
-            'text': {'literalString': 'Open Modal'},
-          },
+          'type': 'Text',
+          'text': {'literalString': 'Open Modal'},
         },
       ),
       const Component(
         id: 'text',
         componentProperties: {
-          'Text': {
-            'text': {'literalString': 'This is a modal.'},
-          },
+          'type': 'Text',
+          'text': {'literalString': 'This is a modal.'},
         },
       ),
     ];
     manager.handleMessage(
-      SurfaceUpdate(surfaceId: surfaceId, components: components),
+      const CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: 'test_catalog',
+        theme: null,
+      ),
     );
     manager.handleMessage(
-      const BeginRendering(
-        surfaceId: surfaceId,
-        root: 'modal',
-        catalogId: 'test_catalog',
-      ),
+      UpdateComponents(surfaceId: surfaceId, components: components),
     );
 
     await tester.pumpWidget(

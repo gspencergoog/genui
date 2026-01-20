@@ -26,30 +26,28 @@ void main() {
       const Component(
         id: 'root',
         componentProperties: {
-          'Button': {
-            'child': 'text',
-            'action': {'name': 'testAction'},
-          },
+          'type': 'Button',
+          'child': 'text',
+          'action': {'name': 'testAction'},
         },
       ),
       const Component(
         id: 'text',
         componentProperties: {
-          'Text': {
-            'text': {'literalString': 'Hello'},
-          },
+          'type': 'Text',
+          'text': {'literalString': 'Hello'},
         },
       ),
     ];
     processor.handleMessage(
-      SurfaceUpdate(surfaceId: surfaceId, components: components),
+      const CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: 'test_catalog',
+        theme: null,
+      ),
     );
     processor.handleMessage(
-      const BeginRendering(
-        surfaceId: surfaceId,
-        root: 'root',
-        catalogId: 'test_catalog',
-      ),
+      UpdateComponents(surfaceId: surfaceId, components: components),
     );
 
     await tester.pumpWidget(
@@ -68,30 +66,28 @@ void main() {
       const Component(
         id: 'root',
         componentProperties: {
-          'Button': {
-            'child': 'text',
-            'action': {'name': 'testAction'},
-          },
+          'type': 'Button',
+          'child': 'text',
+          'action': {'name': 'testAction'},
         },
       ),
       const Component(
         id: 'text',
         componentProperties: {
-          'Text': {
-            'text': {'literalString': 'Hello'},
-          },
+          'type': 'Text',
+          'text': {'literalString': 'Hello'},
         },
       ),
     ];
     processor.handleMessage(
-      SurfaceUpdate(surfaceId: surfaceId, components: components),
+      const CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: 'test_catalog',
+        theme: null,
+      ),
     );
     processor.handleMessage(
-      const BeginRendering(
-        surfaceId: surfaceId,
-        root: 'root',
-        catalogId: 'test_catalog',
-      ),
+      UpdateComponents(surfaceId: surfaceId, components: components),
     );
 
     await tester.pumpWidget(
@@ -111,22 +107,21 @@ void main() {
         const Component(
           id: 'root',
           componentProperties: {
-            'Text': {
-              'text': {'literalString': 'Hello'},
-            },
+            'type': 'Text',
+            'text': {'literalString': 'Hello'},
           },
         ),
       ];
-      processor.handleMessage(
-        SurfaceUpdate(surfaceId: surfaceId, components: components),
-      );
       // Request a catalogId that doesn't exist in the processor.
       processor.handleMessage(
-        const BeginRendering(
+        const CreateSurface(
           surfaceId: surfaceId,
-          root: 'root',
           catalogId: 'non_existent_catalog',
+          theme: null,
         ),
+      );
+      processor.handleMessage(
+        UpdateComponents(surfaceId: surfaceId, components: components),
       );
 
       final logs = <LogRecord>[];

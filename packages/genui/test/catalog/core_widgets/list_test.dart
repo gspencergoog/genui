@@ -19,41 +19,38 @@ void main() {
     const surfaceId = 'testSurface';
     final components = [
       const Component(
-        id: 'list',
+        id: 'root',
         componentProperties: {
-          'List': {
-            'children': {
-              'explicitList': ['text1', 'text2'],
-            },
+          'type': 'List',
+          'children': {
+            'explicitList': ['text1', 'text2'],
           },
         },
       ),
       const Component(
         id: 'text1',
         componentProperties: {
-          'Text': {
-            'text': {'literalString': 'First'},
-          },
+          'type': 'Text',
+          'text': {'literalString': 'First'},
         },
       ),
       const Component(
         id: 'text2',
         componentProperties: {
-          'Text': {
-            'text': {'literalString': 'Second'},
-          },
+          'type': 'Text',
+          'text': {'literalString': 'Second'},
         },
       ),
     ];
     manager.handleMessage(
-      SurfaceUpdate(surfaceId: surfaceId, components: components),
+      const CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: 'test_catalog',
+        theme: null,
+      ),
     );
     manager.handleMessage(
-      const BeginRendering(
-        surfaceId: surfaceId,
-        root: 'list',
-        catalogId: 'test_catalog',
-      ),
+      UpdateComponents(surfaceId: surfaceId, components: components),
     );
 
     await tester.pumpWidget(

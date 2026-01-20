@@ -191,24 +191,37 @@ void main() {
 (GenUiHost, String) setup(String componentId, Map<String, dynamic> props) {
   final catalog = Catalog([
     CoreCatalogItems.dateTimeInput,
+    CoreCatalogItems.column,
   ], catalogId: 'test_catalog');
 
   final manager = A2uiMessageProcessor(catalogs: [catalog]);
   const surfaceId = 'testSurface';
 
   final components = [
-    Component(id: componentId, componentProperties: {'DateTimeInput': props}),
+    Component(
+      id: 'root',
+      componentProperties: {
+        'type': 'Column',
+        'children': {
+          'explicitList': [componentId],
+        },
+      },
+    ),
+    Component(
+      id: componentId,
+      componentProperties: {'type': 'DateTimeInput', ...props},
+    ),
   ];
 
   manager.handleMessage(
-    SurfaceUpdate(surfaceId: surfaceId, components: components),
+    const CreateSurface(
+      surfaceId: surfaceId,
+      catalogId: 'test_catalog',
+      theme: null,
+    ),
   );
   manager.handleMessage(
-    BeginRendering(
-      surfaceId: surfaceId,
-      root: componentId,
-      catalogId: 'test_catalog',
-    ),
+    UpdateComponents(surfaceId: surfaceId, components: components),
   );
 
   return (manager, surfaceId);

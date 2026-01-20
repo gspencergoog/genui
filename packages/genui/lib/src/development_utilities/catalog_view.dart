@@ -86,11 +86,17 @@ class _DebugCatalogViewState extends State<DebugCatalogView> {
             continue;
           }
 
+          // v0.9: CreateSurface must be called first.
           _a2uiMessageProcessor.handleMessage(
-            SurfaceUpdate(surfaceId: surfaceId, components: components),
+            CreateSurface(
+              surfaceId: surfaceId,
+              catalogId: widget.catalog.catalogId ?? 'unknown_catalog',
+              theme: null, // No theme in example data usually.
+              attachDataModel: false,
+            ),
           );
           _a2uiMessageProcessor.handleMessage(
-            BeginRendering(surfaceId: surfaceId, root: rootComponent.id),
+            UpdateComponents(surfaceId: surfaceId, components: components),
           );
           surfaceIds.add(surfaceId);
         } catch (e, s) {

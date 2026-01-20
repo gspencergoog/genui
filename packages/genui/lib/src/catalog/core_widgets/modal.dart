@@ -13,96 +13,79 @@ import '../../primitives/simple_items.dart';
 
 final _schema = S.object(
   properties: {
-    'entryPointChild': A2uiSchemas.componentReference(
+    'trigger': A2uiSchemas.componentReference(
       description: 'The widget that opens the modal.',
     ),
-    'contentChild': A2uiSchemas.componentReference(
+    'content': A2uiSchemas.componentReference(
       description: 'The widget to display in the modal.',
     ),
   },
-  required: ['entryPointChild', 'contentChild'],
+  required: ['trigger', 'content'],
 );
 
 extension type _ModalData.fromMap(JsonMap _json) {
-  factory _ModalData({
-    required String entryPointChild,
-    required String contentChild,
-  }) => _ModalData.fromMap({
-    'entryPointChild': entryPointChild,
-    'contentChild': contentChild,
-  });
+  factory _ModalData({required String trigger, required String content}) =>
+      _ModalData.fromMap({'trigger': trigger, 'content': content});
 
-  String get entryPointChild => _json['entryPointChild'] as String;
-  String get contentChild => _json['contentChild'] as String;
+  String get trigger => _json['trigger'] as String;
+  String get content => _json['content'] as String;
 }
 
 /// A catalog item representing a modal bottom sheet.
 ///
 /// This component doesn't render the modal content directly. Instead, it
-/// renders the `entryPointChild` widget. The `entryPointChild` is expected to
-/// trigger an action (e.g., on button press) that causes the `contentChild` to
+/// renders the `trigger` widget. The `trigger` is expected to
+/// trigger an action (e.g., on button press) that causes the `content` to
 /// be displayed within a modal bottom sheet by the [GenUiSurface].
 ///
 /// ## Parameters:
 ///
-/// - `entryPointChild`: The ID of the widget that opens the modal.
-/// - `contentChild`: The ID of the widget to display in the modal.
+/// - `trigger`: The ID of the widget that opens the modal.
+/// - `content`: The ID of the widget to display in the modal.
 final modal = CatalogItem(
   name: 'Modal',
   dataSchema: _schema,
   widgetBuilder: (itemContext) {
     final modalData = _ModalData.fromMap(itemContext.data as JsonMap);
-    return itemContext.buildChild(modalData.entryPointChild);
+    return itemContext.buildChild(modalData.trigger);
   },
   exampleData: [
     () => '''
       [
         {
           "id": "root",
-          "component": {
-            "Modal": {
-              "entryPointChild": "button",
-              "contentChild": "text"
-            }
-          }
+          "type": "Modal",
+          "trigger": "button",
+          "content": "text"
         },
         {
           "id": "button",
-          "component": {
-            "Button": {
-              "child": "button_text",
-              "action": {
-                "name": "showModal",
-                "context": [
-                  {
-                    "key": "modalId",
-                    "value": {
-                      "literalString": "root"
-                    }
-                  }
-                ]
+          "type": "Button",
+          "child": "button_text",
+          "action": {
+            "name": "showModal",
+            "context": [
+              {
+                "key": "modalId",
+                "value": {
+                  "literalString": "root"
+                }
               }
-            }
+            ]
           }
         },
         {
           "id": "button_text",
-          "component": {
-            "Text": {
-              "text": {
-                "literalString": "Open Modal"
-              }
-            }
+          "type": "Text",
+          "text": {
+            "literalString": "Open Modal"
           }
         },
         {
           "id": "text",
-          "component": {
-            "Text": {
-              "text": {
-                "literalString": "This is a modal."
-              }
-            }
+          "type": "Text",
+          "text": {
+            "literalString": "This is a modal."
           }
         }
       ]

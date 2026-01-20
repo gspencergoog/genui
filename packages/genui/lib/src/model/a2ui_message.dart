@@ -15,19 +15,22 @@ sealed class A2uiMessage {
   /// Creates an [A2uiMessage].
   const A2uiMessage();
 
+  /// The ID of the surface that this message applies to.
+  String get surfaceId;
+
   /// Creates an [A2uiMessage] from a JSON map.
   factory A2uiMessage.fromJson(JsonMap json) {
-    if (json.containsKey('surfaceUpdate')) {
-      return SurfaceUpdate.fromJson(json['surfaceUpdate'] as JsonMap);
+    if (json.containsKey('updateComponents')) {
+      return UpdateComponents.fromJson(json['updateComponents'] as JsonMap);
     }
-    if (json.containsKey('dataModelUpdate')) {
-      return DataModelUpdate.fromJson(json['dataModelUpdate'] as JsonMap);
+    if (json.containsKey('updateDataModel')) {
+      return UpdateDataModel.fromJson(json['updateDataModel'] as JsonMap);
     }
-    if (json.containsKey('beginRendering')) {
-      return BeginRendering.fromJson(json['beginRendering'] as JsonMap);
+    if (json.containsKey('createSurface')) {
+      return CreateSurface.fromJson(json['createSurface'] as JsonMap);
     }
     if (json.containsKey('deleteSurface')) {
-      return SurfaceDeletion.fromJson(json['deleteSurface'] as JsonMap);
+      return DeleteSurface.fromJson(json['deleteSurface'] as JsonMap);
     }
     throw ArgumentError('Unknown A2UI message type: $json');
   }
@@ -37,25 +40,25 @@ sealed class A2uiMessage {
     return S.object(
       title: 'A2UI Message Schema',
       description:
-          """Describes a JSON payload for an A2UI (Agent to UI) message, which is used to dynamically construct and update user interfaces. A message MUST contain exactly ONE of the action properties: 'beginRendering', 'surfaceUpdate', 'dataModelUpdate', or 'deleteSurface'.""",
+          """Describes a JSON payload for an A2UI (Agent to UI) message, which is used to dynamically construct and update user interfaces. A message MUST contain exactly ONE of the action properties: 'createSurface', 'updateComponents', 'updateDataModel', or 'deleteSurface'.""",
       properties: {
-        'surfaceUpdate': A2uiSchemas.surfaceUpdateSchema(catalog),
-        'dataModelUpdate': A2uiSchemas.dataModelUpdateSchema(),
-        'beginRendering': A2uiSchemas.beginRenderingSchema(),
-        'deleteSurface': A2uiSchemas.surfaceDeletionSchema(),
+        'updateComponents': A2uiSchemas.updateComponentsSchema(catalog),
+        'updateDataModel': A2uiSchemas.updateDataModelSchema(),
+        'createSurface': A2uiSchemas.createSurfaceSchema(),
+        'deleteSurface': A2uiSchemas.deleteSurfaceSchema(),
       },
     );
   }
 }
 
 /// An A2UI message that updates a surface with new components.
-final class SurfaceUpdate extends A2uiMessage {
-  /// Creates a [SurfaceUpdate] message.
-  const SurfaceUpdate({required this.surfaceId, required this.components});
+final class UpdateComponents extends A2uiMessage {
+  /// Creates an [UpdateComponents] message.
+  const UpdateComponents({required this.surfaceId, required this.components});
 
-  /// Creates a [SurfaceUpdate] message from a JSON map.
-  factory SurfaceUpdate.fromJson(JsonMap json) {
-    return SurfaceUpdate(
+  /// Creates an [UpdateComponents] message from a JSON map.
+  factory UpdateComponents.fromJson(JsonMap json) {
+    return UpdateComponents(
       surfaceId: json[surfaceIdKey] as String,
       components: (json['components'] as List<Object?>)
           .map((e) => Component.fromJson(e as JsonMap))
@@ -64,6 +67,7 @@ final class SurfaceUpdate extends A2uiMessage {
   }
 
   /// The ID of the surface that this message applies to.
+  @override
   final String surfaceId;
 
   /// The list of components to add or update.
@@ -79,76 +83,79 @@ final class SurfaceUpdate extends A2uiMessage {
 }
 
 /// An A2UI message that updates the data model.
-final class DataModelUpdate extends A2uiMessage {
-  /// Creates a [DataModelUpdate] message.
-  const DataModelUpdate({
+final class UpdateDataModel extends A2uiMessage {
+  /// Creates an [UpdateDataModel] message.
+  const UpdateDataModel({
     required this.surfaceId,
     this.path,
-    required this.contents,
+    required this.value,
   });
 
-  /// Creates a [DataModelUpdate] message from a JSON map.
-  factory DataModelUpdate.fromJson(JsonMap json) {
-    return DataModelUpdate(
+  /// Creates an [UpdateDataModel] message from a JSON map.
+  factory UpdateDataModel.fromJson(JsonMap json) {
+    return UpdateDataModel(
       surfaceId: json[surfaceIdKey] as String,
       path: json['path'] as String?,
-      contents: json['contents'] as Object,
+      value: json['value'] as Object,
     );
   }
 
   /// The ID of the surface that this message applies to.
+  @override
   final String surfaceId;
 
   /// The path in the data model to update.
   final String? path;
 
-  /// The new contents to write to the data model.
-  final Object contents;
+  /// The new value to write to the data model.
+  final Object value;
 }
 
-/// An A2UI message that signals the client to begin rendering.
-final class BeginRendering extends A2uiMessage {
-  /// Creates a [BeginRendering] message.
-  const BeginRendering({
+/// An A2UI message that signals the client to create a surface.
+final class CreateSurface extends A2uiMessage {
+  /// Creates a [CreateSurface] message.
+  const CreateSurface({
     required this.surfaceId,
-    required this.root,
-    this.styles,
-    this.catalogId,
+    required this.catalogId,
+    this.theme,
+    this.attachDataModel = false,
   });
 
-  /// Creates a [BeginRendering] message from a JSON map.
-  factory BeginRendering.fromJson(JsonMap json) {
-    return BeginRendering(
+  /// Creates a [CreateSurface] message from a JSON map.
+  factory CreateSurface.fromJson(JsonMap json) {
+    return CreateSurface(
       surfaceId: json[surfaceIdKey] as String,
-      root: json['root'] as String,
-      styles: json['styles'] as JsonMap?,
-      catalogId: json['catalogId'] as String?,
+      catalogId: json['catalogId'] as String,
+      theme: json['theme'] as JsonMap?,
+      attachDataModel: json['attachDataModel'] as bool? ?? false,
     );
   }
 
   /// The ID of the surface that this message applies to.
+  @override
   final String surfaceId;
 
-  /// The ID of the root component.
-  final String root;
-
-  /// The styles to apply to the UI.
-  final JsonMap? styles;
-
   /// The ID of the catalog to use for rendering this surface.
-  final String? catalogId;
+  final String catalogId;
+
+  /// The theme to apply to the UI.
+  final JsonMap? theme;
+
+  /// Whether to attach the data model to client messages.
+  final bool attachDataModel;
 }
 
 /// An A2UI message that deletes a surface.
-final class SurfaceDeletion extends A2uiMessage {
-  /// Creates a [SurfaceDeletion] message.
-  const SurfaceDeletion({required this.surfaceId});
+final class DeleteSurface extends A2uiMessage {
+  /// Creates a [DeleteSurface] message.
+  const DeleteSurface({required this.surfaceId});
 
-  /// Creates a [SurfaceDeletion] message from a JSON map.
-  factory SurfaceDeletion.fromJson(JsonMap json) {
-    return SurfaceDeletion(surfaceId: json[surfaceIdKey] as String);
+  /// Creates a [DeleteSurface] message from a JSON map.
+  factory DeleteSurface.fromJson(JsonMap json) {
+    return DeleteSurface(surfaceId: json[surfaceIdKey] as String);
   }
 
   /// The ID of the surface that this message applies to.
+  @override
   final String surfaceId;
 }

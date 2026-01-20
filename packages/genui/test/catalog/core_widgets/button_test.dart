@@ -23,32 +23,30 @@ void main() {
     const surfaceId = 'testSurface';
     final components = [
       const Component(
-        id: 'button',
+        id: 'root',
         componentProperties: {
-          'Button': {
-            'child': 'button_text',
-            'action': {'name': 'testAction'},
-          },
+          'type': 'Button',
+          'child': 'button_text',
+          'action': {'name': 'testAction'},
         },
       ),
       const Component(
         id: 'button_text',
         componentProperties: {
-          'Text': {
-            'text': {'literalString': 'Click Me'},
-          },
+          'type': 'Text',
+          'text': {'literalString': 'Click Me'},
         },
       ),
     ];
     manager.handleMessage(
-      SurfaceUpdate(surfaceId: surfaceId, components: components),
+      const CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: 'test_catalog',
+        theme: null,
+      ),
     );
     manager.handleMessage(
-      const BeginRendering(
-        surfaceId: surfaceId,
-        root: 'button',
-        catalogId: 'test_catalog',
-      ),
+      UpdateComponents(surfaceId: surfaceId, components: components),
     );
 
     await tester.pumpWidget(

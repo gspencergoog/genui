@@ -15,8 +15,8 @@ void main() {
       a2uiMessageProcessor = A2uiMessageProcessor(catalogs: [catalog]);
     });
 
-    test('SurfaceUpdateTool sends SurfaceUpdate message', () async {
-      final tool = SurfaceUpdateTool(
+    test('UpdateComponentsTool sends UpdateComponents message', () async {
+      final tool = UpdateComponentsTool(
         handleMessage: a2uiMessageProcessor.handleMessage,
         catalog: catalog,
       );
@@ -26,19 +26,18 @@ void main() {
         'components': [
           {
             'id': 'root',
-            'component': {
-              'Text': {
-                'text': {'literalString': 'Hello'},
-              },
-            },
+            // v0.9 flattened
+            'type': 'Text',
+            'text': {'literalString': 'Hello'},
           },
         ],
       };
 
       final Future<void> future = expectLater(
         a2uiMessageProcessor.surfaceUpdates,
-        emits(
-          isA<SurfaceAdded>()
+        emitsInOrder([
+          isA<SurfaceAdded>(),
+          isA<SurfaceUpdated>()
               .having((e) => e.surfaceId, surfaceIdKey, 'testSurface')
               .having(
                 (e) => e.definition.components.length,
@@ -50,44 +49,30 @@ void main() {
                 'components.first.id',
                 'root',
               ),
-        ),
+        ]),
+      );
+
+      // Must create surface first in v0.9
+      a2uiMessageProcessor.handleMessage(
+        const CreateSurface(surfaceId: 'testSurface', catalogId: 'default'),
       );
 
       await tool.invoke(args);
-      a2uiMessageProcessor.handleMessage(
-        const BeginRendering(surfaceId: 'testSurface', root: 'root'),
-      );
 
       await future;
     });
 
-    test('BeginRenderingTool sends BeginRendering message', () async {
-      final tool = BeginRenderingTool(
+    test('CreateSurfaceTool sends CreateSurface message', () async {
+      final tool = CreateSurfaceTool(
         handleMessage: a2uiMessageProcessor.handleMessage,
-        catalogId: 'test_catalog',
       );
 
-      final Map<String, String> args = {
+      final Map<String, Object?> args = {
         surfaceIdKey: 'testSurface',
-        'root': 'root',
+        'catalogId': 'test_catalog',
+        'theme': null,
+        'attachDataModel': false,
       };
-
-      // First, add a component to the surface so that the root can be set.
-      a2uiMessageProcessor.handleMessage(
-        const SurfaceUpdate(
-          surfaceId: 'testSurface',
-          components: [
-            Component(
-              id: 'root',
-              componentProperties: {
-                'Text': {
-                  'text': {'literalString': 'Hello'},
-                },
-              },
-            ),
-          ],
-        ),
-      );
 
       // Use expectLater to wait for the stream to emit the correct event.
       final Future<void> future = expectLater(

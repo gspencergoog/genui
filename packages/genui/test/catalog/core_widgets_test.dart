@@ -15,7 +15,6 @@ void main() {
 
     Future<void> pumpWidgetWithDefinition(
       WidgetTester tester,
-      String rootId,
       List<Component> components,
     ) async {
       message = null;
@@ -24,14 +23,15 @@ void main() {
       messageProcessor!.onSubmit.listen((event) => message = event);
       const surfaceId = 'testSurface';
       messageProcessor!.handleMessage(
-        SurfaceUpdate(surfaceId: surfaceId, components: components),
+        const CreateSurface(
+          surfaceId: surfaceId,
+          catalogId: standardCatalogId,
+          theme: null,
+          attachDataModel: true,
+        ),
       );
       messageProcessor!.handleMessage(
-        BeginRendering(
-          surfaceId: surfaceId,
-          root: rootId,
-          catalogId: testCatalog.catalogId,
-        ),
+        UpdateComponents(surfaceId: surfaceId, components: components),
       );
       await tester.pumpWidget(
         MaterialApp(
@@ -45,25 +45,23 @@ void main() {
     testWidgets('Button renders and handles taps', (WidgetTester tester) async {
       final components = [
         const Component(
-          id: 'button',
+          id: 'root',
           componentProperties: {
-            'Button': {
-              'child': 'text',
-              'action': {'name': 'testAction'},
-            },
+            'type': 'Button',
+            'child': 'text',
+            'action': {'name': 'testAction'},
           },
         ),
         const Component(
           id: 'text',
           componentProperties: {
-            'Text': {
-              'text': {'literalString': 'Click Me'},
-            },
+            'type': 'Text',
+            'text': {'literalString': 'Click Me'},
           },
         ),
       ];
 
-      await pumpWidgetWithDefinition(tester, 'button', components);
+      await pumpWidgetWithDefinition(tester, components);
 
       expect(find.text('Click Me'), findsOneWidget);
 
@@ -75,16 +73,15 @@ void main() {
     testWidgets('Text renders from data model', (WidgetTester tester) async {
       final components = [
         const Component(
-          id: 'text',
+          id: 'root',
           componentProperties: {
-            'Text': {
-              'text': {'path': '/myText'},
-            },
+            'type': 'Text',
+            'text': {'path': '/myText'},
           },
         ),
       ];
 
-      await pumpWidgetWithDefinition(tester, 'text', components);
+      await pumpWidgetWithDefinition(tester, components);
       messageProcessor!
           .dataModelForSurface('testSurface')
           .update(DataPath('/myText'), 'Hello from data model');
@@ -96,34 +93,31 @@ void main() {
     testWidgets('Column renders children', (WidgetTester tester) async {
       final components = [
         const Component(
-          id: 'col',
+          id: 'root',
           componentProperties: {
-            'Column': {
-              'children': {
-                'explicitList': ['text1', 'text2'],
-              },
+            'type': 'Column',
+            'children': {
+              'explicitList': ['text1', 'text2'],
             },
           },
         ),
         const Component(
           id: 'text1',
           componentProperties: {
-            'Text': {
-              'text': {'literalString': 'First'},
-            },
+            'type': 'Text',
+            'text': {'literalString': 'First'},
           },
         ),
         const Component(
           id: 'text2',
           componentProperties: {
-            'Text': {
-              'text': {'literalString': 'Second'},
-            },
+            'type': 'Text',
+            'text': {'literalString': 'Second'},
           },
         ),
       ];
 
-      await pumpWidgetWithDefinition(tester, 'col', components);
+      await pumpWidgetWithDefinition(tester, components);
 
       expect(find.text('First'), findsOneWidget);
       expect(find.text('Second'), findsOneWidget);
@@ -134,25 +128,30 @@ void main() {
     ) async {
       final components = [
         const Component(
-          id: 'field',
+          id: 'root',
           componentProperties: {
-            'TextField': {
-              'text': {'path': '/myValue'},
-              'label': {'literalString': 'My Label'},
-              'onSubmittedAction': {'name': 'submit'},
-            },
+            'type': 'TextField',
+            'text': {'path': '/myValue'},
+            'label': {'literalString': 'My Label'},
+            'onSubmittedAction': {'name': 'submit'},
           },
         ),
       ];
 
-      await pumpWidgetWithDefinition(tester, 'field', components);
+      await pumpWidgetWithDefinition(tester, components);
       messageProcessor!
           .dataModelForSurface('testSurface')
           .update(DataPath('/myValue'), 'initial');
       await tester.pumpAndSettle();
 
       final Finder textFieldFinder = find.byType(TextField);
-      expect(find.widgetWithText(TextField, 'initial'), findsOneWidget);
+      expect(textFieldFinder, findsOneWidget);
+      expect(find.text('initial'), findsOneWidget);
+      // Verify ancestry explicitly if needed, but separate checks help debug.
+      expect(
+        find.descendant(of: textFieldFinder, matching: find.text('initial')),
+        findsOneWidget,
+      );
       final TextField textField = tester.widget<TextField>(textFieldFinder);
       expect(textField.decoration?.labelText, 'My Label');
 

@@ -21,33 +21,33 @@ void main() {
     const surfaceId = 'testSurface';
     final components = [
       const Component(
-        id: 'multiple_choice',
+        id: 'root',
         componentProperties: {
-          'MultipleChoice': {
-            'selections': {'path': '/mySelections'},
-            'options': [
-              {
-                'label': {'literalString': 'Option 1'},
-                'value': '1',
-              },
-              {
-                'label': {'literalString': 'Option 2'},
-                'value': '2',
-              },
-            ],
-          },
+          'type': 'MultipleChoice',
+          'selections': {'path': '/mySelections'},
+          'options': [
+            {
+              'label': {'literalString': 'Option 1'},
+              'value': '1',
+            },
+            {
+              'label': {'literalString': 'Option 2'},
+              'value': '2',
+            },
+          ],
         },
       ),
     ];
     processor.handleMessage(
-      SurfaceUpdate(surfaceId: surfaceId, components: components),
+      const CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: 'test_catalog',
+        theme: null,
+        attachDataModel: true,
+      ),
     );
     processor.handleMessage(
-      const BeginRendering(
-        surfaceId: surfaceId,
-        root: 'multiple_choice',
-        catalogId: 'test_catalog',
-      ),
+      UpdateComponents(surfaceId: surfaceId, components: components),
     );
     processor.dataModelForSurface(surfaceId).update(DataPath('/mySelections'), [
       '1',
@@ -96,35 +96,35 @@ void main() {
 
       final components = [
         const Component(
-          id: 'multiple_choice',
+          id: 'root',
           componentProperties: {
-            'MultipleChoice': {
-              'selections': {'path': '/mySelections'},
-              'maxAllowedSelections': 3.0,
-              'options': [
-                {
-                  'label': {'literalString': 'Option 1'},
-                  'value': '1',
-                },
-                {
-                  'label': {'literalString': 'Option 2'},
-                  'value': '2',
-                },
-              ],
-            },
+            'type': 'MultipleChoice',
+            'selections': {'path': '/mySelections'},
+            'maxAllowedSelections': 3.0,
+            'options': [
+              {
+                'label': {'literalString': 'Option 1'},
+                'value': '1',
+              },
+              {
+                'label': {'literalString': 'Option 2'},
+                'value': '2',
+              },
+            ],
           },
         ),
       ];
 
       processor.handleMessage(
-        SurfaceUpdate(surfaceId: surfaceId, components: components),
+        const CreateSurface(
+          surfaceId: surfaceId,
+          catalogId: 'test_catalog',
+          theme: null,
+          attachDataModel: true,
+        ),
       );
       processor.handleMessage(
-        const BeginRendering(
-          surfaceId: surfaceId,
-          root: 'multiple_choice',
-          catalogId: 'test_catalog',
-        ),
+        UpdateComponents(surfaceId: surfaceId, components: components),
       );
 
       processor

@@ -21,48 +21,45 @@ void main() {
     const surfaceId = 'testSurface';
     final components = [
       const Component(
-        id: 'tabs',
+        id: 'root',
         componentProperties: {
-          'Tabs': {
-            'tabItems': [
-              {
-                'title': {'literalString': 'Tab 1'},
-                'child': 'text1',
-              },
-              {
-                'title': {'literalString': 'Tab 2'},
-                'child': 'text2',
-              },
-            ],
-          },
+          'type': 'Tabs',
+          'tabItems': [
+            {
+              'title': {'literalString': 'Tab 1'},
+              'child': 'text1',
+            },
+            {
+              'title': {'literalString': 'Tab 2'},
+              'child': 'text2',
+            },
+          ],
         },
       ),
       const Component(
         id: 'text1',
         componentProperties: {
-          'Text': {
-            'text': {'literalString': 'This is the first tab.'},
-          },
+          'type': 'Text',
+          'text': {'literalString': 'This is the first tab.'},
         },
       ),
       const Component(
         id: 'text2',
         componentProperties: {
-          'Text': {
-            'text': {'literalString': 'This is the second tab.'},
-          },
+          'type': 'Text',
+          'text': {'literalString': 'This is the second tab.'},
         },
       ),
     ];
     manager.handleMessage(
-      SurfaceUpdate(surfaceId: surfaceId, components: components),
+      const CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: 'test_catalog',
+        theme: null,
+      ),
     );
     manager.handleMessage(
-      const BeginRendering(
-        surfaceId: surfaceId,
-        root: 'tabs',
-        catalogId: 'test_catalog',
-      ),
+      UpdateComponents(surfaceId: surfaceId, components: components),
     );
 
     await tester.pumpWidget(

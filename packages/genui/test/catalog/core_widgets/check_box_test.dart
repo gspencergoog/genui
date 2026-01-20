@@ -18,24 +18,24 @@ void main() {
     const surfaceId = 'testSurface';
     final components = [
       const Component(
-        id: 'checkbox',
+        id: 'root',
         componentProperties: {
-          'CheckBox': {
-            'label': {'literalString': 'Check me'},
-            'value': {'path': '/myValue'},
-          },
+          'type': 'CheckBox',
+          'label': {'literalString': 'Check me'},
+          'value': {'path': '/myValue'},
         },
       ),
     ];
     manager.handleMessage(
-      SurfaceUpdate(surfaceId: surfaceId, components: components),
+      const CreateSurface(
+        surfaceId: surfaceId,
+        catalogId: 'test_catalog',
+        theme: null,
+        attachDataModel: true,
+      ),
     );
     manager.handleMessage(
-      const BeginRendering(
-        surfaceId: surfaceId,
-        root: 'checkbox',
-        catalogId: 'test_catalog',
-      ),
+      UpdateComponents(surfaceId: surfaceId, components: components),
     );
     manager.dataModelForSurface(surfaceId).update(DataPath('/myValue'), true);
 

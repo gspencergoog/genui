@@ -37,7 +37,7 @@ GenUiFunctionDeclaration catalogToFunctionDeclaration(
   return GenUiFunctionDeclaration(
     description: toolDescription,
     name: toolName,
-    parameters: A2uiSchemas.surfaceUpdateSchema(catalog),
+    parameters: A2uiSchemas.updateComponentsSchema(catalog),
   );
 }
 
@@ -45,18 +45,33 @@ GenUiFunctionDeclaration catalogToFunctionDeclaration(
 ParsedToolCall parseToolCall(ToolCall toolCall, String toolName) {
   assert(toolCall.name == toolName);
 
-  final Map<String, Object?> messageJson = {'surfaceUpdate': toolCall.args};
-  final surfaceUpdateMessage = A2uiMessage.fromJson(messageJson);
+  // This function assumes the toolCall maps to an UpdateComponents message roughly.
+  // But we also need to ensure the surface is created.
+  // We can emit both CreateSurface and UpdateComponents.
+
+  final Map<String, Object?> messageJson = {'updateComponents': toolCall.args};
+  final updateComponentsMessage = A2uiMessage.fromJson(messageJson);
 
   final surfaceId = (toolCall.args as JsonMap)[surfaceIdKey] as String;
 
-  final beginRenderingMessage = BeginRendering(
+  // We don't have catalogId here easily unless we infer or it's hardcoded.
+  // For direct call integration, maybe we assume a default catalog or it's not strictly checked by client if not using it for loading?
+  // But CreateSurface requires catalogId.
+  // Let's assume an empty string or 'default' if unknown, or maybe we shouldn't emit CreateSurface here?
+  // But A2uiMessageProcessor expects CreateSurface to behave correctly (init notifier).
+  // Let's use 'default' for now or passed in context if possible.
+  // But this function signature doesn't have it.
+  // However, `updateComponents` assumes surface exists.
+  // If `parseToolCall` is used for the *first* call, it needs CreateSurface.
+
+  final createSurfaceMessage = CreateSurface(
     surfaceId: surfaceId,
-    root: 'root',
+    catalogId: 'default', // Placeholder
+    // root is implicit 'root'
   );
 
   return ParsedToolCall(
-    messages: [surfaceUpdateMessage, beginRenderingMessage],
+    messages: [createSurfaceMessage, updateComponentsMessage],
     surfaceId: surfaceId,
   );
 }
@@ -67,11 +82,17 @@ ToolCall catalogExampleToToolCall(
   String toolName,
   String surfaceId,
 ) {
-  final messageJson = {'surfaceUpdate': example};
-  final surfaceUpdateMessage = A2uiMessage.fromJson(messageJson);
+  // Example is usually a list of components or a map with 'components'.
+  // If example is just components list, we wrap it?
+  // The catalog example usually matches the tool args.
+  // A2uiSchemas.updateComponentsSchema structure: { surfaceId, components: [...] }
 
-  return ToolCall(
-    name: toolName,
-    args: {surfaceIdKey: surfaceId, 'surfaceUpdate': surfaceUpdateMessage},
-  );
+  // If the example is just the components list (v0.8 style was sometimes ambiguous), we need to ensure it matches v0.9 schema arg structure.
+  // But usually `example` is the `args` map.
+
+  // Create message to verify it parses?
+  // final messageJson = {'updateComponents': example};
+  // final updateMessage = A2uiMessage.fromJson(messageJson);
+
+  return ToolCall(name: toolName, args: example);
 }
