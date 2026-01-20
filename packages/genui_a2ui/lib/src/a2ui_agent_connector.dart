@@ -165,10 +165,10 @@ class A2uiAgentConnector {
     _log.info('--- OUTGOING REQUEST ---');
     _log.info('URL: ${url.toString()}');
     _log.info('Method: message/stream');
-    _log.info(
-      'Payload: '
-      '${const JsonEncoder.withIndent('  ').convert(messageWithExtensions.toJson())}',
-    );
+    String payload = const JsonEncoder.withIndent(
+      '  ',
+    ).convert(messageWithExtensions.toJson());
+    _log.info('Payload: $payload');
     _log.info('----------------------');
 
     final Stream<Event> events = client.messageStream(messageWithExtensions);

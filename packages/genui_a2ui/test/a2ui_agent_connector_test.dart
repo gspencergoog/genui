@@ -114,17 +114,16 @@ void main() {
       connector.taskId = 'task1';
       // connector.contextId ??= 'context1'; // contextId is private setter?
       // Wait, A2uiAgentConnector has `String? _contextId`. `contextId` getter.
-      // Can't set contextId directly.
-      // But we can set it via receiving an event first or accessing the private field via reflection?
-      // Or just assume it sends what it has.
-      // The connector.contextId is read-only.
-      // However, connector tracks it.
-      // In this test, we might not have contextId set if we didn't receive a message.
-      // But we can simulate receiving a message first to set contextId.
+      // Can't set contextId directly. But we can set it via receiving an event
+      // first or accessing the private field via reflection? Or just assume it
+      // sends what it has. The connector.contextId is read-only. However,
+      // connector tracks it. In this test, we might not have contextId set if
+      // we didn't receive a message. But we can simulate receiving a message
+      // first to set contextId.
 
-      // Instead, we can't easily force contextId without reflection or unsafe access,
-      // or modifying the Connector to be more testable.
-      // But we can just test that it sends event even if contextId is null (or whatever).
+      // Instead, we can't easily force contextId without reflection or unsafe
+      // access, or modifying the Connector to be more testable. But we can just
+      // test that it sends event even if contextId is null (or whatever).
 
       // Actually `connectAndSend` sets `_contextId`.
       // Let's call connectAndSend first to set state?

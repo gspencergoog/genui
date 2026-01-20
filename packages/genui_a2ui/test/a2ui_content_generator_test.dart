@@ -4,10 +4,10 @@
 
 import 'dart:async';
 
-import 'package:genui_a2ui/src/a2a/a2a.dart' as a2a;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
 import 'package:genui_a2ui/genui_a2ui.dart';
+import 'package:genui_a2ui/src/a2a/a2a.dart' as a2a;
 
 import 'fakes.dart';
 
@@ -33,17 +33,17 @@ void main() {
             url: 'http://localhost:8080',
           );
           fakeConnector = FakeA2uiAgentConnector();
-          // mocking setup if needed, usually we use dependency injection or pass it in constructor
-          // A2uiContentGenerator takes a connector.
+          // mocking setup if needed, usually we use dependency injection or
+          // pass it in constructor A2uiContentGenerator takes a connector.
 
-          // We need to implement `errorStream` on fakeConnector because usage depends on it.
-          // FakeA2uiAgentConnector in fakes.dart returns const Stream.empty().
-          // If we want to test errorStream updates, we need a controller.
+          // We need to implement `errorStream` on fakeConnector because usage
+          // depends on it. FakeA2uiAgentConnector in fakes.dart returns const
+          // Stream.empty(). If we want to test errorStream updates, we need a
+          // controller.
         });
 
         tearDown(() {
           contentGenerator.dispose();
-          // fakeConnector.dispose(); // Mock doesn't need dispose unless we implemented it with resources
         });
 
         test('sendRequest updates isProcessing', () async {
@@ -57,7 +57,7 @@ void main() {
           fakeConnector.connectAndSendHandler =
               (msg, {clientCapabilities}) async {
                 // Simulate delay
-                await Future.delayed(const Duration(milliseconds: 10));
+                await Future<void>.delayed(const Duration(milliseconds: 10));
                 return 'Response';
               };
 
@@ -135,9 +135,10 @@ void main() {
         });
 
         test('errorStream forwards errors from connector', () async {
-          // To test error forwarding, we need a way to emit errors from connector.errorStream.
-          // The current FakeA2uiAgentConnector returns Stream.empty().
-          // We must subclass or use a different mock setup that allows controlling the stream.
+          // To test error forwarding, we need a way to emit errors from
+          // connector.errorStream. The current FakeA2uiAgentConnector returns
+          // Stream.empty(). We must subclass or use a different mock setup that
+          // allows controlling the stream.
 
           final controller = StreamController<Object>();
 
@@ -174,8 +175,8 @@ class FakeA2uiAgentConnectorWithStream extends FakeA2uiAgentConnector {
   @override
   Stream<Object> get errorStream => _customErrorStream;
 
-  // We also need to override dispose to avoid closing the controller if we owned it,
-  // but here we just injected the stream.
+  // We also need to override dispose to avoid closing the controller if we
+  // owned it, but here we just injected the stream.
   @override
   void dispose() {}
 }
