@@ -139,6 +139,11 @@ class FakeA2uiAgentConnector implements A2uiAgentConnector {
   genui.A2UiClientCapabilities? lastClientCapabilities;
 
   @override
+  Uri get extensionUri => _extensionUri ?? a2uiExtensionUri;
+  Uri? _extensionUri;
+  set extensionUri(Uri value) => _extensionUri = value;
+
+  @override
   Future<String?> connectAndSend(
     genui.ChatMessage chatMessage, {
     genui.A2UiClientCapabilities? clientCapabilities,

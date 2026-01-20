@@ -194,5 +194,94 @@ void main() {
       await expectLater(streamDone.future, completes);
       await expectLater(errorStreamDone.future, completes);
     });
+    test(
+      'connectAndSend translates v0.8 messages when configured for v0.8',
+      () async {
+        connector = A2uiAgentConnector(
+          url: Uri.parse('http://localhost:8080'),
+          client: fakeClient,
+          extensionUri: a2uiExtensionUriV08,
+        );
+
+        final responses = <a2a.Event>[
+          const a2a.Event.taskStatusUpdate(
+            taskId: 'task1',
+            contextId: 'context1',
+            status: a2a.TaskStatus(
+              state: a2a.TaskState.working,
+              message: a2a.Message(
+                messageId: 'msg1',
+                role: a2a.Role.agent,
+                parts: [
+                  a2a.Part.data(
+                    data: {
+                      'beginRendering': {
+                        'surfaceId': 's1',
+                        'styles': {'color': 'red'},
+                      },
+                    },
+                  ),
+                ],
+              ),
+            ),
+            final_: false,
+          ),
+        ];
+        fakeClient.messageStreamHandler = (_) => Stream.fromIterable(responses);
+
+        final messages = <genui.A2uiMessage>[];
+        connector.stream.listen(messages.add);
+
+        await connector.connectAndSend(genui.UserMessage.text('Hi'));
+        // Wait a tick for stream processing
+        await Future<void>.delayed(Duration.zero);
+
+        expect(messages.length, 1);
+        final msg = messages.first as genui.CreateSurface;
+        expect(msg.surfaceId, 's1');
+        expect(msg.theme, {'color': 'red'});
+      },
+    );
+
+    test(
+      'connectAndSend ignores v0.8 messages when configured for v0.9 (default)',
+      () async {
+        // Connector is v0.9 by default
+        final responses = <a2a.Event>[
+          const a2a.Event.taskStatusUpdate(
+            taskId: 'task1',
+            contextId: 'context1',
+            status: a2a.TaskStatus(
+              state: a2a.TaskState.working,
+              message: a2a.Message(
+                messageId: 'msg1',
+                role: a2a.Role.agent,
+                parts: [
+                  a2a.Part.data(
+                    data: {
+                      'beginRendering': {
+                        'surfaceId': 's1',
+                        'styles': {'color': 'red'},
+                      },
+                    },
+                  ),
+                ],
+              ),
+            ),
+            final_: false,
+          ),
+        ];
+        fakeClient.messageStreamHandler = (_) => Stream.fromIterable(responses);
+
+        final messages = <genui.A2uiMessage>[];
+        connector.stream.listen(messages.add);
+
+        await connector.connectAndSend(genui.UserMessage.text('Hi'));
+        // Wait a tick for stream processing
+        await Future<void>.delayed(Duration.zero);
+
+        expect(messages, isEmpty);
+      },
+    );
   });
 }

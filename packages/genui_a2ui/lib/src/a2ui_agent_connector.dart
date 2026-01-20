@@ -12,9 +12,15 @@ import 'package:uuid/uuid.dart';
 
 import 'a2a/a2a.dart';
 
+import 'v0_8_to_v0_9_translator.dart';
+
 export 'a2a/a2a.dart' show AgentCard;
 
 final Uri a2uiExtensionUri = Uri.parse(
+  'https://a2ui.org/a2a-extension/a2ui/v0.9',
+);
+
+final Uri a2uiExtensionUriV08 = Uri.parse(
   'https://a2ui.org/a2a-extension/a2ui/v0.8',
 );
 
@@ -26,8 +32,16 @@ final Logger _log = genui.genUiLogger;
 /// the agent card, sending messages, and receiving the A2UI protocol stream.
 class A2uiAgentConnector {
   /// Creates a [A2uiAgentConnector] that connects to the given [url].
-  A2uiAgentConnector({required this.url, A2AClient? client, String? contextId})
-    : _contextId = contextId {
+  ///
+  /// [extensionUri] defaults to [a2uiExtensionUri] (v0.9).
+  /// Pass [a2uiExtensionUriV08] to enable v0.8 backward compatibility mode.
+  A2uiAgentConnector({
+    required this.url,
+    A2AClient? client,
+    String? contextId,
+    Uri? extensionUri,
+  }) : _contextId = contextId,
+       extensionUri = extensionUri ?? a2uiExtensionUri {
     this.client =
         client ??
         A2AClient(
@@ -36,13 +50,16 @@ class A2uiAgentConnector {
           transport: SseTransport(
             url: url.toString(),
             log: _log,
-            authHeaders: {'X-A2A-Extensions': a2uiExtensionUri.toString()},
+            authHeaders: {'X-A2A-Extensions': this.extensionUri.toString()},
           ),
         );
   }
 
   /// The URL of the A2UI Agent.
   final Uri url;
+
+  /// The A2UI extension URI to use (determines protocol version).
+  final Uri extensionUri;
 
   final _controller = StreamController<genui.A2uiMessage>.broadcast();
   final _errorController = StreamController<Object>.broadcast();
@@ -257,7 +274,7 @@ class A2uiAgentConnector {
       contextId: contextId,
       referenceTaskIds: [taskId!],
       messageId: const Uuid().v4(),
-      extensions: [a2uiExtensionUri.toString()],
+      extensions: [extensionUri.toString()],
     );
 
     try {
@@ -279,6 +296,31 @@ class A2uiAgentConnector {
       'Processing a2ui messages from data part:\n'
       '${const JsonEncoder.withIndent('  ').convert(data)}',
     );
+    // Strict version check
+    if (extensionUri == a2uiExtensionUriV08) {
+      if (data.containsKey('beginRendering') ||
+          data.containsKey('surfaceUpdate') ||
+          data.containsKey('dataModelUpdate') ||
+          data.containsKey('surfaceDeletion')) {
+        _log.info('Translating v0.8 A2UI message (v0.8 mode active)...');
+        final translator = A2ui08To09Translator();
+        translator
+            .translateOne(data)
+            .listen(
+              (message) {
+                if (!_controller.isClosed) {
+                  _controller.add(message);
+                }
+              },
+              onError: (Object error) {
+                _log.severe('Error translating v0.8 message: $error');
+              },
+            );
+        return;
+      }
+    }
+
+    // Default v0.9 handling (or if fallback is needed, but we prefer strict)
     if (data.containsKey('updateComponents') ||
         data.containsKey('updateDataModel') ||
         data.containsKey('createSurface') ||
@@ -291,7 +333,9 @@ class A2uiAgentConnector {
         _controller.add(genui.A2uiMessage.fromJson(data));
       }
     } else {
-      _log.warning('A2A data part did not contain any known A2UI messages.');
+      _log.warning(
+        'A2A data part did not contain any known A2UI messages for version $extensionUri.',
+      );
     }
   }
 
