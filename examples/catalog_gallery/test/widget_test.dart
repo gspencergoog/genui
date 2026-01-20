@@ -28,7 +28,7 @@ void main() {
 name: Test Sample
 description: This is a test sample to verify the parser.
 ---
-{"surfaceUpdate": {"surfaceId": "default", "components": [{"id": "text1", "props": {"component": "Text", "text": {"literalString": "Hello World"}}}]}}
+{"surfaceUpdate": {"surfaceId": "default", "components": [{"id": "text1", "component": {"Text": {"text": "Hello World"}}}]}}
 {"beginRendering": {"surfaceId": "default", "root": "text1"}}
 ''');
 
@@ -58,7 +58,7 @@ description: This is a test sample to verify the parser.
 name: Ordered Sample
 description: Testing order.
 ---
-{"surfaceUpdate": {"surfaceId": "s1", "components": [{"id": "root", "props": {"component": "Text", "text": {"literalString": "Ordered Success"}}}]}}
+{"surfaceUpdate": {"surfaceId": "s1", "components": [{"id": "root", "component": {"Text": {"text": "Ordered Success"}}}]}}
 {"beginRendering": {"surfaceId": "s1", "root": "root", "catalogId": "default"}}
 ''');
 

@@ -220,7 +220,14 @@ final class Component {
   }
 
   /// The type of the component.
-  String get type => componentProperties['component'] as String;
+  String get type {
+    switch (version) {
+      case A2uiProtocolVersion.v0_8:
+        return (props['component'] as Map).keys.first as String;
+      case A2uiProtocolVersion.v0_9:
+        return componentProperties['component'] as String;
+    }
+  }
 
   @override
   bool operator ==(Object other) =>

@@ -12,7 +12,7 @@ void main() {
 name: Test Sample
 description: A test description
 ---
-{"surfaceUpdate": {"surfaceId": "default", "components": [{"id": "text1", "props": {"component": "Text", "text": {"literalString": "Hello"}}}]}}
+{"surfaceUpdate": {"surfaceId": "default", "components": [{"id": "text1", "component": {"Text": {"text": "Hello"}}}]}}
 {"beginRendering": {"surfaceId": "default", "root": "text1"}}
 ''';
 
