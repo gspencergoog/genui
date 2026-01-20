@@ -57,8 +57,7 @@ class DartanticContentGenerator implements ContentGenerator {
       ),
       DeleteSurfaceTool(
         handleMessage: _a2uiMessageController.add,
-        messageFactory: (surfaceId) =>
-            DeleteSurface(surfaceId: surfaceId),
+        messageFactory: (surfaceId) => DeleteSurface(surfaceId: surfaceId),
       ),
       ...additionalTools,
     ];

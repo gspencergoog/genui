@@ -223,7 +223,7 @@ final class Component {
   String get type {
     switch (version) {
       case A2uiProtocolVersion.v0_8:
-        return (props['component'] as Map).keys.first as String;
+        return (componentProperties['component'] as Map).keys.first as String;
       case A2uiProtocolVersion.v0_9:
         return componentProperties['component'] as String;
     }
