@@ -45,7 +45,8 @@ GenUiFunctionDeclaration catalogToFunctionDeclaration(
 ParsedToolCall parseToolCall(ToolCall toolCall, String toolName) {
   assert(toolCall.name == toolName);
 
-  // This function assumes the toolCall maps to an UpdateComponents message roughly.
+  // This function assumes the toolCall maps to an UpdateComponents message
+  // roughly.
   // But we also need to ensure the surface is created.
   // We can emit both CreateSurface and UpdateComponents.
 
@@ -55,10 +56,13 @@ ParsedToolCall parseToolCall(ToolCall toolCall, String toolName) {
   final surfaceId = (toolCall.args as JsonMap)[surfaceIdKey] as String;
 
   // We don't have catalogId here easily unless we infer or it's hardcoded.
-  // For direct call integration, maybe we assume a default catalog or it's not strictly checked by client if not using it for loading?
+  // For direct call integration, maybe we assume a default catalog or it's not
+  // strictly checked by client if not using it for loading?
   // But CreateSurface requires catalogId.
-  // Let's assume an empty string or 'default' if unknown, or maybe we shouldn't emit CreateSurface here?
-  // But A2uiMessageProcessor expects CreateSurface to behave correctly (init notifier).
+  // Let's assume an empty string or 'default' if unknown, or maybe we shouldn't
+  // emit CreateSurface here?
+  // But A2uiMessageProcessor expects CreateSurface to behave correctly (init
+  // notifier).
   // Let's use 'default' for now or passed in context if possible.
   // But this function signature doesn't have it.
   // However, `updateComponents` assumes surface exists.
@@ -87,7 +91,8 @@ ToolCall catalogExampleToToolCall(
   // The catalog example usually matches the tool args.
   // A2uiSchemas.updateComponentsSchema structure: { surfaceId, components: [...] }
 
-  // If the example is just the components list (v0.8 style was sometimes ambiguous), we need to ensure it matches v0.9 schema arg structure.
+  // If the example is just the components list (v0.8 style was sometimes
+  // ambiguous), we need to ensure it matches v0.9 schema arg structure.
   // But usually `example` is the `args` map.
 
   // Create message to verify it parses?

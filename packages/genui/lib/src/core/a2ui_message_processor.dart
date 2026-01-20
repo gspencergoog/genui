@@ -187,7 +187,8 @@ class A2uiMessageProcessor implements GenUiHost {
         notifier.value = uiDefinition;
 
         // In v0.9, we assume the surface is already created via CreateSurface
-        // or implicitly if acceptable (though spec says CreateSurface is required).
+        // or implicitly if acceptable (though spec says CreateSurface is
+        // required).
         // If the listener is waiting for updates:
         genUiLogger.info('Updating surface $surfaceId');
         _surfaceUpdates.add(SurfaceUpdated(surfaceId, uiDefinition));

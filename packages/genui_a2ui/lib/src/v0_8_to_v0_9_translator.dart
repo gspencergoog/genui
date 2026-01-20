@@ -9,7 +9,8 @@ final _log = Logger('A2ui08To09Translator');
 
 /// Translates A2UI v0.8 messages to v0.9 format.
 class A2ui08To09Translator {
-  /// Translates a stream of v0.8 JSON maps into a stream of v0.9 [A2uiMessage]s.
+  /// Translates a stream of v0.8 JSON maps into a stream of v0.9
+  /// [A2uiMessage]s.
   Stream<A2uiMessage> translate(Stream<Map<String, Object?>> v08Stream) async* {
     await for (final message in v08Stream) {
       yield* translateOne(message);
@@ -57,7 +58,8 @@ class A2ui08To09Translator {
   Stream<A2uiMessage> _translateSurfaceUpdate(
     Map<String, Object?> content,
   ) async* {
-    // v0.8: { surfaceId, components: [ { id, component: { Type: { props } } } ] }
+    // v0.8:
+    // { surfaceId, components: [ { id, component: { Type: { props } } } ] }
     // v0.9: { surfaceId, components: [ { id, type: Type, ...props } ] }
     final String surfaceId = content['surfaceId'] as String? ?? 'default';
     final List<Object?> componentsV08 =
@@ -92,7 +94,8 @@ class A2ui08To09Translator {
       }
       if (newProps.containsKey('text') &&
           (type == 'TextField' || type == 'Text')) {
-        // Only rename if it's semantically a value. For 'Text' widget, 'text' property remains 'text' in v0.9?
+        // Only rename if it's semantically a value. For 'Text' widget, 'text'
+        // property remains 'text' in v0.9?
         // Checking standard catalog...
         // In v0.9 'Text' widget has 'text' property.
         // 'TextField' has 'label', 'value'.

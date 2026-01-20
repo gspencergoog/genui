@@ -334,7 +334,8 @@ class A2uiAgentConnector {
       }
     } else {
       _log.warning(
-        'A2A data part did not contain any known A2UI messages for version $extensionUri.',
+        'A2A data part did not contain any known A2UI messages for version '
+        '$extensionUri.',
       );
     }
   }

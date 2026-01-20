@@ -11,14 +11,16 @@ void main() {
     final translator = A2ui08To09Translator();
 
     test('translateOne converts beginRendering to CreateSurface', () async {
-      final v08Message = {
+      final Map<String, Map<String, Object>> v08Message = {
         'beginRendering': {
           'surfaceId': 'test_surface',
           'styles': {'color': 'red'},
-        }
+        },
       };
 
-      final messages = await translator.translateOne(v08Message).toList();
+      final List<A2uiMessage> messages = await translator
+          .translateOne(v08Message)
+          .toList();
       expect(messages.length, 1);
       final msg = messages.first as CreateSurface;
       expect(msg.surfaceId, 'test_surface');
@@ -27,8 +29,9 @@ void main() {
       expect(msg.attachDataModel, isTrue);
     });
 
-    test('translateOne converts surfaceUpdate to UpdateComponents (flattening props)', () async {
-      final v08Message = {
+    test('translateOne converts surfaceUpdate to UpdateComponents '
+        '(flattening props)', () async {
+      final Map<String, Map<String, Object>> v08Message = {
         'surfaceUpdate': {
           'surfaceId': 'test_surface',
           'components': [
@@ -39,20 +42,22 @@ void main() {
                   'label': 'My Label',
                   'text': 'Initial Value', // Should become value
                   'usageHint': 'outlined', // Should become variant
-                }
-              }
-            }
-          ]
-        }
+                },
+              },
+            },
+          ],
+        },
       };
 
-      final messages = await translator.translateOne(v08Message).toList();
+      final List<A2uiMessage> messages = await translator
+          .translateOne(v08Message)
+          .toList();
       expect(messages.length, 1);
       final msg = messages.first as UpdateComponents;
       expect(msg.surfaceId, 'test_surface');
       expect(msg.components.length, 1);
 
-      final comp = msg.components.first;
+      final Component comp = msg.components.first;
       expect(comp.id, 'comp1');
       expect(comp.type, 'TextField');
       expect(comp.componentProperties['label'], 'My Label');
@@ -63,17 +68,19 @@ void main() {
     });
 
     test('translateOne converts dataModelUpdate to UpdateDataModel', () async {
-      final v08Message = {
+      final Map<String, Map<String, Object>> v08Message = {
         'dataModelUpdate': {
           'surfaceId': 'test_surface',
           'contents': [
             {'key': 'name', 'valueString': 'Alice'},
             {'key': 'age', 'valueInt': 30},
-          ]
-        }
+          ],
+        },
       };
 
-      final messages = await translator.translateOne(v08Message).toList();
+      final List<A2uiMessage> messages = await translator
+          .translateOne(v08Message)
+          .toList();
       expect(messages.length, 1);
       final msg = messages.first as UpdateDataModel;
       expect(msg.surfaceId, 'test_surface');

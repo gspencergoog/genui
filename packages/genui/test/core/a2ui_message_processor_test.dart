@@ -55,45 +55,43 @@ void main() {
       );
     });
 
-    test(
-      'handleMessage updates an existing surface and fires SurfaceUpdated (clean)',
-      () async {
-        const surfaceId = 's2';
-        final oldComponents = [
-          const Component(
-            id: 'root',
-            componentProperties: {'type': 'Text', 'text': 'Old'},
-          ),
-        ];
-        final newComponents = [
-          const Component(
-            id: 'root',
-            componentProperties: {'type': 'Text', 'text': 'New'},
-          ),
-        ];
+    test('handleMessage updates an existing surface and fires SurfaceUpdated '
+        '(clean)', () async {
+      const surfaceId = 's2';
+      final oldComponents = [
+        const Component(
+          id: 'root',
+          componentProperties: {'type': 'Text', 'text': 'Old'},
+        ),
+      ];
+      final newComponents = [
+        const Component(
+          id: 'root',
+          componentProperties: {'type': 'Text', 'text': 'New'},
+        ),
+      ];
 
-        final Future<void> expectation = expectLater(
-          messageProcessor.surfaceUpdates,
-          emitsInOrder([
-            isA<SurfaceAdded>(),
-            isA<SurfaceUpdated>(),
-            isA<SurfaceUpdated>(),
-          ]),
-        );
+      final Future<void> expectation = expectLater(
+        messageProcessor.surfaceUpdates,
+        emitsInOrder([
+          isA<SurfaceAdded>(),
+          isA<SurfaceUpdated>(),
+          isA<SurfaceUpdated>(),
+        ]),
+      );
 
-        messageProcessor.handleMessage(
-          const CreateSurface(surfaceId: surfaceId, catalogId: 'default'),
-        );
-        messageProcessor.handleMessage(
-          UpdateComponents(surfaceId: surfaceId, components: oldComponents),
-        );
-        messageProcessor.handleMessage(
-          UpdateComponents(surfaceId: surfaceId, components: newComponents),
-        );
+      messageProcessor.handleMessage(
+        const CreateSurface(surfaceId: surfaceId, catalogId: 'default'),
+      );
+      messageProcessor.handleMessage(
+        UpdateComponents(surfaceId: surfaceId, components: oldComponents),
+      );
+      messageProcessor.handleMessage(
+        UpdateComponents(surfaceId: surfaceId, components: newComponents),
+      );
 
-        await expectation;
-      },
-    );
+      await expectation;
+    });
 
     test('handleMessage removes a surface and fires SurfaceRemoved', () async {
       const surfaceId = 's1';

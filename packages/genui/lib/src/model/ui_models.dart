@@ -190,7 +190,8 @@ final class Component {
     if (t is String) return t;
     // Fallback or error? v0.9 requires 'type'.
     // If not found, return empty or throw?
-    // Return empty string to be safe, or check if we support implicit types (we don't).
+    // Return empty string to be safe, or check if we support implicit types
+    // (we don't).
     return '';
   }
 
