@@ -20,25 +20,25 @@ void main() {
     }
 
     final Map<String, Object> testData = {
-      'title': {'literalString': 'My Awesome Trip'},
-      'subheading': {'literalString': 'A 3-day adventure'},
+      'title': 'My Awesome Trip',
+      'subheading': 'A 3-day adventure',
       'imageChildId': 'image1',
       'days': [
         {
-          'title': {'literalString': 'Day 1'},
-          'subtitle': {'literalString': 'Arrival and Exploration'},
-          'description': {'literalString': 'Welcome to the city!'},
+          'title': 'Day 1',
+          'subtitle': 'Arrival and Exploration',
+          'description': 'Welcome to the city!',
           'imageChildId': 'image2',
           'entries': [
             {
-              'title': {'literalString': 'Choose your hotel'},
-              'bodyText': {'literalString': 'Select a hotel for your stay.'},
-              'time': {'literalString': '3:00 PM'},
+              'title': 'Choose your hotel',
+              'bodyText': 'Select a hotel for your stay.',
+              'time': '3:00 PM',
               'type': 'accommodation',
               'status': 'choiceRequired',
               'choiceRequiredAction': {
                 'name': 'testAction',
-                'context': <Object>[],
+                'context': <String, Object?>{},
               },
             },
           ],

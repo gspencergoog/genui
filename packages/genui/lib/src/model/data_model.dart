@@ -6,17 +6,20 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
+import '../core/functions.dart';
 import '../primitives/logging.dart';
 import '../primitives/simple_items.dart';
 
 @immutable
 class DataPath {
   factory DataPath(String path) {
+    // Determine if absolute by checking startsWith('/') BEFORE splitting
+    final bool isAbs = path.startsWith(_separator);
     final List<String> segments = path
         .split(_separator)
         .where((s) => s.isNotEmpty)
         .toList();
-    return DataPath._(segments, path.startsWith(_separator));
+    return DataPath._(segments, isAbs);
   }
 
   const DataPath._(this.segments, this.isAbsolute);
@@ -27,10 +30,11 @@ class DataPath {
   static const String _separator = '/';
   static const DataPath root = DataPath._([], true);
 
-  String get basename => segments.last;
+  String get basename => segments.isNotEmpty ? segments.last : '';
 
-  DataPath get dirname =>
-      DataPath._(segments.sublist(0, segments.length - 1), isAbsolute);
+  DataPath get dirname => segments.isEmpty
+      ? this
+      : DataPath._(segments.sublist(0, segments.length - 1), isAbsolute);
 
   DataPath join(DataPath other) {
     if (other.isAbsolute) {
@@ -109,6 +113,161 @@ class DataContext {
       return pathToResolve;
     }
     return path.join(pathToResolve);
+  }
+
+  /// Subscribes to a v0.9 DynamicString, returning a ValueNotifier.
+  ///
+  /// If the definition is a static string, the notifier will hold that value.
+  /// If it's a path, it will subscribe to that path.
+  /// Interpolation and function calls are currently evaluated once.
+  ValueNotifier<String?> subscribeToString(Object? definition) {
+    if (definition is String) {
+      return ValueNotifier(_interpolate(definition));
+    }
+    if (definition is Map && definition.containsKey('path')) {
+      final pathStr = definition['path'] as String;
+      return subscribe<String>(DataPath(pathStr));
+    }
+    return ValueNotifier(resolveDynamicString(definition));
+  }
+
+  /// Subscribes to a v0.9 DynamicNumber.
+  ValueNotifier<num?> subscribeToNumber(Object? definition) {
+    if (definition is num) {
+      return ValueNotifier(definition);
+    }
+    if (definition is Map && definition.containsKey('path')) {
+      final pathStr = definition['path'] as String;
+      return subscribe<num>(DataPath(pathStr));
+    }
+    return ValueNotifier(resolveDynamicNumber(definition));
+  }
+
+  /// Subscribes to a v0.9 DynamicBoolean.
+  ValueNotifier<bool?> subscribeToBool(Object? definition) {
+    if (definition is bool) {
+      return ValueNotifier(definition);
+    }
+    if (definition is Map && definition.containsKey('path')) {
+      final pathStr = definition['path'] as String;
+      return subscribe<bool>(DataPath(pathStr));
+    }
+    return ValueNotifier(resolveDynamicBool(definition));
+  }
+
+  /// Subscribes to a v0.9 DynamicStringList.
+  ValueNotifier<List<Object?>?> subscribeToObjectArray(Object? definition) {
+    if (definition is List) {
+      return ValueNotifier(definition);
+    }
+    if (definition is Map && definition.containsKey('path')) {
+      final pathStr = definition['path'] as String;
+      return subscribe<List<Object?>>(DataPath(pathStr));
+    }
+    // Fallback to resolving it once if possible (though
+    // resolveDynamicStringList returns List<String>)
+    if (definition is Map && definition.containsKey('call')) {
+      final Object? result = _executeFunction(definition);
+      if (result is List) return ValueNotifier(result);
+    }
+    return ValueNotifier(null);
+  }
+
+  /// Evaluates a v0.9 DynamicString, handling interpolation and function calls.
+  ///
+  /// [definition] can be:
+  /// - String: literal with potential "${...}" interpolation.
+  /// - Map {'path': '...'}: data binding.
+  /// - Map {'call': '...'}: function call.
+  String? resolveDynamicString(Object? definition) {
+    return _resolveDynamicValue<String>(definition);
+  }
+
+  /// Evaluates a v0.9 DynamicNumber.
+  num? resolveDynamicNumber(Object? definition) {
+    return _resolveDynamicValue<num>(definition);
+  }
+
+  /// Evaluates a v0.9 DynamicBoolean.
+  bool? resolveDynamicBool(Object? definition) {
+    return _resolveDynamicValue<bool>(definition);
+  }
+
+  /// Evaluates a v0.9 DynamicStringList.
+  List<String>? resolveDynamicStringList(Object? definition) {
+    return _resolveDynamicValue<List<String>>(definition);
+  }
+
+  T? _resolveDynamicValue<T>(Object? definition) {
+    if (definition == null) return null;
+
+    if (definition is T) {
+      if (definition is String) {
+        // Handle interpolation for strings
+        return _interpolate(definition) as T;
+      }
+      return definition as T;
+    }
+
+    if (definition is Map) {
+      if (definition.containsKey('path')) {
+        final pathStr = definition['path'] as String;
+        return getValue<T>(DataPath(pathStr));
+      }
+      if (definition.containsKey('call')) {
+        return _executeFunction(definition) as T?;
+      }
+    }
+    return null;
+  }
+
+  Object? _executeFunction(Map<dynamic, dynamic> callDef) {
+    final functionName = callDef['call'] as String;
+    final List<Object?> args = (callDef['args'] as List?) ?? [];
+
+    // Resolve args recursively
+    final List<Object?> resolvedArgs = args.map(_resolveArg).toList();
+
+    return FunctionRegistry.instance.execute(functionName, resolvedArgs);
+  }
+
+  Object? _resolveArg(Object? arg) {
+    if (arg is Map) {
+      if (arg.containsKey('path')) {
+        return getValue(DataPath(arg['path'] as String));
+      }
+      if (arg.containsKey('call')) return _executeFunction(arg);
+    }
+    if (arg is String) return _interpolate(arg);
+    return arg;
+  }
+
+  String _interpolate(String value) {
+    // Simple interpolation handling: ${path} or ${function()}
+    // This is a simplified regex-based interpolator for Phase 1.
+    // It does NOT support nested braces cleanly yet, but covers basic cases.
+    // TODO: Implement full recursive parser for nested expressions.
+
+    return value.replaceAllMapped(RegExp(r'\${([^}]+)}'), (match) {
+      final String expression = match.group(1)!;
+      // Expression can be a path or a function call.
+      // If it starts with '/', it is likely a path.
+      // If it looks like 'func(...)', it is a function call.
+
+      if (expression.contains('(') && expression.endsWith(')')) {
+        // It's a function call in string format?
+        // v0.9 spec: ${now()} or ${formatDate(${/date}, 'yyyy')}
+        // Complexity: parsing arguments inside string expression is hard with
+        // regex.
+        // fallback: return raw match if complex, implementing full parser
+        // later.
+        return match.group(0)!;
+      }
+
+      // Assume path
+      final Object? val = getValue<Object?>(DataPath(expression));
+      return val?.toString() ?? '';
+    });
   }
 }
 

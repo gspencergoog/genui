@@ -26,14 +26,8 @@ void main() {
           'type': 'MultipleChoice',
           'selections': {'path': '/mySelections'},
           'options': [
-            {
-              'label': {'literalString': 'Option 1'},
-              'value': '1',
-            },
-            {
-              'label': {'literalString': 'Option 2'},
-              'value': '2',
-            },
+            {'label': 'Option 1', 'value': '1'},
+            {'label': 'Option 2', 'value': '2'},
           ],
         },
       ),
@@ -102,14 +96,8 @@ void main() {
             'selections': {'path': '/mySelections'},
             'maxAllowedSelections': 3.0,
             'options': [
-              {
-                'label': {'literalString': 'Option 1'},
-                'value': '1',
-              },
-              {
-                'label': {'literalString': 'Option 2'},
-                'value': '2',
-              },
+              {'label': 'Option 1', 'value': '1'},
+              {'label': 'Option 2', 'value': '2'},
             ],
           },
         ),

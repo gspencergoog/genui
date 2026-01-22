@@ -25,10 +25,7 @@ void main() {
       ),
       const Component(
         id: 'text_field',
-        componentProperties: {
-          'type': 'TextField',
-          'label': {'literalString': 'Input'},
-        },
+        componentProperties: {'type': 'TextField', 'label': 'Input'},
         // "weight" property is left unset.
       ),
     ];
@@ -86,10 +83,7 @@ void main() {
       ),
       const Component(
         id: 'text_field',
-        componentProperties: {
-          'type': 'TextField',
-          'label': {'literalString': 'Input'},
-        },
+        componentProperties: {'type': 'TextField', 'label': 'Input'},
         weight: 1,
       ),
     ];

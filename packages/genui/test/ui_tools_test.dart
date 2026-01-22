@@ -28,7 +28,7 @@ void main() {
             'id': 'root',
             // v0.9 flattened
             'type': 'Text',
-            'text': {'literalString': 'Hello'},
+            'text': 'Hello',
           },
         ],
       };

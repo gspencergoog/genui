@@ -231,7 +231,8 @@ ${const JsonEncoder.withIndent('  ').convert(outputSchemaBuilder.toJson())}
           // We can append the error to history as a system or user message
           // mimicking a "Validation Error" feedback.
           // Since sendFor takes history, we can modify it.
-          // But sendFor ALSO returns a ChatMessage we should ideally add to history.
+          // But sendFor ALSO returns a ChatMessage we should ideally add to
+          // history.
           // However, we are re-sending the *same* turn effectively?
           // No, we should treat it as a conversation turn:
           // User: request -> Model: invalid -> System: Error, try again.
@@ -239,7 +240,8 @@ ${const JsonEncoder.withIndent('  ').convert(outputSchemaBuilder.toJson())}
 
           // We can append the INVALID message to history
           // And then append a "Validation Failed" message from User/System.
-          // Note: dartantic sendFor doesn't automatically update a persistent history,
+          // Note: dartantic sendFor doesn't automatically update a persistent
+          // history,
           // it takes history as arg.
 
           currentHistory.add(
@@ -283,8 +285,10 @@ ${const JsonEncoder.withIndent('  ').convert(outputSchemaBuilder.toJson())}
                   'Error parsing A2UI message: $actionData',
                   e,
                 );
-                // We could treat this as a validation error too, but it passed schema validation?
-                // Maybe schema validation wasn't strict enough or A2uiMessage.fromJson is stricter.
+                // We could treat this as a validation error too, but it passed
+                // schema validation?
+                // Maybe schema validation wasn't strict enough or
+                // A2uiMessage.fromJson is stricter.
               }
             }
           }

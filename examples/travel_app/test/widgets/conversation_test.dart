@@ -27,10 +27,7 @@ void main() {
       final components = [
         const Component(
           id: 'root',
-          componentProperties: {
-            'type': 'Text',
-            'text': {'literalString': 'Hi there!'},
-          },
+          componentProperties: {'type': 'Text', 'text': 'Hi there!'},
         ),
       ];
       manager.handleMessage(
@@ -78,10 +75,7 @@ void main() {
       final components = [
         const Component(
           id: 'root',
-          componentProperties: {
-            'type': 'Text',
-            'text': {'literalString': 'UI Content'},
-          },
+          componentProperties: {'type': 'Text', 'text': 'UI Content'},
         ),
       ];
       manager.handleMessage(

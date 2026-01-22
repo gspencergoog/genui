@@ -25,7 +25,12 @@ void main() {
       expect(json[surfaceIdKey], 'testSurface');
       expect(json['rootComponentId'], 'root');
       expect(json['components'], {
-        'root': {'id': 'root', 'type': 'Text', 'text': 'Hello'},
+        'root': {
+          'id': 'root',
+          'component': {
+            'Text': {'text': 'Hello'},
+          },
+        },
       });
     });
   });

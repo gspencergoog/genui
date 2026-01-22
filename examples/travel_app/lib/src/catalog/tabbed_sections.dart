@@ -12,10 +12,10 @@ final _schema = S.object(
       description: 'A list of sections to display as tabs.',
       items: S.object(
         properties: {
-          'title': A2uiSchemas.stringReference(
+          'title': A2uiSchemas.dynamicString(
             description: 'The title of the tab.',
           ),
-          'child': A2uiSchemas.componentReference(
+          'child': S.string(
             description: 'The ID of the child widget for the tab content.',
           ),
         },
@@ -36,12 +36,10 @@ extension type _TabbedSectionsData.fromMap(Map<String, Object?> _json) {
 }
 
 extension type _TabSectionItemData.fromMap(Map<String, Object?> _json) {
-  factory _TabSectionItemData({
-    required Map<String, Object?> title,
-    required String child,
-  }) => _TabSectionItemData.fromMap({'child': child, 'title': title});
+  factory _TabSectionItemData({required Object title, required String child}) =>
+      _TabSectionItemData.fromMap({'child': child, 'title': title});
 
-  Map<String, Object?> get title => _json['title'] as Map<String, Object?>;
+  Object get title => _json['title']!;
   String get childId => _json['child'] as String;
 }
 
@@ -64,15 +62,11 @@ final tabbedSections = CatalogItem(
             "TabbedSections": {
               "sections": [
                 {
-                  "title": {
-                    "literalString": "Tab 1"
-                  },
+                  "title": "Tab 1",
                   "child": "tab1_content"
                 },
                 {
-                  "title": {
-                    "literalString": "Tab 2"
-                  },
+                  "title": "Tab 2",
                   "child": "tab2_content"
                 }
               ]
@@ -83,9 +77,7 @@ final tabbedSections = CatalogItem(
           "id": "tab1_content",
           "component": {
             "Text": {
-              "text": {
-                "literalString": "This is the content of Tab 1."
-              }
+              "text": "This is the content of Tab 1."
             }
           }
         },
@@ -93,9 +85,7 @@ final tabbedSections = CatalogItem(
           "id": "tab2_content",
           "component": {
             "Text": {
-              "text": {
-                "literalString": "This is the content of Tab 2."
-              }
+              "text": "This is the content of Tab 2."
             }
           }
         }

@@ -29,17 +29,11 @@ void main() {
       ),
       const Component(
         id: 'text1',
-        componentProperties: {
-          'type': 'Text',
-          'text': {'literalString': 'First'},
-        },
+        componentProperties: {'type': 'Text', 'text': 'First'},
       ),
       const Component(
         id: 'text2',
-        componentProperties: {
-          'type': 'Text',
-          'text': {'literalString': 'Second'},
-        },
+        componentProperties: {'type': 'Text', 'text': 'Second'},
       ),
     ];
     manager.handleMessage(

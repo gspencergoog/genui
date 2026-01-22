@@ -89,7 +89,8 @@ ToolCall catalogExampleToToolCall(
   // Example is usually a list of components or a map with 'components'.
   // If example is just components list, we wrap it?
   // The catalog example usually matches the tool args.
-  // A2uiSchemas.updateComponentsSchema structure: { surfaceId, components: [...] }
+  // A2uiSchemas.updateComponentsSchema structure:
+  // { surfaceId, components: [...] }
 
   // If the example is just the components list (v0.8 style was sometimes
   // ambiguous), we need to ensure it matches v0.9 schema arg structure.

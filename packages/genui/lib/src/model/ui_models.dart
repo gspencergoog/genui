@@ -151,13 +151,25 @@ final class Component {
     if (json['id'] == null) {
       throw ArgumentError('Component.fromJson: id property is null');
     }
-    // Deep copy to facilitate testing where the same map might be reused.
-    final Map<String, Object?> properties = Map.of(json);
-    properties.remove('id');
-    properties.remove('weight');
 
-    // Ensure properties map contains 'type' if it was top level.
-    // In v0.9, 'type' is just a property.
+    final Map<String, Object?> properties;
+    if (json.containsKey('component')) {
+      final componentMap = json['component'] as Map<String, Object?>;
+      if (componentMap.isNotEmpty) {
+        final String type = componentMap.keys.first;
+        final Map<String, Object?> innerProps =
+            componentMap[type] as Map<String, Object?>? ?? {};
+        properties = Map.of(innerProps);
+        properties['type'] = type;
+      } else {
+        properties = {};
+      }
+    } else {
+      // Deep copy to facilitate testing where the same map might be reused.
+      properties = Map.of(json);
+      properties.remove('id');
+      properties.remove('weight');
+    }
 
     return Component(
       id: json['id'] as String,
@@ -177,11 +189,19 @@ final class Component {
 
   /// Converts this object to a JSON map.
   JsonMap toJson() {
-    return {
-      'id': id,
-      if (weight != null) 'weight': weight,
-      ...componentProperties,
-    };
+    final Map<String, Object?> properties = Map.of(componentProperties);
+    final type = properties.remove('type') as String?;
+
+    if (type != null) {
+      return {
+        'id': id,
+        if (weight != null) 'weight': weight,
+        'component': {type: properties},
+      };
+    }
+
+    // Fallback for when type is missing (shouldn't happen in valid v0.9 components)
+    return {'id': id, if (weight != null) 'weight': weight, ...properties};
   }
 
   /// The type of the component.

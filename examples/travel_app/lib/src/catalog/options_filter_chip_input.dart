@@ -30,7 +30,7 @@ final _schema = S.object(
       description: 'An icon to display on the left of the chip.',
       enumValues: TravelIcon.values.map((e) => e.name).toList(),
     ),
-    'value': A2uiSchemas.stringReference(
+    'value': A2uiSchemas.dynamicString(
       description:
           'The name of the option that should be selected initially. This '
           'option must exist in the "options" list.',
@@ -44,7 +44,7 @@ extension type _OptionsFilterChipInputData.fromMap(Map<String, Object?> _json) {
     required String chipLabel,
     required List<String> options,
     String? iconName,
-    JsonMap? value,
+    Object? value,
   }) => _OptionsFilterChipInputData.fromMap({
     'chipLabel': chipLabel,
     'options': options,
@@ -55,7 +55,7 @@ extension type _OptionsFilterChipInputData.fromMap(Map<String, Object?> _json) {
   String get chipLabel => _json['chipLabel'] as String;
   List<String> get options => (_json['options'] as List).cast<String>();
   String? get iconName => _json['iconName'] as String?;
-  JsonMap? get value => _json['value'] as JsonMap?;
+  Object? get value => _json['value'];
 }
 
 /// An interactive chip that allows the user to select a single option from a
@@ -84,9 +84,7 @@ final optionsFilterChipInput = CatalogItem(
                 "\$\$",
                 "\$\$\$"
               ],
-              "value": {
-                "literalString": "\$\$"
-              }
+              "value": "\$\$"
             }
           }
         }
@@ -108,8 +106,8 @@ final optionsFilterChipInput = CatalogItem(
       }
     }
 
-    final JsonMap? valueRef = optionsFilterChipData.value;
-    final path = valueRef?['path'] as String?;
+    final Object? valueRef = optionsFilterChipData.value;
+    final String? path = valueRef is Map ? (valueRef['path'] as String?) : null;
     final ValueNotifier<String?> notifier = context.dataContext
         .subscribeToString(valueRef);
 

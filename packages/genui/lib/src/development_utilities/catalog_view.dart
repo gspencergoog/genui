@@ -136,7 +136,12 @@ class _DebugCatalogViewState extends State<DebugCatalogView> {
               children: <Widget>[
                 Text(surfaceId, style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8.0),
-                SizedBox(height: widget.itemHeight, child: surfaceWidget),
+                widget.itemHeight != null
+                    ? SizedBox(height: widget.itemHeight, child: surfaceWidget)
+                    : ConstrainedBox(
+                        constraints: const BoxConstraints(maxHeight: 400),
+                        child: surfaceWidget,
+                      ),
               ],
             ),
           ),

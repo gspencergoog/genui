@@ -16,7 +16,7 @@ import '../../primitives/simple_items.dart';
 
 final _schema = S.object(
   properties: {
-    'child': A2uiSchemas.componentReference(
+    'child': S.string(
       description:
           'The ID of a child widget. This should always be set, e.g. to the ID '
           'of a `Text` widget.',
@@ -65,8 +65,7 @@ final button = CatalogItem(
     final Widget child = itemContext.buildChild(buttonData.child);
     final JsonMap actionData = buttonData.action;
     final actionName = actionData['name'] as String;
-    final List<Object?> contextDefinition =
-        (actionData['context'] as List<Object?>?) ?? <Object?>[];
+    final JsonMap contextDefinition = (actionData['context'] as JsonMap?) ?? {};
 
     genUiLogger.info('Building Button with child: ${buttonData.child}');
     final ColorScheme colorScheme = Theme.of(
@@ -122,9 +121,7 @@ final button = CatalogItem(
           "id": "text",
           "component": {
             "Text": {
-              "text": {
-                "literalString": "Hello World"
-              }
+              "text": "Hello World"
             }
           }
         }
@@ -136,9 +133,7 @@ final button = CatalogItem(
           "id": "root",
           "component": {
             "Column": {
-              "children": {
-                "explicitList": ["primaryButton", "secondaryButton"]
-              }
+              "children": ["primaryButton", "secondaryButton"]
             }
           }
         },
@@ -169,9 +164,7 @@ final button = CatalogItem(
           "id": "primaryText",
           "component": {
             "Text": {
-              "text": {
-                "literalString": "Primary Button"
-              }
+              "text": "Primary Button"
             }
           }
         },
@@ -179,9 +172,7 @@ final button = CatalogItem(
           "id": "secondaryText",
           "component": {
             "Text": {
-              "text": {
-                "literalString": "Secondary Button"
-              }
+              "text": "Secondary Button"
             }
           }
         }

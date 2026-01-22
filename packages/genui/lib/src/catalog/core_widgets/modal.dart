@@ -7,18 +7,13 @@ library;
 
 import 'package:json_schema_builder/json_schema_builder.dart';
 
-import '../../model/a2ui_schemas.dart';
 import '../../model/catalog_item.dart';
 import '../../primitives/simple_items.dart';
 
 final _schema = S.object(
   properties: {
-    'trigger': A2uiSchemas.componentReference(
-      description: 'The widget that opens the modal.',
-    ),
-    'content': A2uiSchemas.componentReference(
-      description: 'The widget to display in the modal.',
-    ),
+    'trigger': S.string(description: 'The widget that opens the modal.'),
+    'content': S.string(description: 'The widget to display in the modal.'),
   },
   required: ['trigger', 'content'],
 );
@@ -64,29 +59,20 @@ final modal = CatalogItem(
           "child": "button_text",
           "action": {
             "name": "showModal",
-            "context": [
-              {
-                "key": "modalId",
-                "value": {
-                  "literalString": "root"
-                }
-              }
-            ]
+            "context": {
+              "modalId": "root"
+            }
           }
         },
         {
           "id": "button_text",
           "type": "Text",
-          "text": {
-            "literalString": "Open Modal"
-          }
+          "text": "Open Modal"
         },
         {
           "id": "text",
           "type": "Text",
-          "text": {
-            "literalString": "This is a modal."
-          }
+          "text": "This is a modal."
         }
       ]
     ''',

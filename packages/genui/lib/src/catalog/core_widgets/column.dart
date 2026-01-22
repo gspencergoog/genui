@@ -29,7 +29,7 @@ final _schema = S.object(
       description: 'How children are aligned on the cross axis. ',
       enumValues: ['start', 'center', 'end', 'stretch', 'baseline'],
     ),
-    'children': A2uiSchemas.componentArrayReference(
+    'children': A2uiSchemas.childList(
       description:
           'Either an explicit list of widget IDs for the children, or a '
           'template with a data binding to the list of children.',
@@ -157,13 +157,11 @@ final column = CatalogItem(
           "id": "root",
           "component": {
             "Column": {
-              "children": {
-                "explicitList": [
+                "children": [
                   "advice_text",
                   "advice_options",
                   "submit_button"
                 ]
-              }
             }
           }
         },
@@ -171,9 +169,7 @@ final column = CatalogItem(
           "id": "advice_text",
           "component": {
             "Text": {
-              "text": {
-                "literalString": "What kind of advice are you looking for?"
-              }
+              "text": "What kind of advice are you looking for?"
             }
           }
         },
@@ -181,9 +177,7 @@ final column = CatalogItem(
           "id": "advice_options",
           "component": {
             "Text": {
-              "text": {
-                "literalString": "Some advice options."
-              }
+              "text": "Some advice options."
             }
           }
         },
@@ -202,9 +196,7 @@ final column = CatalogItem(
           "id": "submit_button_text",
           "component": {
             "Text": {
-              "text": {
-                "literalString": "Submit"
-              }
+              "text": "Submit"
             }
           }
         }

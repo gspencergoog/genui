@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
-import '../../core/widget_utilities.dart';
 import '../../model/a2ui_schemas.dart';
 import '../../model/catalog_item.dart';
 import '../../model/data_model.dart';
@@ -13,18 +12,18 @@ import '../../primitives/simple_items.dart';
 
 final _schema = S.object(
   properties: {
-    'label': A2uiSchemas.stringReference(),
-    'value': A2uiSchemas.booleanReference(),
+    'label': A2uiSchemas.dynamicString(),
+    'value': A2uiSchemas.dynamicBoolean(),
   },
   required: ['label', 'value'],
 );
 
 extension type _CheckBoxData.fromMap(JsonMap _json) {
-  factory _CheckBoxData({required JsonMap label, required JsonMap value}) =>
+  factory _CheckBoxData({required Object? label, required Object? value}) =>
       _CheckBoxData.fromMap({'label': label, 'value': value});
 
-  JsonMap get label => _json['label'] as JsonMap;
-  JsonMap get value => _json['value'] as JsonMap;
+  Object? get label => _json['label'];
+  Object? get value => _json['value'];
 }
 
 /// A catalog item representing a Material Design checkbox with a label.
@@ -60,9 +59,12 @@ final checkBox = CatalogItem(
               ),
               value: value ?? false,
               onChanged: (newValue) {
-                final path = checkBoxData.value['path'] as String?;
-                if (path != null) {
-                  itemContext.dataContext.update(DataPath(path), newValue);
+                final Object? valRef = checkBoxData.value;
+                if (valRef is Map && valRef.containsKey('path')) {
+                  final path = valRef['path'] as String?;
+                  if (path != null) {
+                    itemContext.dataContext.update(DataPath(path), newValue);
+                  }
                 }
               },
             );
@@ -78,12 +80,9 @@ final checkBox = CatalogItem(
           "id": "root",
           "component": {
             "CheckBox": {
-              "label": {
-                "literalString": "Check me"
-              },
+              "label": "Check me",
               "value": {
-                "path": "/myValue",
-                "literalBoolean": true
+                "path": "/myValue"
               }
             }
           }

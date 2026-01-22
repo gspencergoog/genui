@@ -10,129 +10,178 @@ import 'tools.dart';
 /// Provides a set of pre-defined, reusable schema objects for common
 /// A2UI patterns, simplifying the creation of CatalogItem definitions.
 class A2uiSchemas {
-  /// Schema for a value that can be either a literal string or a
-  /// data-bound path to a string in the DataModel. If both path and
-  /// literal are provided, the value at the path will be initialized
-  /// with the literal.
-  ///
-  /// If `enumValues` are provided, the string value (either literal or at the
-  /// path) must be one of the values in the enum.
-  static Schema stringReference({
-    String? description,
-    List<String>? enumValues,
-  }) => S.object(
-    description: description,
+  /// Schema for a function call.
+  static Schema functionCall() => S.object(
     properties: {
-      'path': S.string(
-        description: 'A relative or absolute path in the data model.',
-        enumValues: enumValues,
-      ),
-      'literalString': S.string(enumValues: enumValues),
-    },
-  );
-
-  /// Schema for a value that can be either a literal number or a
-  /// data-bound path to a number in the DataModel. If both path and
-  /// literal are provided, the value at the path will be initialized
-  /// with the literal.
-  static Schema numberReference({String? description}) => S.object(
-    description: description,
-    properties: {
-      'path': S.string(
-        description: 'A relative or absolute path in the data model.',
-      ),
-      'literalNumber': S.number(),
-    },
-  );
-
-  /// Schema for a value that can be either a literal boolean or a
-  /// data-bound path to a boolean in the DataModel. If both path and
-  /// literal are provided, the value at the path will be initialized
-  /// with the literal.
-  static Schema booleanReference({String? description}) => S.object(
-    description: description,
-    properties: {
-      'path': S.string(
-        description: 'A relative or absolute path in the data model.',
-      ),
-      'literalBoolean': S.boolean(),
-    },
-  );
-
-  /// Schema for a property that holds a reference to a single child
-  /// component by its ID.
-  static Schema componentReference({String? description}) =>
-      S.string(description: description);
-
-  /// Schema for a property that holds a list of child components,
-  /// either as an explicit list of IDs or a data-bound template.
-  static Schema componentArrayReference({String? description}) => S.object(
-    description: description,
-    properties: {
-      'explicitList': S.list(items: componentReference()),
-      'template': S.object(
-        properties: {'componentId': S.string(), 'dataBinding': S.string()},
-        required: ['componentId', 'dataBinding'],
+      'call': S.string(description: 'The name of the function to call.'),
+      'args': S.list(description: 'Arguments passed to the function.'),
+      'returnType': S.string(
+        description: 'The expected return type of the function call.',
+        enumValues: ['string', 'number', 'boolean', 'array', 'object', 'any'],
       ),
     },
+    required: ['call'],
   );
 
-  /// Schema for a user-initiated action, including the action name
-  /// and a context map of key-value pairs.
+  /// Schema for a value that can be either a literal string, a
+  /// data-bound path to a string, or a function call returning a string.
+  static Schema dynamicString({String? description, List<String>? enumValues}) {
+    // We can't easily express the exact "oneOf" structure of v0.9 in this
+    // builder DSL purely as a single "type" call if we want to mix primitive
+    // and object types strictly,
+    // but we can approximate it or use S.combined(oneOf: ...).
+    //
+    // v0.9 DynamicString:
+    // oneOf: [ string, { path: string }, { allOf: [ FunctionCall, { returnType:
+    // 'string' } ] } ]
+
+    return S.combined(
+      description: description,
+      oneOf: [
+        S.string(enumValues: enumValues),
+        S.object(
+          properties: {
+            'path': S.string(
+              description: 'A relative or absolute path in the data model.',
+            ),
+          },
+          required: ['path'],
+          additionalProperties: false,
+        ),
+        // Function call variant
+        functionCall(),
+      ],
+    );
+  }
+
+  /// Schema for a value that can be either a literal number, a
+  /// data-bound path to a number, or a function call returning a number.
+  static Schema dynamicNumber({String? description}) {
+    return S.combined(
+      description: description,
+      oneOf: [
+        S.number(),
+        S.object(
+          properties: {
+            'path': S.string(
+              description: 'A relative or absolute path in the data model.',
+            ),
+          },
+          required: ['path'],
+          additionalProperties: false,
+        ),
+        functionCall(),
+      ],
+    );
+  }
+
+  /// Schema for a value that can be either a literal boolean, a
+  /// data-bound path to a boolean, or a function call returning a boolean.
+  static Schema dynamicBoolean({String? description}) {
+    return S.combined(
+      description: description,
+      oneOf: [
+        S.boolean(),
+        S.object(
+          properties: {
+            'path': S.string(
+              description: 'A relative or absolute path in the data model.',
+            ),
+          },
+          required: ['path'],
+          additionalProperties: false,
+        ),
+        functionCall(),
+        // Logic expressions would go here too if we fully modeled
+        // LogicExpression
+      ],
+    );
+  }
+
+  /// Schema for a dynamic string list.
+  static Schema dynamicStringList({String? description}) {
+    return S.combined(
+      description: description,
+      oneOf: [
+        S.list(items: S.string()),
+        S.object(
+          properties: {
+            'path': S.string(
+              description: 'A relative or absolute path in the data model.',
+            ),
+          },
+          required: ['path'],
+          additionalProperties: false,
+        ),
+        functionCall(),
+      ],
+    );
+  }
+
+  /// Schema for the `ChildList` type (static array or template).
+  static Schema childList({String? description}) {
+    return S.combined(
+      description: description,
+      oneOf: [
+        S.list(
+          description: 'A static list of child component IDs.',
+          items: S.string(),
+        ),
+        S.object(
+          description:
+              'A template for generating a dynamic list of children from a '
+              'data model list.',
+          properties: {
+            'componentId': S.string(),
+            'path': S.string(
+              description:
+                  'The path to the list of component property objects '
+                  'in the data model.',
+            ),
+          },
+          required: ['componentId', 'path'],
+          additionalProperties: false,
+        ),
+      ],
+    );
+  }
+
+  /// Schema for CheckRule (validation).
+  static Schema checkRule() {
+    return S.object(
+      properties: {
+        'message': S.string(
+          description: 'The error message to display if the check fails.',
+        ),
+        'call': S.string(description: 'Function to call'),
+        'args': S.list(),
+      },
+      required: ['message'],
+    );
+  }
+
+  /// Schema for `checks` property.
+  static Schema checks() {
+    return S.list(
+      description: 'A list of checks to perform.',
+      items: checkRule(),
+    );
+  }
+
+  /// Schema for a user-initiated action.
   static Schema action({String? description}) => S.object(
     description: description,
     properties: {
       'name': S.string(),
-      'context': S.list(
-        description:
-            'A list of name-value pairs to be sent with the action to include '
-            'data associated with the action, e.g. values that are submitted.',
-        items: S.object(
-          properties: {
-            'key': S.string(),
-            'value': S.object(
-              properties: {
-                'path': S.string(
-                  description:
-                      'A path in the data model which should be bound to an '
-                      'input element, e.g. a string reference for a text '
-                      'field, or number reference for a slider.',
-                ),
-                'literalString': S.string(
-                  description: 'A literal string relevant to the action',
-                ),
-                'literalNumber': S.number(
-                  description: 'A literal number relevant to the action',
-                ),
-                'literalBoolean': S.boolean(
-                  description: 'A literal boolean relevant to the action',
-                ),
-              },
-            ),
-          },
-          required: ['key', 'value'],
-        ),
+      'context': S.object(
+        description: 'A map of name-value pairs to be sent with the action.',
+        additionalProperties: S.any(), // Values can be any dynamic value
       ),
     },
     required: ['name'],
   );
 
-  /// Schema for a value that can be either a literal array of strings or a
-  /// data-bound path to an array of strings in the DataModel. If both path and
-  /// literalArray are provided, the value at the path will be
-  /// initialized with the literalArray.
-  static Schema stringArrayReference({String? description}) => S.object(
-    description: description,
-    properties: {
-      'path': S.string(
-        description: 'A relative or absolute path in the data model.',
-      ),
-      'literalArray': S.list(items: S.string()),
-    },
-  );
-
-  /// Schema for a createSurface message, which creates a new surface
-  /// and optionally attaches a data model.
+  /// Schema for a createSurface message.
   static Schema createSurfaceSchema() => S.object(
     properties: {
       surfaceIdKey: S.string(
@@ -158,60 +207,50 @@ class A2uiSchemas {
     required: [surfaceIdKey, 'catalogId'],
   );
 
-  /// Schema for a `deleteSurface` message which will delete the given surface.
+  /// Schema for a `deleteSurface` message.
   static Schema deleteSurfaceSchema() => S.object(
     properties: {surfaceIdKey: S.string()},
     required: [surfaceIdKey],
   );
 
-  /// Schema for a `updateDataModel` message which will update the given path in
-  /// the data model. If the path is omitted, the entire data model is replaced.
+  /// Schema for a `updateDataModel` message.
   static Schema updateDataModelSchema() => S.object(
     properties: {
       surfaceIdKey: S.string(),
       'path': S.string(),
       'value': S.any(description: 'The new value to write to the data model.'),
     },
-    required: [surfaceIdKey, 'value'],
+    required: [surfaceIdKey],
   );
 
-  /// Schema for a `updateComponents` message which defines the components to be
-  /// rendered on a surface.
+  /// Schema for a `updateComponents` message.
   static Schema updateComponentsSchema(Catalog catalog) {
-    // We expect the catalog to be an ObjectSchema with a 'components' property
-    // which is also an ObjectSchema containing the component definitions.
-    // ignore: unused_local_variable
-    final Map<String, Schema> catalogComponents =
-        ((catalog.definition as ObjectSchema).properties!['components']!
-                as ObjectSchema)
-            .properties!;
-
     return S.object(
       properties: {
         surfaceIdKey: S.string(
           description:
-              'The unique identifier for the UI surface to create or '
-              'update. If you are adding a new surface this *must* be a '
-              'new, unique identified that has never been used for any '
-              'existing surfaces shown.',
+              'The unique identifier for the UI surface to create or update.',
         ),
         'components': S.list(
           description: 'A list of component definitions.',
           minItems: 1,
           items: S.object(
-            description:
-                'Represents a *single* component in a UI widget tree. '
-                'This component could be one of many supported types.',
+            description: 'Represents a *single* component in a UI widget tree.',
             properties: {
               'id': S.string(),
-              'weight': S.integer(
-                description:
-                    'Optional layout weight for use in Row/Column children.',
-              ),
-              'type': S.string(
-                description: 'The type of the component (e.g., Button, Text).',
+              'component': S.object(
+                description: 'The component definition.',
+                properties: {
+                  for (final item in catalog.items)
+                    item.name: item.dataSchema ?? S.object(),
+                },
+                minProperties: 1,
+                maxProperties: 1,
+                additionalProperties: false,
               ),
             },
+            required: ['id', 'component'],
+            additionalProperties: true,
           ),
         ),
       },

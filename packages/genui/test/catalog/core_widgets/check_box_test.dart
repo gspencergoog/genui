@@ -21,7 +21,7 @@ void main() {
         id: 'root',
         componentProperties: {
           'type': 'CheckBox',
-          'label': {'literalString': 'Check me'},
+          'label': 'Check me',
           'value': {'path': '/myValue'},
         },
       ),

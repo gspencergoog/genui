@@ -14,7 +14,7 @@ import 'widget_helpers.dart';
 
 final _schema = S.object(
   properties: {
-    'children': A2uiSchemas.componentArrayReference(
+    'children': A2uiSchemas.childList(
       description:
           'Either an explicit list of widget IDs for the children, or a '
           'template with a data binding to the list of children.',
@@ -166,12 +166,7 @@ final row = CatalogItem(
           "id": "root",
           "component": {
             "Row": {
-              "children": {
-                "explicitList": [
-                  "text1",
-                  "text2"
-                ]
-              }
+              "children": ["text1", "text2"]
             }
           }
         },
@@ -179,9 +174,7 @@ final row = CatalogItem(
           "id": "text1",
           "component": {
             "Text": {
-              "text": {
-                "literalString": "First"
-              }
+                "text": "First"
             }
           }
         },
@@ -189,9 +182,7 @@ final row = CatalogItem(
           "id": "text2",
           "component": {
             "Text": {
-              "text": {
-                "literalString": "Second"
-              }
+                "text": "Second"
             }
           }
         }

@@ -36,28 +36,17 @@ void main() {
           'child': 'button_text',
           'action': {
             'name': 'showModal',
-            'context': [
-              {
-                'key': 'modalId',
-                'value': {'literalString': 'root'},
-              },
-            ],
+            'context': {'modalId': 'root'},
           },
         },
       ),
       const Component(
         id: 'button_text',
-        componentProperties: {
-          'type': 'Text',
-          'text': {'literalString': 'Open Modal'},
-        },
+        componentProperties: {'type': 'Text', 'text': 'Open Modal'},
       ),
       const Component(
         id: 'text',
-        componentProperties: {
-          'type': 'Text',
-          'text': {'literalString': 'This is a modal.'},
-        },
+        componentProperties: {'type': 'Text', 'text': 'This is a modal.'},
       ),
     ];
     manager.handleMessage(

@@ -24,10 +24,7 @@ void main() {
       ),
       const Component(
         id: 'text',
-        componentProperties: {
-          'type': 'Text',
-          'text': {'literalString': 'This is a card.'},
-        },
+        componentProperties: {'type': 'Text', 'text': 'This is a card.'},
       ),
     ];
     manager.handleMessage(

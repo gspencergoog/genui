@@ -13,10 +13,7 @@ void main() {
       WidgetTester tester,
     ) async {
       final Map<String, Object> data = {
-        'topics': [
-          {'literalString': 'Topic A'},
-          {'literalString': 'Topic B'},
-        ],
+        'topics': ['Topic A', 'Topic B'],
         'action': {'name': 'selectTopic'},
       };
       UiEvent? dispatchedEvent;

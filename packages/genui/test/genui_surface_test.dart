@@ -33,10 +33,7 @@ void main() {
       ),
       const Component(
         id: 'text',
-        componentProperties: {
-          'type': 'Text',
-          'text': {'literalString': 'Hello'},
-        },
+        componentProperties: {'type': 'Text', 'text': 'Hello'},
       ),
     ];
     processor.handleMessage(
@@ -73,10 +70,7 @@ void main() {
       ),
       const Component(
         id: 'text',
-        componentProperties: {
-          'type': 'Text',
-          'text': {'literalString': 'Hello'},
-        },
+        componentProperties: {'type': 'Text', 'text': 'Hello'},
       ),
     ];
     processor.handleMessage(
@@ -106,10 +100,7 @@ void main() {
       final components = [
         const Component(
           id: 'root',
-          componentProperties: {
-            'type': 'Text',
-            'text': {'literalString': 'Hello'},
-          },
+          componentProperties: {'type': 'Text', 'text': 'Hello'},
         ),
       ];
       // Request a catalogId that doesn't exist in the processor.

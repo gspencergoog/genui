@@ -19,7 +19,7 @@ final _schema = S.object(
       description: 'Listings to select among.',
       items: S.string(),
     ),
-    'itineraryName': A2uiSchemas.stringReference(
+    'itineraryName': A2uiSchemas.dynamicString(
       description: 'The name of the itinerary.',
     ),
     'modifyAction': A2uiSchemas.action(
@@ -35,7 +35,7 @@ final _schema = S.object(
 extension type _ListingsBookerData.fromMap(Map<String, Object?> _json) {
   factory _ListingsBookerData({
     required List<String> listingSelectionIds,
-    required JsonMap itineraryName,
+    required Object itineraryName,
     JsonMap? modifyAction,
   }) => _ListingsBookerData.fromMap({
     'listingSelectionIds': listingSelectionIds,
@@ -45,7 +45,7 @@ extension type _ListingsBookerData.fromMap(Map<String, Object?> _json) {
 
   List<String> get listingSelectionIds =>
       (_json['listingSelectionIds'] as List).cast<String>();
-  JsonMap get itineraryName => _json['itineraryName'] as JsonMap;
+  Object get itineraryName => _json['itineraryName']!;
   JsonMap? get modifyAction => _json['modifyAction'] as JsonMap?;
 }
 
@@ -102,7 +102,7 @@ final listingsBooker = CatalogItem(
           'component': {
             'ListingsBooker': {
               'listingSelectionIds': [listingSelectionId1, listingSelectionId2],
-              'itineraryName': {'literalString': 'Dart and Flutter deep dive'},
+              'itineraryName': 'Dart and Flutter deep dive',
             },
           },
         },
@@ -333,9 +333,9 @@ class _ListingsBookerState extends State<_ListingsBooker> {
                                   return;
                                 }
                                 final actionName = actionData['name'] as String;
-                                final List<Object?> contextDefinition =
-                                    (actionData['context'] as List<Object?>?) ??
-                                    <Object?>[];
+                                final JsonMap contextDefinition =
+                                    (actionData['context'] as JsonMap?) ??
+                                    <String, Object?>{};
                                 final JsonMap resolvedContext = resolveContext(
                                   widget.dataContext,
                                   contextDefinition,

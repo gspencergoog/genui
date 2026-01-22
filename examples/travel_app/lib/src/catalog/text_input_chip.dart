@@ -12,7 +12,7 @@ final _schema = S.object(
       'select a destination. This should only be used inside an InputGroup.',
   properties: {
     'label': S.string(description: 'The label for the text input chip.'),
-    'value': A2uiSchemas.stringReference(
+    'value': A2uiSchemas.dynamicString(
       description: 'The initial value for the text input.',
     ),
     'obscured': S.boolean(
@@ -25,7 +25,7 @@ final _schema = S.object(
 extension type _TextInputChipData.fromMap(Map<String, Object?> _json) {
   factory _TextInputChipData({
     required String label,
-    JsonMap? value,
+    Object? value,
     bool? obscured,
   }) => _TextInputChipData.fromMap({
     'label': label,
@@ -34,7 +34,7 @@ extension type _TextInputChipData.fromMap(Map<String, Object?> _json) {
   });
 
   String get label => _json['label'] as String;
-  JsonMap? get value => _json['value'] as JsonMap?;
+  Object? get value => _json['value'];
   bool get obscured => _json['obscured'] as bool? ?? false;
 }
 
@@ -48,9 +48,7 @@ final textInputChip = CatalogItem(
           "id": "root",
           "component": {
             "TextInputChip": {
-              "value": {
-                "literalString": "John Doe"
-              },
+              "value": "John Doe",
               "label": "Enter your name"
             }
           }
@@ -76,8 +74,8 @@ final textInputChip = CatalogItem(
       context.data as Map<String, Object?>,
     );
 
-    final JsonMap? valueRef = textInputChipData.value;
-    final path = valueRef?['path'] as String?;
+    final Object? valueRef = textInputChipData.value;
+    final String? path = valueRef is Map ? (valueRef['path'] as String?) : null;
     final ValueNotifier<String?> notifier = context.dataContext
         .subscribeToString(valueRef);
 

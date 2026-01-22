@@ -16,13 +16,13 @@ enum ItineraryEntryStatus { noBookingRequired, choiceRequired, chosen }
 final _schema = S.object(
   description: 'Widget to show an itinerary or a plan for travel.',
   properties: {
-    'title': A2uiSchemas.stringReference(
+    'title': A2uiSchemas.dynamicString(
       description: 'The title of the itinerary.',
     ),
-    'subheading': A2uiSchemas.stringReference(
+    'subheading': A2uiSchemas.dynamicString(
       description: 'The subheading of the itinerary.',
     ),
-    'imageChildId': A2uiSchemas.componentReference(
+    'imageChildId': A2uiSchemas.dynamicString(
       description:
           'The ID of the Image widget to display. The Image fit '
           "should typically be 'cover'. Be sure to create an Image widget "
@@ -32,18 +32,18 @@ final _schema = S.object(
       description: 'A list of days in the itinerary.',
       items: S.object(
         properties: {
-          'title': A2uiSchemas.stringReference(
+          'title': A2uiSchemas.dynamicString(
             description: 'The title for the day, e.g., "Day 1".',
           ),
-          'subtitle': A2uiSchemas.stringReference(
+          'subtitle': A2uiSchemas.dynamicString(
             description: 'The subtitle for the day, e.g., "Arrival in Tokyo".',
           ),
-          'description': A2uiSchemas.stringReference(
+          'description': A2uiSchemas.dynamicString(
             description:
                 'A short description of the day\'s plan. '
                 'This supports markdown.',
           ),
-          'imageChildId': A2uiSchemas.componentReference(
+          'imageChildId': A2uiSchemas.dynamicString(
             description:
                 'The ID of the Image widget to display. The Image fit should '
                 'typically be \'cover\'.',
@@ -54,23 +54,23 @@ final _schema = S.object(
                 'children for this day.',
             items: S.object(
               properties: {
-                'title': A2uiSchemas.stringReference(
+                'title': A2uiSchemas.dynamicString(
                   description: 'The title of the itinerary entry.',
                 ),
-                'subtitle': A2uiSchemas.stringReference(
+                'subtitle': A2uiSchemas.dynamicString(
                   description: 'The subtitle of the itinerary entry.',
                 ),
-                'bodyText': A2uiSchemas.stringReference(
+                'bodyText': A2uiSchemas.dynamicString(
                   description:
                       'The body text for the entry. This supports markdown.',
                 ),
-                'address': A2uiSchemas.stringReference(
+                'address': A2uiSchemas.dynamicString(
                   description: 'The address for the entry.',
                 ),
-                'time': A2uiSchemas.stringReference(
+                'time': A2uiSchemas.dynamicString(
                   description: 'The time for the entry (formatted string).',
                 ),
-                'totalCost': A2uiSchemas.stringReference(
+                'totalCost': A2uiSchemas.dynamicString(
                   description: 'The total cost for the entry.',
                 ),
                 'type': S.string(
@@ -118,27 +118,27 @@ final _schema = S.object(
 );
 
 extension type _ItineraryData.fromMap(Map<String, Object?> _json) {
-  JsonMap get title => _json['title'] as JsonMap;
-  JsonMap get subheading => _json['subheading'] as JsonMap;
+  Object? get title => _json['title'];
+  Object? get subheading => _json['subheading'];
   String get imageChildId => _json['imageChildId'] as String;
   List<JsonMap> get days => (_json['days'] as List).cast<JsonMap>();
 }
 
 extension type _ItineraryDayData.fromMap(Map<String, Object?> _json) {
-  JsonMap get title => _json['title'] as JsonMap;
-  JsonMap get subtitle => _json['subtitle'] as JsonMap;
-  JsonMap get description => _json['description'] as JsonMap;
+  Object? get title => _json['title'];
+  Object? get subtitle => _json['subtitle'];
+  Object? get description => _json['description'];
   String get imageChildId => _json['imageChildId'] as String;
   List<JsonMap> get entries => (_json['entries'] as List).cast<JsonMap>();
 }
 
 extension type _ItineraryEntryData.fromMap(Map<String, Object?> _json) {
-  JsonMap get title => _json['title'] as JsonMap;
-  JsonMap? get subtitle => _json['subtitle'] as JsonMap?;
-  JsonMap get bodyText => _json['bodyText'] as JsonMap;
-  JsonMap? get address => _json['address'] as JsonMap?;
-  JsonMap get time => _json['time'] as JsonMap;
-  JsonMap? get totalCost => _json['totalCost'] as JsonMap?;
+  Object? get title => _json['title'];
+  Object? get subtitle => _json['subtitle'];
+  Object? get bodyText => _json['bodyText'];
+  Object? get address => _json['address'];
+  Object? get time => _json['time'];
+  Object? get totalCost => _json['totalCost'];
   ItineraryEntryType get type =>
       ItineraryEntryType.values.byName(_json['type'] as String);
   ItineraryEntryStatus get status =>
@@ -157,36 +157,20 @@ final itinerary = CatalogItem(
           "id": "root",
           "component": {
             "Itinerary": {
-              "title": {
-                "literalString": "My Awesome Trip"
-              },
-              "subheading": {
-                "literalString": "A 3-day adventure"
-              },
+              "title": "My Awesome Trip",
+              "subheading": "A 3-day adventure",
               "imageChildId": "image1",
               "days": [
                 {
-                  "title": {
-                    "literalString": "Day 1"
-                  },
-                  "subtitle": {
-                    "literalString": "Arrival and Exploration"
-                  },
-                  "description": {
-                    "literalString": "Welcome to the city!"
-                  },
+                  "title": "Day 1",
+                  "subtitle": "Arrival and Exploration",
+                  "description": "Welcome to the city!",
                   "imageChildId": "image2",
                   "entries": [
                     {
-                      "title": {
-                        "literalString": "Check-in to Hotel"
-                      },
-                      "bodyText": {
-                        "literalString": "Check-in to your hotel and relax."
-                      },
-                      "time": {
-                        "literalString": "3:00 PM"
-                      },
+                      "title": "Check-in to Hotel",
+                      "bodyText": "Check-in to your hotel and relax.",
+                      "time": "3:00 PM",
                       "type": "accommodation",
                       "status": "noBookingRequired"
                     }
@@ -200,9 +184,7 @@ final itinerary = CatalogItem(
           "id": "image1",
           "component": {
             "Image": {
-              "url": {
-                "literalString": "assets/travel_images/canyonlands_national_park_utah.jpg"
-              }
+              "url": "assets/travel_images/canyonlands_national_park_utah.jpg"
             }
           }
         },
@@ -210,9 +192,7 @@ final itinerary = CatalogItem(
           "id": "image2",
           "component": {
             "Image": {
-              "url": {
-                "literalString": "assets/travel_images/brooklyn_bridge_new_york.jpg"
-              }
+              "url": "assets/travel_images/brooklyn_bridge_new_york.jpg"
             }
           }
         }
@@ -550,9 +530,9 @@ class _ItineraryEntry extends StatelessWidget {
                               return;
                             }
                             final actionName = actionData['name'] as String;
-                            final List<Object?> contextDefinition =
-                                (actionData['context'] as List<Object?>?) ??
-                                <Object>[];
+                            final JsonMap contextDefinition =
+                                (actionData['context'] as JsonMap?) ??
+                                <String, Object?>{};
                             final JsonMap resolvedContext = resolveContext(
                               dataContext,
                               contextDefinition,

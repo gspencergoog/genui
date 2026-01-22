@@ -16,11 +16,11 @@ final _schema = S.object(
           'card. The Image fit should typically be "cover". Be sure to create '
           'an Image widget with a matching ID.',
     ),
-    'title': A2uiSchemas.stringReference(description: 'The title of the card.'),
-    'subtitle': A2uiSchemas.stringReference(
+    'title': A2uiSchemas.dynamicString(description: 'The title of the card.'),
+    'subtitle': A2uiSchemas.dynamicString(
       description: 'The subtitle of the card.',
     ),
-    'body': A2uiSchemas.stringReference(
+    'body': A2uiSchemas.dynamicString(
       description: 'The body text of the card. This supports markdown.',
     ),
   },
@@ -30,9 +30,9 @@ final _schema = S.object(
 extension type _InformationCardData.fromMap(Map<String, Object?> _json) {
   factory _InformationCardData({
     String? imageChildId,
-    required JsonMap title,
-    JsonMap? subtitle,
-    required JsonMap body,
+    required Object title,
+    Object? subtitle,
+    required Object body,
   }) => _InformationCardData.fromMap({
     if (imageChildId != null) 'imageChildId': imageChildId,
     'title': title,
@@ -41,9 +41,9 @@ extension type _InformationCardData.fromMap(Map<String, Object?> _json) {
   });
 
   String? get imageChildId => _json['imageChildId'] as String?;
-  JsonMap get title => _json['title'] as JsonMap;
-  JsonMap? get subtitle => _json['subtitle'] as JsonMap?;
-  JsonMap get body => _json['body'] as JsonMap;
+  Object get title => _json['title']!;
+  Object? get subtitle => _json['subtitle'];
+  Object get body => _json['body']!;
 }
 
 final informationCard = CatalogItem(
@@ -56,15 +56,9 @@ final informationCard = CatalogItem(
           "id": "root",
           "component": {
             "InformationCard": {
-              "title": {
-                "literalString": "Beautiful Scenery"
-              },
-              "subtitle": {
-                "literalString": "A stunning view"
-              },
-              "body": {
-                "literalString": "This is a beautiful place to visit in the summer."
-              },
+              "title": "Beautiful Scenery",
+              "subtitle": "A stunning view",
+              "body": "This is a beautiful place to visit in the summer.",
               "imageChildId": "image1"
             }
           }
@@ -73,9 +67,7 @@ final informationCard = CatalogItem(
           "id": "image1",
           "component": {
             "Image": {
-              "url": {
-                "literalString": "assets/travel_images/canyonlands_national_park_utah.jpg"
-              }
+              "url": "assets/travel_images/canyonlands_national_park_utah.jpg"
             }
           }
         }

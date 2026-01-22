@@ -8,7 +8,7 @@ import 'package:json_schema_builder/json_schema_builder.dart';
 
 final _schema = S.object(
   properties: {
-    'submitLabel': A2uiSchemas.stringReference(
+    'submitLabel': A2uiSchemas.dynamicString(
       description: 'The label for the submit button.',
     ),
     'children': S.list(
@@ -30,7 +30,7 @@ final _schema = S.object(
 
 extension type _InputGroupData.fromMap(Map<String, Object?> _json) {
   factory _InputGroupData({
-    required JsonMap submitLabel,
+    required Object submitLabel,
     required List<String> children,
     required JsonMap action,
   }) => _InputGroupData.fromMap({
@@ -39,7 +39,7 @@ extension type _InputGroupData.fromMap(Map<String, Object?> _json) {
     'action': action,
   });
 
-  JsonMap get submitLabel => _json['submitLabel'] as JsonMap;
+  Object get submitLabel => _json['submitLabel']!;
   List<String> get children => (_json['children'] as List).cast<String>();
   JsonMap get action => _json['action'] as JsonMap;
 }
@@ -60,9 +60,7 @@ final inputGroup = CatalogItem(
           "id": "root",
           "component": {
             "InputGroup": {
-              "submitLabel": {
-                "literalString": "Submit"
-              },
+              "submitLabel": "Submit",
               "children": [
                 "check_in",
                 "check_out",
@@ -79,9 +77,7 @@ final inputGroup = CatalogItem(
           "id": "check_in",
           "component": {
             "DateInputChip": {
-              "value": {
-                "literalString": "2026-07-22"
-              },
+              "value": "2026-07-22",
               "label": "Check-in date"
             }
           }
@@ -98,9 +94,7 @@ final inputGroup = CatalogItem(
           "id": "text_input1",
           "component": {
             "TextInputChip": {
-              "value": {
-                "literalString": "John Doe"
-              },
+              "value": "John Doe",
               "label": "Enter your name"
             }
           }
@@ -129,8 +123,8 @@ final inputGroup = CatalogItem(
     final List<String> children = inputGroupData.children;
     final JsonMap actionData = inputGroupData.action;
     final name = actionData['name'] as String;
-    final List<Object?> contextDefinition =
-        (actionData['context'] as List<Object?>?) ?? <Object?>[];
+    final JsonMap contextDefinition =
+        (actionData['context'] as JsonMap?) ?? <String, Object?>{};
 
     return Card(
       color: Theme.of(itemContext.buildContext).colorScheme.primaryContainer,

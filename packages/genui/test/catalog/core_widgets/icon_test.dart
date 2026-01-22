@@ -19,10 +19,7 @@ void main() {
     final components = [
       const Component(
         id: 'root',
-        componentProperties: {
-          'type': 'Icon',
-          'name': {'literalString': 'add'},
-        },
+        componentProperties: {'type': 'Icon', 'name': 'add'},
       ),
     ];
     manager.handleMessage(

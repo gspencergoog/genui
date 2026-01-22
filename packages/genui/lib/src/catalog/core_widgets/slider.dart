@@ -13,7 +13,7 @@ import '../../primitives/simple_items.dart';
 
 final _schema = S.object(
   properties: {
-    'value': A2uiSchemas.numberReference(),
+    'value': A2uiSchemas.dynamicNumber(),
     'minValue': S.number(),
     'maxValue': S.number(),
   },
@@ -22,7 +22,7 @@ final _schema = S.object(
 
 extension type _SliderData.fromMap(JsonMap _json) {
   factory _SliderData({
-    required JsonMap value,
+    required Object? value,
     double? minValue,
     double? maxValue,
   }) => _SliderData.fromMap({
@@ -31,7 +31,7 @@ extension type _SliderData.fromMap(JsonMap _json) {
     'maxValue': maxValue,
   });
 
-  JsonMap get value => _json['value'] as JsonMap;
+  Object? get value => _json['value'];
   double get minValue => (_json['minValue'] as num?)?.toDouble() ?? 0.0;
   double get maxValue => (_json['maxValue'] as num?)?.toDouble() ?? 1.0;
 }
@@ -53,7 +53,7 @@ final slider = CatalogItem(
   widgetBuilder: (CatalogItemContext itemContext) {
     final sliderData = _SliderData.fromMap(itemContext.data as JsonMap);
     final ValueNotifier<num?> valueNotifier = itemContext.dataContext
-        .subscribeToValue<num>(sliderData.value, 'literalNumber');
+        .subscribeToDynamicValue<num>(sliderData.value);
 
     return ValueListenableBuilder<num?>(
       valueListenable: valueNotifier,
@@ -71,9 +71,15 @@ final slider = CatalogItem(
                   divisions: (sliderData.maxValue - sliderData.minValue)
                       .toInt(),
                   onChanged: (newValue) {
-                    final path = sliderData.value['path'] as String?;
-                    if (path != null) {
-                      itemContext.dataContext.update(DataPath(path), newValue);
+                    final Object? valRef = sliderData.value;
+                    if (valRef is Map && valRef.containsKey('path')) {
+                      final path = valRef['path'] as String?;
+                      if (path != null) {
+                        itemContext.dataContext.update(
+                          DataPath(path),
+                          newValue,
+                        );
+                      }
                     }
                   },
                 ),
@@ -98,8 +104,7 @@ final slider = CatalogItem(
               "minValue": 0,
               "maxValue": 10,
               "value": {
-                "path": "/myValue",
-                "literalNumber": 5
+                "path": "/myValue"
               }
             }
           }

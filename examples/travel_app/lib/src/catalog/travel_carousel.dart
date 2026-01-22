@@ -14,21 +14,21 @@ import '../tools/booking/model.dart';
 
 final _schema = S.object(
   properties: {
-    'title': A2uiSchemas.stringReference(
+    'title': A2uiSchemas.dynamicString(
       description: 'An optional title to display above the carousel.',
     ),
     'items': S.list(
       description: 'A list of items to display in the carousel.',
       items: S.object(
         properties: {
-          'description': A2uiSchemas.stringReference(
+          'description': A2uiSchemas.dynamicString(
             description:
                 'The short description of the carousel item. '
                 'It may include the price and location if applicable. '
                 'It should be very concise. '
                 'Example: "The Dart Inn in Sunnyvale, CA for \$150"',
           ),
-          'imageChildId': A2uiSchemas.componentReference(
+          'imageChildId': S.string(
             description:
                 'The ID of the Image widget to display as the carousel item '
                 'image. Be sure to create Image widgets with matching IDs.',
@@ -103,14 +103,14 @@ final travelCarousel = CatalogItem(
 
 extension type _TravelCarouselData.fromMap(Map<String, Object?> _json) {
   factory _TravelCarouselData({
-    JsonMap? title,
+    Object? title,
     required List<Map<String, Object?>> items,
   }) => _TravelCarouselData.fromMap({
     if (title != null) 'title': title,
     'items': items,
   });
 
-  JsonMap? get title => _json['title'] as JsonMap?;
+  Object? get title => _json['title'];
   Iterable<_TravelCarouselItemSchemaData> get items => (_json['items'] as List)
       .cast<Map<String, Object?>>()
       .map<_TravelCarouselItemSchemaData>(
@@ -122,7 +122,7 @@ extension type _TravelCarouselItemSchemaData.fromMap(
   Map<String, Object?> _json
 ) {
   factory _TravelCarouselItemSchemaData({
-    required JsonMap description,
+    required Object description,
     required String imageChildId,
     String? listingSelectionId,
     required JsonMap action,
@@ -133,7 +133,7 @@ extension type _TravelCarouselItemSchemaData.fromMap(
     'action': action,
   });
 
-  JsonMap get description => _json['description'] as JsonMap? ?? {};
+  Object get description => _json['description']!;
   String get imageChildId => _json['imageChildId'] as String? ?? '';
   String? get listingSelectionId => _json['listingSelectionId'] as String?;
   JsonMap get action => _json['action'] as JsonMap? ?? {};
@@ -236,8 +236,8 @@ class _TravelCarouselItem extends StatelessWidget {
       child: InkWell(
         onTap: () {
           final name = data.action['name'] as String;
-          final List<Object?> contextDefinition =
-              (data.action['context'] as List<Object?>?) ?? <Object?>[];
+          final JsonMap contextDefinition =
+              (data.action['context'] as JsonMap?) ?? <String, Object?>{};
           final JsonMap resolvedContext = resolveContext(
             dataContext,
             contextDefinition,
@@ -306,13 +306,13 @@ String _hotelExample() {
         'TravelCarousel': {
           'items': [
             {
-              'description': {'literalString': hotel1.description},
+              'description': hotel1.description,
               'imageChildId': 'image_1',
               'listingSelectionId': '12345',
               'action': {'name': 'selectHotel'},
             },
             {
-              'description': {'literalString': hotel2.description},
+              'description': hotel2.description,
               'imageChildId': 'image_2',
               'listingSelectionId': '12346',
               'action': {'name': 'selectHotel'},
@@ -324,19 +324,13 @@ String _hotelExample() {
     {
       'id': 'image_1',
       'component': {
-        'Image': {
-          'fit': 'cover',
-          'url': {'literalString': hotel1.images[0]},
-        },
+        'Image': {'fit': 'cover', 'url': hotel1.images[0]},
       },
     },
     {
       'id': 'image_2',
       'component': {
-        'Image': {
-          'fit': 'cover',
-          'url': {'literalString': hotel2.images[0]},
-        },
+        'Image': {'fit': 'cover', 'url': hotel2.images[0]},
       },
     },
   ]);
@@ -348,9 +342,7 @@ String _inspirationExample() => '''
       "id": "root",
       "component": {
         "Column": {
-          "children": {
-            "explicitList": ["inspiration_title", "inspiration_carousel"]
-          }
+          "children": ["inspiration_title", "inspiration_carousel"]
         }
       }
     },
@@ -358,9 +350,7 @@ String _inspirationExample() => '''
       "id": "inspiration_title",
       "component": {
         "Text": {
-          "text": {
-            "literalString": "Let's plan your dream trip to Greece! What kind of experience are you looking for?"
-          }
+           "text": "Let's plan your dream trip to Greece! What kind of experience are you looking for?"
         }
       }
     },
@@ -370,9 +360,7 @@ String _inspirationExample() => '''
         "TravelCarousel": {
           "items": [
             {
-              "description": {
-                "literalString": "Relaxing Beach Holiday"
-              },
+              "description": "Relaxing Beach Holiday",
               "imageChildId": "santorini_beach_image",
               "listingSelectionId": "12345",
               "action": {
@@ -381,9 +369,7 @@ String _inspirationExample() => '''
             },
             {
               "imageChildId": "akrotiri_fresco_image",
-              "description": {
-                "literalString": "Cultural Exploration"
-              },
+              "description": "Cultural Exploration",
               "listingSelectionId": "12346",
               "action": {
                 "name": "selectExperience"
@@ -391,18 +377,14 @@ String _inspirationExample() => '''
             },
             {
               "imageChildId": "santorini_caldera_image",
-              "description": {
-                "literalString": "Adventure & Outdoors"
-              },
+              "description": "Adventure & Outdoors",
               "listingSelectionId": "12347",
               "action": {
                 "name": "selectExperience"
               }
             },
             {
-              "description": {
-                "literalString": "Foodie Tour"
-              },
+              "description": "Foodie Tour",
               "imageChildId": "greece_food_image",
               "action": {
                 "name": "selectExperience"
@@ -417,9 +399,7 @@ String _inspirationExample() => '''
       "component": {
         "Image": {
           "fit": "cover",
-          "url": {
-            "literalString": "assets/travel_images/santorini_panorama.jpg"
-          }
+           "url": "assets/travel_images/santorini_panorama.jpg"
         }
       }
     },
@@ -428,9 +408,7 @@ String _inspirationExample() => '''
       "component": {
         "Image": {
           "fit": "cover",
-          "url": {
-            "literalString": "assets/travel_images/akrotiri_spring_fresco_santorini.jpg"
-          }
+           "url": "assets/travel_images/akrotiri_spring_fresco_santorini.jpg"
         }
       }
     },
@@ -438,9 +416,7 @@ String _inspirationExample() => '''
       "id": "santorini_caldera_image",
       "component": {
         "Image": {
-          "url": {
-            "literalString": "assets/travel_images/santorini_from_space.jpg"
-          },
+           "url": "assets/travel_images/santorini_from_space.jpg",
           "fit": "cover"
         }
       }
@@ -450,9 +426,7 @@ String _inspirationExample() => '''
       "component": {
         "Image": {
           "fit": "cover",
-          "url": {
-            "literalString": "assets/travel_images/saffron_gatherers_fresco_santorini.jpg"
-          }
+           "url": "assets/travel_images/saffron_gatherers_fresco_santorini.jpg"
         }
       }
     }

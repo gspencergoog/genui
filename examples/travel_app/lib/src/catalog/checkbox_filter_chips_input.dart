@@ -31,7 +31,7 @@ final _schema = S.object(
       description: 'An icon to display on the left of the chip.',
       enumValues: TravelIcon.values.map((e) => e.name).toList(),
     ),
-    'selectedOptions': A2uiSchemas.stringArrayReference(
+    'selectedOptions': A2uiSchemas.dynamicStringList(
       description:
           'The names of the options that should be selected '
           'initially. These options must exist in the "options" list.',
@@ -47,7 +47,7 @@ extension type _CheckboxFilterChipsInputData.fromMap(
     required String chipLabel,
     required List<String> options,
     String? iconName,
-    required JsonMap selectedOptions,
+    required Object selectedOptions,
   }) => _CheckboxFilterChipsInputData.fromMap({
     'chipLabel': chipLabel,
     'options': options,
@@ -58,7 +58,7 @@ extension type _CheckboxFilterChipsInputData.fromMap(
   String get chipLabel => _json['chipLabel'] as String;
   List<String> get options => (_json['options'] as List).cast<String>();
   String? get iconName => _json['iconName'] as String?;
-  JsonMap get selectedOptions => _json['selectedOptions'] as JsonMap;
+  Object get selectedOptions => _json['selectedOptions']!;
 }
 
 /// An interactive chip that allows the user to select multiple options from a
@@ -89,12 +89,10 @@ final checkboxFilterChipsInput = CatalogItem(
                 "Pool",
                 "Parking"
               ],
-              "selectedOptions": {
-                "literalArray": [
-                  "Wifi",
-                  "Gym"
-                ]
-              }
+              "selectedOptions": [
+                "Wifi",
+                "Gym"
+              ]
             }
           }
         }
@@ -121,7 +119,7 @@ final checkboxFilterChipsInput = CatalogItem(
       }
     }
 
-    final JsonMap selectedOptionsRef = checkboxFilterChipsData.selectedOptions;
+    final Object selectedOptionsRef = checkboxFilterChipsData.selectedOptions;
     final ValueNotifier<List<Object?>?> notifier = context.dataContext
         .subscribeToObjectArray(selectedOptionsRef);
 
@@ -137,7 +135,9 @@ final checkboxFilterChipsInput = CatalogItem(
           icon: icon,
           selectedOptions: selectedOptionsSet,
           onChanged: (newSelectedOptions) {
-            final path = selectedOptionsRef['path'] as String?;
+            final String? path = selectedOptionsRef is Map
+                ? (selectedOptionsRef['path'] as String?)
+                : null;
             if (path != null) {
               context.dataContext.update(
                 DataPath(path),

@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../model/data_model.dart';
-import '../primitives/logging.dart';
 import '../primitives/simple_items.dart';
 
 /// A builder widget that simplifies handling of nullable `ValueListenable`s.
@@ -43,63 +42,133 @@ class OptionalValueBuilder<T> extends StatelessWidget {
 
 /// Extension methods for [DataContext] to simplify data binding.
 extension DataContextExtensions on DataContext {
-  /// Subscribes to a value, which can be a literal or a data-bound path.
-  ValueNotifier<T?> subscribeToValue<T>(JsonMap? ref, String literalKey) {
-    genUiLogger.info(
-      'DataContext.subscribeToValue: ref=$ref, literalKey=$literalKey',
-    );
-    if (ref == null) return ValueNotifier<T?>(null);
-    final path = ref['path'] as String?;
-    final Object? literal = ref[literalKey];
+  /// Subscribes to a dynamic value (v0.9).
+  ///
+  /// [definition] can be:
+  /// - A literal value (String, num, bool).
+  /// - A map with 'path' key.
+  /// - A map with 'call' key (function).
+  ///
+  /// If the definition points to a path, this returns a notifier that updates
+  /// when the data at that path changes.
+  /// Otherwise, it returns a static notifier with the resolved value.
+  ValueNotifier<T?> subscribeToDynamicValue<T>(Object? definition) {
+    if (definition == null) return ValueNotifier<T?>(null);
 
-    if (path != null) {
-      final dataPath = DataPath(path);
-      if (literal != null) {
-        update(dataPath, literal);
+    // 1. Handle explicit path objects
+    if (definition is Map && definition.containsKey('path')) {
+      final path = definition['path'] as String?;
+      if (path != null) {
+        return subscribe<T>(DataPath(path));
       }
-      return subscribe<T>(dataPath);
     }
 
-    return ValueNotifier<T?>(literal as T?);
+    // 2. Handle function calls or complex objects (resolved once for now)
+    // TODO: Implement reactive function calls if they depend on data.
+    if (definition is Map && definition.containsKey('call')) {
+      // Ideally we'd analyze dependencies. For now, static resolution.
+      if (T == String) {
+        return ValueNotifier<T?>(resolveDynamicString(definition) as T?);
+      }
+      if (T == num) {
+        return ValueNotifier<T?>(resolveDynamicNumber(definition) as T?);
+      }
+      if (T == bool) {
+        return ValueNotifier<T?>(resolveDynamicBool(definition) as T?);
+      }
+    }
+
+    // 3. Handle literals (including interpolated strings resolved ONCE)
+    if (definition is String && T == String) {
+      return ValueNotifier<T?>(resolveDynamicString(definition) as T?);
+    }
+
+    // Fallback for simple literals
+    if (definition is T) {
+      return ValueNotifier<T?>(definition as T);
+    }
+
+    // Try resolving generally if T allows
+    if (T == String) {
+      return ValueNotifier<T?>(resolveDynamicString(definition) as T?);
+    }
+    if (T == num) {
+      return ValueNotifier<T?>(resolveDynamicNumber(definition) as T?);
+    }
+    if (T == bool) {
+      return ValueNotifier<T?>(resolveDynamicBool(definition) as T?);
+    }
+
+    return ValueNotifier<T?>(definition as T?);
   }
 
-  /// Subscribes to a string value, which can be a literal or a data-bound path.
-  ValueNotifier<String?> subscribeToString(JsonMap? ref) {
-    return subscribeToValue<String>(ref, 'literalString');
+  /// Subscribes to a dynamic string.
+  ValueNotifier<String?> subscribeToString(Object? definition) {
+    return subscribeToDynamicValue<String>(definition);
   }
 
-  /// Subscribes to a boolean value, which can be a literal or a data-bound
-  /// path.
-  ValueNotifier<bool?> subscribeToBool(JsonMap? ref) {
-    return subscribeToValue<bool>(ref, 'literalBoolean');
+  /// Subscribes to a dynamic boolean.
+  ValueNotifier<bool?> subscribeToBool(Object? definition) {
+    return subscribeToDynamicValue<bool>(definition);
   }
 
-  /// Subscribes to a list of objects, which can be a literal or a data-bound
-  /// path.
-  ValueNotifier<List<Object?>?> subscribeToObjectArray(JsonMap? ref) {
-    return subscribeToValue<List<Object?>>(ref, 'literalArray');
+  /// Subscribes to a dynamic object/list.
+  ValueNotifier<List<Object?>?> subscribeToObjectArray(Object? definition) {
+    return subscribeToDynamicValue<List<Object?>>(definition);
   }
 }
 
 /// Resolves a context map definition against a [DataContext].
-///
-JsonMap resolveContext(
-  DataContext dataContext,
-  List<Object?> contextDefinitions,
-) {
+JsonMap resolveContext(DataContext dataContext, JsonMap contextDefinitions) {
   final resolved = <String, Object?>{};
-  for (final contextEntry in contextDefinitions) {
-    final entry = contextEntry as JsonMap;
-    final key = entry['key']! as String;
-    final value = entry['value'] as JsonMap;
-    if (value.containsKey('path')) {
-      resolved[key] = dataContext.getValue(DataPath(value['path'] as String));
-    } else if (value.containsKey('literalString')) {
-      resolved[key] = value['literalString'];
-    } else if (value.containsKey('literalNumber')) {
-      resolved[key] = value['literalNumber'];
-    } else if (value.containsKey('literalBoolean')) {
-      resolved[key] = value['literalBoolean'];
+  for (final MapEntry<String, Object?> entry in contextDefinitions.entries) {
+    final String key = entry.key;
+    final Object? valueDef = entry.value;
+    // We assume the value definition is a DynamicValue (string/num/bool/etc.)
+    // We try to resolve it as best we can.
+    if (valueDef is String) {
+      resolved[key] = dataContext.resolveDynamicString(valueDef);
+    } else if (valueDef is num) {
+      resolved[key] = dataContext.resolveDynamicNumber(valueDef);
+    } else if (valueDef is bool) {
+      resolved[key] = dataContext.resolveDynamicBool(valueDef);
+    } else if (valueDef is Map) {
+      // Could be complex object or path reference.
+      // Easiest is to try resolving as string if it looks like one, or just
+      // pass through?
+      // Check if it has 'path' or 'call', if so, assume it might be any type.
+      // v0.9 "context" values are "any".
+      // Let's try to resolve dynamic string first, if not null use it?
+      // Or strict check?
+      if (valueDef.containsKey('path') || valueDef.containsKey('call')) {
+        // Resolve generically? DataContext doesn't expose generic resolve yet
+        // easily without type.
+        // Let's assume String for now as that's most common in context, or just
+        // raw value if resolve fails?
+        // Actually `resolveDynamicString` handles path/call.
+        final String? resolvedVal = dataContext.resolveDynamicString(valueDef);
+        if (resolvedVal != null) {
+          resolved[key] = resolvedVal;
+        } else {
+          // Maybe it was a number?
+          final num? resolvedNum = dataContext.resolveDynamicNumber(valueDef);
+          if (resolvedNum != null) {
+            resolved[key] = resolvedNum;
+          } else {
+            // Boolean?
+            final bool? resolvedBool = dataContext.resolveDynamicBool(valueDef);
+            if (resolvedBool != null) {
+              resolved[key] = resolvedBool;
+            } else {
+              resolved[key] = valueDef; // Fallback
+            }
+          }
+        }
+      } else {
+        resolved[key] = valueDef;
+      }
+    } else {
+      resolved[key] = valueDef;
     }
   }
   return resolved;

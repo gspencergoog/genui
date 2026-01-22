@@ -10,7 +10,7 @@ import '../../model/catalog_item.dart';
 
 final _schema = S.object(
   properties: {
-    'url': A2uiSchemas.stringReference(
+    'url': A2uiSchemas.dynamicString(
       description: 'The URL of the audio to play.',
     ),
   },
@@ -41,9 +41,7 @@ final audioPlayer = CatalogItem(
           "id": "root",
           "component": {
             "AudioPlayer": {
-              "url": {
-                "literalString": "https://example.com/audio.mp3"
-              }
+              "url": "https://example.com/audio.mp3"
             }
           }
         }

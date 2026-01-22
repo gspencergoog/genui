@@ -54,10 +54,7 @@ void main() {
         ),
         const Component(
           id: 'text',
-          componentProperties: {
-            'type': 'Text',
-            'text': {'literalString': 'Click Me'},
-          },
+          componentProperties: {'type': 'Text', 'text': 'Click Me'},
         ),
       ];
 
@@ -96,24 +93,16 @@ void main() {
           id: 'root',
           componentProperties: {
             'type': 'Column',
-            'children': {
-              'explicitList': ['text1', 'text2'],
-            },
+            'children': ['text1', 'text2'],
           },
         ),
         const Component(
           id: 'text1',
-          componentProperties: {
-            'type': 'Text',
-            'text': {'literalString': 'First'},
-          },
+          componentProperties: {'type': 'Text', 'text': 'First'},
         ),
         const Component(
           id: 'text2',
-          componentProperties: {
-            'type': 'Text',
-            'text': {'literalString': 'Second'},
-          },
+          componentProperties: {'type': 'Text', 'text': 'Second'},
         ),
       ];
 
@@ -131,8 +120,8 @@ void main() {
           id: 'root',
           componentProperties: {
             'type': 'TextField',
-            'text': {'path': '/myValue'},
-            'label': {'literalString': 'My Label'},
+            'value': {'path': '/myValue'},
+            'label': 'My Label',
             'onSubmittedAction': {'name': 'submit'},
           },
         ),

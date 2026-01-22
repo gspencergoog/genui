@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
-import '../../core/widget_utilities.dart';
 import '../../model/a2ui_schemas.dart';
 import '../../model/catalog_item.dart';
 import '../../model/data_model.dart';
@@ -13,7 +12,7 @@ import '../../primitives/simple_items.dart';
 
 final _schema = S.object(
   properties: {
-    'value': A2uiSchemas.stringReference(
+    'value': A2uiSchemas.dynamicString(
       description: 'The selected date and/or time.',
     ),
     'enableDate': S.boolean(),
@@ -32,7 +31,7 @@ final _schema = S.object(
 
 extension type _DateTimeInputData.fromMap(JsonMap _json) {
   factory _DateTimeInputData({
-    required JsonMap value,
+    required Object? value,
     bool? enableDate,
     bool? enableTime,
     String? firstDate,
@@ -45,7 +44,7 @@ extension type _DateTimeInputData.fromMap(JsonMap _json) {
     'lastDate': lastDate,
   });
 
-  JsonMap get value => _json['value'] as JsonMap;
+  Object? get value => _json['value'];
   bool get enableDate => (_json['enableDate'] as bool?) ?? true;
   bool get enableTime => (_json['enableTime'] as bool?) ?? true;
   DateTime get firstDate =>
@@ -158,7 +157,11 @@ Future<void> _handleTap({
   required _DateTimeInputData data,
   required String? value,
 }) async {
-  final path = data.value['path'] as String?;
+  final Object? valRef = data.value;
+  String? path;
+  if (valRef is Map && valRef.containsKey('path')) {
+    path = valRef['path'] as String?;
+  }
   if (path == null) {
     return;
   }

@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
-import '../../core/widget_utilities.dart';
 import '../../model/a2ui_schemas.dart';
 import '../../model/catalog_item.dart';
 import '../../model/data_model.dart';
@@ -13,13 +12,10 @@ import '../../primitives/simple_items.dart';
 
 final _schema = S.object(
   properties: {
-    'selections': A2uiSchemas.stringArrayReference(),
+    'selections': A2uiSchemas.dynamicStringList(),
     'options': S.list(
       items: S.object(
-        properties: {
-          'label': A2uiSchemas.stringReference(),
-          'value': S.string(),
-        },
+        properties: {'label': A2uiSchemas.dynamicString(), 'value': S.string()},
         required: ['label', 'value'],
       ),
     ),
@@ -30,7 +26,7 @@ final _schema = S.object(
 
 extension type _MultipleChoiceData.fromMap(JsonMap _json) {
   factory _MultipleChoiceData({
-    required JsonMap selections,
+    required Object? selections,
     required List<JsonMap> options,
     int? maxAllowedSelections,
   }) => _MultipleChoiceData.fromMap({
@@ -39,7 +35,7 @@ extension type _MultipleChoiceData.fromMap(JsonMap _json) {
     'maxAllowedSelections': maxAllowedSelections,
   });
 
-  JsonMap get selections => _json['selections'] as JsonMap;
+  Object? get selections => _json['selections'];
   List<JsonMap> get options => (_json['options'] as List).cast<JsonMap>();
   int? get maxAllowedSelections =>
       (_json['maxAllowedSelections'] as num?)?.toInt();
@@ -75,7 +71,7 @@ final multipleChoice = CatalogItem(
         return Column(
           children: multipleChoiceData.options.map((option) {
             final ValueNotifier<String?> labelNotifier = itemContext.dataContext
-                .subscribeToString(option['label'] as JsonMap);
+                .subscribeToString(option['label']);
             final value = option['value'] as String;
             return ValueListenableBuilder<String?>(
               valueListenable: labelNotifier,
@@ -96,8 +92,13 @@ final multipleChoice = CatalogItem(
                     groupValue: groupValue is String ? groupValue : null,
                     // ignore: deprecated_member_use
                     onChanged: (newValue) {
-                      final path =
-                          multipleChoiceData.selections['path'] as String?;
+                      final Object? selectionsRef =
+                          multipleChoiceData.selections;
+                      String? path;
+                      if (selectionsRef is Map &&
+                          selectionsRef.containsKey('path')) {
+                        path = selectionsRef['path'] as String?;
+                      }
                       if (path == null || newValue == null) {
                         return;
                       }
@@ -113,8 +114,13 @@ final multipleChoice = CatalogItem(
                     controlAffinity: ListTileControlAffinity.leading,
                     value: selections?.contains(value) ?? false,
                     onChanged: (newValue) {
-                      final path =
-                          multipleChoiceData.selections['path'] as String?;
+                      final Object? selectionsRef =
+                          multipleChoiceData.selections;
+                      String? path;
+                      if (selectionsRef is Map &&
+                          selectionsRef.containsKey('path')) {
+                        path = selectionsRef['path'] as String?;
+                      }
                       if (path == null) {
                         return;
                       }
@@ -151,14 +157,12 @@ final multipleChoice = CatalogItem(
           "id": "root",
           "component": {
             "Column": {
-              "children": {
-                "explicitList": [
+              "children": [
                   "heading1",
                   "singleChoice",
                   "heading2",
-                  "multiChoice"
+                  "multipleChoice"
                 ]
-              }
             }
           }
         },
@@ -166,9 +170,7 @@ final multipleChoice = CatalogItem(
           "id": "heading1",
           "component": {
             "Text": {
-              "text": {
-                "literalString": "Single Selection (maxAllowedSelections: 1)"
-              }
+              "text": "Single Selection (maxAllowedSelections: 1)"
             }
           }
         },
@@ -182,15 +184,11 @@ final multipleChoice = CatalogItem(
               "maxAllowedSelections": 1,
               "options": [
                 {
-                  "label": {
-                    "literalString": "Option A"
-                  },
+                    "label": "Option A",
                   "value": "A"
                 },
                 {
-                  "label": {
-                    "literalString": "Option B"
-                  },
+                    "label": "Option B",
                   "value": "B"
                 }
               ]
@@ -201,9 +199,7 @@ final multipleChoice = CatalogItem(
           "id": "heading2",
           "component": {
             "Text": {
-              "text": {
-                "literalString": "Multiple Selections (unlimited)"
-              }
+              "text": "Multiple Selections (unlimited)"
             }
           }
         },
@@ -216,21 +212,15 @@ final multipleChoice = CatalogItem(
               },
               "options": [
                 {
-                  "label": {
-                    "literalString": "Option X"
-                  },
+                    "label": "Option X",
                   "value": "X"
                 },
                 {
-                  "label": {
-                    "literalString": "Option Y"
-                  },
+                    "label": "Option Y",
                   "value": "Y"
                 },
                 {
-                  "label": {
-                    "literalString": "Option Z"
-                  },
+                    "label": "Option Z",
                   "value": "Z"
                 }
               ]

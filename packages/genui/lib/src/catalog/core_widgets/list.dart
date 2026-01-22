@@ -13,7 +13,7 @@ import 'widget_helpers.dart';
 
 final _schema = S.object(
   properties: {
-    'children': A2uiSchemas.componentArrayReference(),
+    'children': A2uiSchemas.childList(),
     'direction': S.string(enumValues: ['vertical', 'horizontal']),
     'alignment': S.string(enumValues: ['start', 'center', 'end', 'stretch']),
   },
@@ -92,12 +92,10 @@ final list = CatalogItem(
           "id": "root",
           "component": {
             "List": {
-              "children": {
-                "explicitList": [
-                  "text1",
-                  "text2"
-                ]
-              }
+              "children": [
+                "text1",
+                "text2"
+              ]
             }
           }
         },
@@ -105,9 +103,7 @@ final list = CatalogItem(
           "id": "text1",
           "component": {
             "Text": {
-              "text": {
-                "literalString": "First"
-              }
+                "text": "First"
             }
           }
         },
@@ -115,9 +111,7 @@ final list = CatalogItem(
           "id": "text2",
           "component": {
             "Text": {
-              "text": {
-                "literalString": "Second"
-              }
+                "text": "Second"
             }
           }
         }

@@ -7,12 +7,12 @@ import 'package:json_schema_builder/json_schema_builder.dart';
 
 import '../../model/a2ui_schemas.dart';
 import '../../model/catalog_item.dart';
-import '../../model/data_model.dart';
+
 import '../../primitives/simple_items.dart';
 
 final _schema = S.object(
   properties: {
-    'name': A2uiSchemas.stringReference(
+    'name': A2uiSchemas.dynamicString(
       description:
           '''The name of the icon to display. This can be a literal string ('literalString') or a reference to a value in the data model ('path', e.g. '/icon/name').''',
       enumValues: AvailableIcons.allAvailable,
@@ -22,13 +22,10 @@ final _schema = S.object(
 );
 
 extension type _IconData.fromMap(JsonMap _json) {
-  factory _IconData({required JsonMap name}) =>
+  factory _IconData({required Object? name}) =>
       _IconData.fromMap({'name': name});
 
-  JsonMap get nameMap => _json['name'] as JsonMap;
-
-  String? get literalName => nameMap['literalString'] as String?;
-  String? get namePath => nameMap['path'] as String?;
+  Object? get name => _json['name'];
 }
 
 enum AvailableIcons {
@@ -108,21 +105,8 @@ final icon = CatalogItem(
   dataSchema: _schema,
   widgetBuilder: (itemContext) {
     final iconData = _IconData.fromMap(itemContext.data as JsonMap);
-    final String? literalName = iconData.literalName;
-    final String? namePath = iconData.namePath;
-
-    if (literalName != null) {
-      final IconData icon =
-          AvailableIcons.fromName(literalName)?.iconData ?? Icons.broken_image;
-      return Icon(icon);
-    }
-
-    if (namePath == null) {
-      return const Icon(Icons.broken_image);
-    }
-
     final ValueNotifier<String?> notifier = itemContext.dataContext
-        .subscribe<String>(DataPath(namePath));
+        .subscribeToString(iconData.name);
 
     return ValueListenableBuilder<String?>(
       valueListenable: notifier,
@@ -141,9 +125,7 @@ final icon = CatalogItem(
           "id": "root",
           "component": {
             "Icon": {
-              "name": {
-                "literalString": "add"
-              }
+                "name": "add"
             }
           }
         }

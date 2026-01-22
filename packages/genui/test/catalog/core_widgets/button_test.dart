@@ -32,10 +32,7 @@ void main() {
       ),
       const Component(
         id: 'button_text',
-        componentProperties: {
-          'type': 'Text',
-          'text': {'literalString': 'Click Me'},
-        },
+        componentProperties: {'type': 'Text', 'text': 'Click Me'},
       ),
     ];
     manager.handleMessage(

@@ -10,7 +10,7 @@ import '../../model/catalog_item.dart';
 
 final _schema = S.object(
   properties: {
-    'url': A2uiSchemas.stringReference(
+    'url': A2uiSchemas.dynamicString(
       description: 'The URL of the video to play.',
     ),
   },
@@ -41,9 +41,7 @@ final video = CatalogItem(
           "id": "root",
           "component": {
             "Video": {
-              "url": {
-                "literalString": "https://example.com/video.mp4"
-              }
+              "url": "https://example.com/video.mp4"
             }
           }
         }
