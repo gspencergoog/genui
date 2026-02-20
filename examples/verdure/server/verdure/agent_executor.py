@@ -88,11 +88,21 @@ class LandscapeAgentExecutor(AgentExecutor):
             )
             for i, part in enumerate(context.message.parts):
                 if isinstance(part.root, DataPart):
-                    if "action" in part.root.data:
+                    part_data = part.root.data
+                    if isinstance(part_data, dict) and "_A2UI_ARRAY_WRAPPER_" in part_data:
+                        part_data = part_data["_A2UI_ARRAY_WRAPPER_"]
+
+                    if isinstance(part_data, dict) and "action" in part_data:
                         logger.info(f"  Part {i}: Found a2ui UI ClientEvent payload.")
-                        ui_event_part = part.root.data["action"]
+                        ui_event_part = part_data["action"]
+                    elif isinstance(part_data, list):
+                        for item in part_data:
+                            if isinstance(item, dict) and "action" in item:
+                                logger.info(f"  Part {i}: Found a2ui UI ClientEvent payload in list.")
+                                ui_event_part = item["action"]
+                                break
                     else:
-                        logger.info(f"  Part {i}: DataPart (data: {part.root.data})")
+                        logger.info(f"  Part {i}: DataPart (data: {part_data})")
                 elif isinstance(part.root, TextPart):
                     logger.info(f"  Part {i}: TextPart (text: {part.root.text})")
                 elif isinstance(part.root, FilePart):

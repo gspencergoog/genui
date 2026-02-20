@@ -141,7 +141,9 @@ interface class SurfaceController implements SurfaceHost, A2uiMessageSink {
     _onSubmit.add(
       ChatMessage.user(
         '',
-        parts: [UiInteractionPart.create(jsonEncode(errorMsg))],
+        parts: [
+          UiInteractionPart.create(jsonEncode([errorMsg])),
+        ],
       ),
     );
   }
@@ -263,7 +265,9 @@ interface class SurfaceController implements SurfaceHost, A2uiMessageSink {
         '',
         parts: [
           UiInteractionPart.create(
-            jsonEncode({'version': 'v0.9', 'action': event.toMap()}),
+            jsonEncode([
+              {'version': 'v0.9', 'action': event.toMap()},
+            ]),
           ),
         ],
       ),

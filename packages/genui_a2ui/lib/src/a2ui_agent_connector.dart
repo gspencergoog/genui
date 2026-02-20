@@ -107,7 +107,15 @@ class A2uiAgentConnector {
           try {
             final Object? json = jsonDecode(uiPart.interaction);
             if (json is Map<String, Object?>) {
-              return Part.data(data: json);
+              return Part.data(
+                data: [json],
+                metadata: const {'mimeType': 'application/json+a2ui'},
+              );
+            } else if (json is List) {
+              return Part.data(
+                data: json,
+                metadata: const {'mimeType': 'application/json+a2ui'},
+              );
             }
             return Part.text(text: uiPart.interaction);
           } catch (e) {
@@ -289,7 +297,10 @@ class A2uiAgentConnector {
 
     _log.finest('Sending client event: $clientEvent');
 
-    final dataPart = Part.data(data: clientEvent);
+    final dataPart = Part.data(
+      data: [clientEvent],
+      metadata: const {'mimeType': 'application/json+a2ui'},
+    );
     final message = Message(
       role: Role.user,
       parts: [dataPart],
@@ -313,13 +324,33 @@ class A2uiAgentConnector {
     }
   }
 
-  void _processA2uiMessages(Map<String, Object?> data) {
+  void _processA2uiMessages(Object? data) {
+    if (data is List) {
+      for (final Object? item in data) {
+        if (item is Map<String, Object?>) {
+          _processA2uiMessageMap(item);
+        } else if (item is Map) {
+          _processA2uiMessageMap(item.cast<String, Object?>());
+        } else {
+          _log.warning('A2A data part list item was not a map: $item');
+        }
+      }
+    } else if (data is Map<String, Object?>) {
+      _processA2uiMessageMap(data);
+    } else if (data is Map) {
+      _processA2uiMessageMap(data.cast<String, Object?>());
+    } else {
+      _log.warning('A2A data part was not a list or map: $data');
+    }
+  }
+
+  void _processA2uiMessageMap(Map<String, Object?> data) {
     var prettyJson = '(Error sanitizing log data)';
     try {
       prettyJson = const JsonEncoder.withIndent(
         '  ',
       ).convert(sanitizeLogData(data));
-      _log.finest('Processing a2ui messages from data part:\n$prettyJson');
+      _log.finest('Processing a2ui message from data part:\n$prettyJson');
     } catch (e) {
       _log.warning('Error logging a2ui messages: $e');
     }

@@ -48,8 +48,8 @@ abstract class Part with _$Part {
     /// The type discriminator, always 'data'.
     @Default('data') String kind,
 
-    /// The structured data, represented as a map.
-    required Map<String, Object?> data,
+    /// The structured data, represented as a JSON-compatible object.
+    required Object? data,
 
     /// Optional metadata associated with this data part.
     Map<String, Object?>? metadata,
@@ -63,7 +63,7 @@ abstract class Part with _$Part {
 ///
 /// The file content can be provided either as a URI pointing to the file or
 /// directly as base64-encoded bytes.
-@Freezed(unionKey: 'type')
+@Freezed(unionKey: 'type', fromJson: true, toJson: true)
 abstract class FileType with _$FileType {
   /// Represents a file located at a specific URI.
   const factory FileType.uri({

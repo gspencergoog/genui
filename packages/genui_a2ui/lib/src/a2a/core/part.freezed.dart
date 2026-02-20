@@ -189,7 +189,7 @@ return data(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String kind,  String text,  Map<String, Object?>? metadata)?  text,TResult Function( String kind,  FileType file,  Map<String, Object?>? metadata)?  file,TResult Function( String kind,  Map<String, Object?> data,  Map<String, Object?>? metadata)?  data,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String kind,  String text,  Map<String, Object?>? metadata)?  text,TResult Function( String kind,  FileType file,  Map<String, Object?>? metadata)?  file,TResult Function( String kind,  Object? data,  Map<String, Object?>? metadata)?  data,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case TextPart() when text != null:
 return text(_that.kind,_that.text,_that.metadata);case FilePart() when file != null:
@@ -212,7 +212,7 @@ return data(_that.kind,_that.data,_that.metadata);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String kind,  String text,  Map<String, Object?>? metadata)  text,required TResult Function( String kind,  FileType file,  Map<String, Object?>? metadata)  file,required TResult Function( String kind,  Map<String, Object?> data,  Map<String, Object?>? metadata)  data,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String kind,  String text,  Map<String, Object?>? metadata)  text,required TResult Function( String kind,  FileType file,  Map<String, Object?>? metadata)  file,required TResult Function( String kind,  Object? data,  Map<String, Object?>? metadata)  data,}) {final _that = this;
 switch (_that) {
 case TextPart():
 return text(_that.kind,_that.text,_that.metadata);case FilePart():
@@ -234,7 +234,7 @@ return data(_that.kind,_that.data,_that.metadata);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String kind,  String text,  Map<String, Object?>? metadata)?  text,TResult? Function( String kind,  FileType file,  Map<String, Object?>? metadata)?  file,TResult? Function( String kind,  Map<String, Object?> data,  Map<String, Object?>? metadata)?  data,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String kind,  String text,  Map<String, Object?>? metadata)?  text,TResult? Function( String kind,  FileType file,  Map<String, Object?>? metadata)?  file,TResult? Function( String kind,  Object? data,  Map<String, Object?>? metadata)?  data,}) {final _that = this;
 switch (_that) {
 case TextPart() when text != null:
 return text(_that.kind,_that.text,_that.metadata);case FilePart() when file != null:
@@ -431,20 +431,13 @@ $FileTypeCopyWith<$Res> get file {
 @JsonSerializable()
 
 class DataPart implements Part {
-  const DataPart({this.kind = 'data', required final  Map<String, Object?> data, final  Map<String, Object?>? metadata}): _data = data,_metadata = metadata;
+  const DataPart({this.kind = 'data', required this.data, final  Map<String, Object?>? metadata}): _metadata = metadata;
   factory DataPart.fromJson(Map<String, dynamic> json) => _$DataPartFromJson(json);
 
 /// The type discriminator, always 'data'.
 @override@JsonKey() final  String kind;
-/// The structured data, represented as a map.
- final  Map<String, Object?> _data;
-/// The structured data, represented as a map.
- Map<String, Object?> get data {
-  if (_data is EqualUnmodifiableMapView) return _data;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_data);
-}
-
+/// The structured data, represented as a JSON-compatible object.
+ final  Object? data;
 /// Optional metadata associated with this data part.
  final  Map<String, Object?>? _metadata;
 /// Optional metadata associated with this data part.
@@ -470,12 +463,12 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DataPart&&(identical(other.kind, kind) || other.kind == kind)&&const DeepCollectionEquality().equals(other._data, _data)&&const DeepCollectionEquality().equals(other._metadata, _metadata));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DataPart&&(identical(other.kind, kind) || other.kind == kind)&&const DeepCollectionEquality().equals(other.data, data)&&const DeepCollectionEquality().equals(other._metadata, _metadata));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,kind,const DeepCollectionEquality().hash(_data),const DeepCollectionEquality().hash(_metadata));
+int get hashCode => Object.hash(runtimeType,kind,const DeepCollectionEquality().hash(data),const DeepCollectionEquality().hash(_metadata));
 
 @override
 String toString() {
@@ -490,7 +483,7 @@ abstract mixin class $DataPartCopyWith<$Res> implements $PartCopyWith<$Res> {
   factory $DataPartCopyWith(DataPart value, $Res Function(DataPart) _then) = _$DataPartCopyWithImpl;
 @override @useResult
 $Res call({
- String kind, Map<String, Object?> data, Map<String, Object?>? metadata
+ String kind, Object? data, Map<String, Object?>? metadata
 });
 
 
@@ -507,11 +500,10 @@ class _$DataPartCopyWithImpl<$Res>
 
 /// Create a copy of Part
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? kind = null,Object? data = null,Object? metadata = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? kind = null,Object? data = freezed,Object? metadata = freezed,}) {
   return _then(DataPart(
 kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
-as String,data: null == data ? _self._data : data // ignore: cast_nullable_to_non_nullable
-as Map<String, Object?>,metadata: freezed == metadata ? _self._metadata : metadata // ignore: cast_nullable_to_non_nullable
+as String,data: freezed == data ? _self.data : data ,metadata: freezed == metadata ? _self._metadata : metadata // ignore: cast_nullable_to_non_nullable
 as Map<String, Object?>?,
   ));
 }

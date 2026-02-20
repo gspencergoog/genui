@@ -34,7 +34,7 @@ Map<String, dynamic> _$FilePartToJson(FilePart instance) => <String, dynamic>{
 
 DataPart _$DataPartFromJson(Map<String, dynamic> json) => DataPart(
   kind: json['kind'] as String? ?? 'data',
-  data: json['data'] as Map<String, dynamic>,
+  data: json['data'],
   metadata: json['metadata'] as Map<String, dynamic>?,
 );
 

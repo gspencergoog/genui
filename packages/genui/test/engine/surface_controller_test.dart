@@ -188,16 +188,18 @@ void main() {
       expect(message.role, ChatMessageRole.user);
       expect(message.parts.uiInteractionParts, hasLength(1));
 
-      final String expectedJson = jsonEncode({
-        'version': 'v0.9',
-        'action': {
-          'surfaceId': 'testSurface',
-          'name': 'testAction',
-          'sourceComponentId': 'testWidget',
-          'timestamp': now.toIso8601String(),
-          'context': {'key': 'value'},
+      final String expectedJson = jsonEncode([
+        {
+          'version': 'v0.9',
+          'action': {
+            'surfaceId': 'testSurface',
+            'name': 'testAction',
+            'sourceComponentId': 'testWidget',
+            'timestamp': now.toIso8601String(),
+            'context': {'key': 'value'},
+          },
         },
-      });
+      ]);
       final UiInteractionPart part = message.parts.uiInteractionParts.first;
       // Depending on implementation, part.interaction might be the string or
       // data map. UiInteractionPart.create took jsonEncode string.
@@ -217,7 +219,9 @@ void main() {
         final ChatMessage message = await messageFuture;
         expect(message.role, ChatMessageRole.user);
         final UiInteractionPart part = message.parts.uiInteractionParts.first;
-        final errorJson = jsonDecode(part.interaction) as Map<String, dynamic>;
+        final errorJsonList = jsonDecode(part.interaction) as List<dynamic>;
+        expect(errorJsonList.length, 1);
+        final errorJson = errorJsonList.first as Map<String, dynamic>;
 
         expect(errorJson['version'], 'v0.9');
         final Object? errorObj = errorJson['error'];
@@ -324,7 +328,9 @@ void main() {
 
         final ChatMessage message = await future;
         final UiInteractionPart part = message.parts.uiInteractionParts.first;
-        final errorJson = jsonDecode(part.interaction) as Map<String, dynamic>;
+        final errorJsonList = jsonDecode(part.interaction) as List<dynamic>;
+        expect(errorJsonList.length, 1);
+        final errorJson = errorJsonList.first as Map<String, dynamic>;
 
         final errorObj = errorJson['error'] as Map<String, dynamic>;
         expect(errorObj['code'], 'VALIDATION_FAILED');

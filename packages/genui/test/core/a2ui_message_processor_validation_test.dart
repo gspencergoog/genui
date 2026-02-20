@@ -19,7 +19,8 @@ void main() {
           predicate((ChatMessage message) {
             final UiInteractionPart part =
                 message.parts.uiInteractionParts.first;
-            final json = jsonDecode(part.interaction) as Map<String, dynamic>;
+            final jsonArray = jsonDecode(part.interaction) as List<dynamic>;
+            final json = jsonArray.first as Map<String, dynamic>;
             final error = json['error'] as Map<String, dynamic>;
             return error['code'] == 'VALIDATION_FAILED' &&
                 error['path'] == 'surfaceId';

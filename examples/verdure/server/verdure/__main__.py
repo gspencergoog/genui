@@ -25,7 +25,64 @@ from agent import LandscapeAgent
 from agent_executor import LandscapeAgentExecutor
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 from starlette.staticfiles import StaticFiles
+
+class DataPartListMiddleware:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http" or scope["method"] != "POST":
+            return await self.app(scope, receive, send)
+
+        body = b""
+        more_body = True
+
+        # We need to buffer the incoming request to modify it
+        messages = []
+        while more_body:
+            message = await receive()
+            messages.append(message)
+            body += message.get("body", b"")
+            more_body = message.get("more_body", False)
+
+        if body:
+            try:
+                import json
+                data = json.loads(body.decode("utf-8"))
+                changed = False
+
+                def fix_data(node):
+                    nonlocal changed
+                    if isinstance(node, dict):
+                        if node.get("kind") == "data" and isinstance(node.get("data"), list):
+                            node["data"] = {"_A2UI_ARRAY_WRAPPER_": node["data"]}
+                            changed = True
+                        for k, v in node.items():
+                            fix_data(v)
+                    elif isinstance(node, list):
+                        for item in node:
+                            fix_data(item)
+
+                fix_data(data)
+                if changed:
+                    new_body = json.dumps(data).encode("utf-8")
+                    messages = [{"type": "http.request", "body": new_body, "more_body": False}]
+            except Exception as e:
+                logger.error(f"Error in DataPartListMiddleware: {e}")
+
+        # Replay the messages to the downstream app
+        async def receive_generator():
+            for m in messages:
+                yield m
+
+        receiver = receive_generator()
+        async def new_receive():
+            return await anext(receiver)
+
+        return await self.app(scope, new_receive, send)
 
 load_dotenv()
 
@@ -102,6 +159,7 @@ def main(host: str, port: int, base_url: str | None):
             allow_methods=["*"],
             allow_headers=["*"],
         )
+        app.add_middleware(DataPartListMiddleware)
 
         import pathlib
         current_dir = pathlib.Path(__file__).parent.resolve()

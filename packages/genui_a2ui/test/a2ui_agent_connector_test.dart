@@ -173,7 +173,9 @@ void main() {
       expect(sentMessage.referenceTaskIds, ['task1']);
       expect(sentMessage.contextId, 'context1');
       final dataPart = sentMessage.parts.first as a2a.DataPart;
-      final Map<String, Object?> eventData = dataPart.data;
+      final dataList = dataPart.data as List<dynamic>;
+      expect(dataList.length, 1);
+      final eventData = dataList.first as Map<String, Object?>;
       expect(eventData['version'], 'v0.9');
       final action = eventData['action'] as Map<String, Object?>;
       expect(action['name'], 'testAction');
