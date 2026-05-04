@@ -1,5 +1,9 @@
 # `genui_firebase_ai` Changelog
 
+## 0.7.1
+
+- Add discontinuation notice.
+
 ## 0.7.0
 
 - Updated version to match `genui` package version.

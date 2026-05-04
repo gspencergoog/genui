@@ -1,3 +1,5 @@
+> **IMPORTANT:** This package has been deactivated because it is deprecated and no longer needed with current versions of the GenUI package. Please refer to the current [GenUI documentation](https://github.com/flutter/genui) for information on how to use Firebase AI with GenUI, including the [Migration Guide](https://github.com/flutter/genui/blob/main/docs/usage/migration/migration_0.7.0_to_0.8.0.md).
+
 # genui_dartantic
 
 This package provides the integration between `genui` and the Dartantic AI

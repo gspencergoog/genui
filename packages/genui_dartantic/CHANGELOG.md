@@ -1,5 +1,9 @@
 # `genui_dartantic` Changelog
 
+## 0.7.1
+
+- Add discontinuation notice.
+
 ## 0.7.0
 
 - **Internal**: Enable stricter dynamic-related analysis (#652).
