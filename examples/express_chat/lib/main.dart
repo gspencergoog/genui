@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:genkit/genkit.dart' as genkit;
 import 'package:genui_express_platform_interface/genui_express_platform_interface.dart';
@@ -120,6 +121,60 @@ class _ChatScreenState extends State<ChatScreen> {
     _textController.text = _defaultUserMessage;
   }
 
+  String get _appBarTitle {
+    if (kIsWeb) {
+      return 'Chat (Chrome Built-in AI)';
+    }
+    final bool isApplePlatform =
+        defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.iOS;
+    if (isApplePlatform) {
+      return 'Chat (Apple Intelligence)';
+    }
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return 'Chat (Android AI Edge)';
+    }
+    return 'Chat (Local LLM)';
+  }
+
+  String get _platformStatusMessage {
+    if (_isPlatformAvailable == null) return '';
+    if (kIsWeb) {
+      return _isPlatformAvailable!
+          ? 'Chrome Built-in AI (Prompt API / Gemini Nano) '
+              'is active and available!'
+          : 'Chrome Built-in AI (Prompt API / Gemini Nano) '
+              'is not active. Ensure your Chrome flags '
+              'and components are configured.';
+    }
+
+    final bool isApplePlatform =
+        defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.iOS;
+
+    if (isApplePlatform) {
+      return _isPlatformAvailable!
+          ? 'Apple Intelligence Foundation Models '
+              'are active and available!'
+          : 'Local Apple Intelligence models '
+              'are not active. Check System Settings '
+              '& downloads.';
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return _isPlatformAvailable!
+          ? 'Android AI Edge (Gemini Nano) '
+              'is active and available!'
+          : 'Android AI Edge (Gemini Nano) '
+              'is not active. Check device/SDK configuration.';
+    }
+
+    return _isPlatformAvailable!
+        ? 'Local LLM completion server is active and available!'
+        : 'Local LLM completion server is not active. '
+            'Check local completion settings.';
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -127,7 +182,7 @@ class _ChatScreenState extends State<ChatScreen> {
       builder: (context, _) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Chat (Controller + Gemma 4)'),
+            title: Text(_appBarTitle),
             actions: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -173,12 +228,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         const SizedBox(width: 12.0),
                         Expanded(
                           child: Text(
-                            _isPlatformAvailable!
-                                ? 'Apple Intelligence Foundation Models '
-                                      'are active and available!'
-                                : 'Local Apple Intelligence models '
-                                      'are not active. Check System Settings '
-                                      '& downloads.',
+                            _platformStatusMessage,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: _isPlatformAvailable!
